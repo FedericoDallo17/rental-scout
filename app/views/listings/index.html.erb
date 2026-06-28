@@ -1,10 +1,66 @@
-<h1>Scraped Apartments</h1>
+<div class="feed-layout">
+  <aside class="search-sidebar">
+    <p class="search-sidebar__eyebrow">Rental Scout Lite</p>
+    <h2>Saved searches</h2>
+    <p class="search-sidebar__copy">Jump back into the neighborhoods you check most often.</p>
 
-<% @listings.each do |listing| %>
-  <article>
-    <h2><%= listing.title %></h2>
-    <p>Source: <%= listing.listing_source.name %></p>
-    <p><%= listing.location_text %></p>
-    <p><%= listing.canonical_url %></p>
-  </article>
-<% end %>
+    <nav class="search-sidebar__nav" aria-label="Saved searches">
+      <% @searches.each do |search| %>
+        <%= link_to listings_path(search_id: search.id), class: ["search-link", ("search-link--active" if search == @active_search)] do %>
+          <span class="search-link__name"><%= search.name %></span>
+          <span class="search-link__meta"><%= search.location_query %></span>
+        <% end %>
+      <% end %>
+    </nav>
+  </aside>
+
+  <main class="feed-main">
+    <header class="feed-header">
+      <div>
+        <p class="feed-header__eyebrow">Marketplace feed</p>
+        <h1>Scraped Apartments</h1>
+        <% if @active_search %>
+          <p class="feed-header__context">Browsing <strong><%= @active_search.name %></strong></p>
+          <p class="feed-header__refresh-cue">Updated automatically as new matches land.</p>
+        <% end %>
+      </div>
+
+      <p class="feed-header__count"><%= pluralize(@listings.size, "listing") %></p>
+    </header>
+
+    <% if @active_search %>
+      <section class="listings-grid" aria-label="Listings">
+        <% @listings.each do |listing| %>
+          <article class="listing-card">
+            <div class="listing-card__image">Photo</div>
+            <div class="listing-card__body">
+              <p class="listing-card__price"><%= number_to_currency(listing.price_cents.to_i / 100.0, unit: "$", precision: 0) if listing.price_cents %></p>
+              <h2><%= listing.title %></h2>
+              <p class="listing-card__location"><%= listing.location_text %></p>
+              <dl class="listing-card__facts">
+                <div>
+                  <dt>Bedrooms</dt>
+                  <dd><%= listing.bedrooms || "-" %></dd>
+                </div>
+                <div>
+                  <dt>m²</dt>
+                  <dd><%= listing.square_meters || "-" %></dd>
+                </div>
+                <div>
+                  <dt>Source</dt>
+                  <dd><%= listing.listing_source.name %></dd>
+                </div>
+              </dl>
+              <p class="listing-card__url"><%= listing.canonical_url %></p>
+            </div>
+          </article>
+        <% end %>
+      </section>
+    <% else %>
+      <section class="feed-empty-state" aria-label="Saved search setup">
+        <h2>Save your first search to start a feed tailored to you.</h2>
+        <p>Pick a neighborhood and budget once, then come back to a browsing view built around that search.</p>
+      </section>
+    <% end %>
+  </main>
+</div>

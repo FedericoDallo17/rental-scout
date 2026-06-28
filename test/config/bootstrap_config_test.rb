@@ -97,4 +97,12 @@ class BootstrapConfigTest < ActiveSupport::TestCase
 
     assert_match(/unless\s+Rails\.env\.production\?/, seeds)
   end
+
+  test "seeds correct demo saved search locations on repeated runs" do
+    SearchPreference.create!(name: "Pocitos", location_query: "Wrong")
+
+    load Rails.root.join("db/seeds.rb")
+
+    assert_equal "Pocitos", SearchPreference.find_by!(name: "Pocitos").location_query
+  end
 end
