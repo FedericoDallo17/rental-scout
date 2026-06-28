@@ -1,0 +1,10 @@
+<h1>Scraped Apartments</h1>
+
+<% @listings.each do |listing| %>
+  <article>
+    <h2><%= listing.title %></h2>
+    <p>Source: <%= listing.listing_source.name %></p>
+    <p><%= listing.location_text %></p>
+    <p><%= listing.canonical_url %></p>
+  </article>
+<% end %>
