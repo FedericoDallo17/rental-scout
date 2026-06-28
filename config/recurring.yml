@@ -1,0 +1,17 @@
+development:
+  run_scrapers:
+    class: RunScrapersJob
+    queue: default
+    schedule: every hour
+
+test:
+  run_scrapers:
+    class: RunScrapersJob
+    queue: default
+    schedule: every hour
+
+production:
+  run_scrapers:
+    class: RunScrapersJob
+    queue: default
+    schedule: every hour
