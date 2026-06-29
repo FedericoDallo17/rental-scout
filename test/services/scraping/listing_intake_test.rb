@@ -160,4 +160,24 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
     assert_equal 55, listing.square_meters
     assert_equal attributes, listing.raw_payload.symbolize_keys.slice(*attributes.keys)
   end
+
+  test "persists description from normalized adapter attributes" do
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    intake = Scraping::ListingIntake.new
+    attributes = {
+      title: "Apto Pocitos",
+      canonical_url: "https://example.test/a",
+      external_id: "1",
+      location_text: "Pocitos",
+      price_cents: 3_200_000,
+      bedrooms: 2,
+      square_meters: 55,
+      description: "Luminoso apartamento con terraza y gastos comunes bajos"
+    }
+
+    listing = intake.call(listing_source: source, attributes: attributes)
+
+    assert_equal "Luminoso apartamento con terraza y gastos comunes bajos", listing.description
+    assert_equal attributes, listing.raw_payload.symbolize_keys.slice(*attributes.keys)
+  end
 end

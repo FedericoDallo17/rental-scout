@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_28_110000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_29_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -37,6 +37,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_28_110000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "square_meters"
+    t.text "description"
     t.index ["listing_source_id", "canonical_url"], name: "index_listings_on_listing_source_id_and_canonical_url", unique: true
     t.index ["listing_source_id", "external_id"], name: "index_listings_on_listing_source_id_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
     t.index ["listing_source_id"], name: "index_listings_on_listing_source_id"
