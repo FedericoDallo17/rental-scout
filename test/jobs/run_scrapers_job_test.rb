@@ -27,10 +27,11 @@ class RunScrapersJobTest < ActiveJob::TestCase
 
     run = RunScrapersJob.perform_now
 
-    assert_equal 1, run.listings.count
-    assert_equal 1, run.seen_listings.count
+    assert_equal 10, run.listings.count
+    assert_equal 10, run.seen_listings.count
     assert_equal run.id, Listing.last.scraping_run_id
     assert_equal run.id, SeenListing.last.scraping_run_id
+    assert_predicate Listing.last.description, :present?
   end
 
   test "creates per-source outcome records for an orchestrated run" do
@@ -44,8 +45,8 @@ class RunScrapersJobTest < ActiveJob::TestCase
     source_run = run.scraping_source_runs.first
     assert_equal "mock_source", source_run.listing_source.adapter_key
     assert_equal "succeeded", source_run.status
-    assert_equal 1, source_run.listings_seen_count
-    assert_equal 1, source_run.listings_created_count
+    assert_equal 10, source_run.listings_seen_count
+    assert_equal 10, source_run.listings_created_count
   end
 
   test "does not run inactive sources" do
@@ -84,8 +85,8 @@ class RunScrapersJobTest < ActiveJob::TestCase
     assert_equal 2, run.scraping_source_runs.count
     assert_equal ["failed", "succeeded"], run.scraping_source_runs.order(:id).pluck(:status)
     assert_equal "uninitialized constant Sources::MissingSourceAdapter", run.scraping_source_runs.order(:id).first.error_message
-    assert_equal 1, run.listings_seen_count
-    assert_equal 1, run.listings_created_count
+    assert_equal 10, run.listings_seen_count
+    assert_equal 10, run.listings_created_count
   end
 
   test "keeps a succeeded run status when all source runs succeed" do
