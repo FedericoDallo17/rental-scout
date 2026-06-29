@@ -9,5 +9,14 @@ Proposed / Accepted / Superseded
 ## Decision
 <what was decided>
 
+## Alternatives Considered
+- <alternative>
+
+## Provisional Areas
+- <revisitable area>
+
 ## Consequences
 - <impact>
+
+## Related Tickets
+- <ticket>

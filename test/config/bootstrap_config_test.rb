@@ -25,17 +25,10 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     end
   end
 
-  test "ai status reflects the bootstrap-complete state" do
+  test "status matches the scraper domain ADR baseline" do
     status = Rails.root.join(".ai/STATUS.md").read
 
-    assert_includes status, "Bootstrap complete"
-    assert_includes status, "Awaiting first ticket execution"
-    assert_includes status, "- Mock scraper pipeline added"
-    assert_includes status, "Execute Ticket 007, 008, or 009 through the manual AI loop"
-
-    refute_includes status, "Create v2 repo docs and .ai workflow skeleton"
-    refute_includes status, "Creating docs and workflow skeleton"
-    refute_includes status, "Approve the docs skeleton and first discovery ticket"
+    assert_equal expected_status_baseline, status
   end
 
   test "development uses solid queue for active job" do
@@ -104,5 +97,45 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     load Rails.root.join("db/seeds.rb")
 
     assert_equal "Pocitos", SearchPreference.find_by!(name: "Pocitos").location_query
+  end
+
+  private
+
+  def expected_status_baseline
+    <<~MARKDOWN
+      # Status
+
+      ## Current Phase
+      Bootstrap complete
+
+      ## Current Task
+      Awaiting next scraper implementation ticket
+
+      ## Status
+      Done
+
+      ## Done
+      - Docs and tickets created
+      - Rails app initialized
+      - Core models added
+      - Mock scraper pipeline added
+      - Initial portal added
+      - Scraper domain ADR defined
+
+      ## Doing
+      - None
+
+      ## Blockers
+      - None
+
+      ## Risks
+      - Real source adapters and notification delivery still require careful escalation
+
+      ## Human Input Needed
+      - Choose next implementation ticket
+
+      ## Next Step
+      Execute Ticket 008 or 009 using the scraper domain ADR as the baseline
+    MARKDOWN
   end
 end
