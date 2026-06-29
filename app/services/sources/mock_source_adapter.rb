@@ -104,7 +104,9 @@ module Sources
     ].freeze
 
     def fetch_listings
-      LISTINGS.map(&:dup)
+      LISTINGS.map do |listing|
+        listing.transform_values { |value| value.is_a?(String) ? value.dup : value }
+      end
     end
   end
 end
