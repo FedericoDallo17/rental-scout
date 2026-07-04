@@ -2,15 +2,29 @@ require "test_helper"
 
 class ListingTest < ActiveSupport::TestCase
   test "for_search_feed scopes listings by location query" do
+    user = User.create!(
+      first_name: "Listing",
+      last_name: "Owner",
+      email: "listing-owner@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     matching = Listing.create!(listing_source: source, title: "Apto Pocitos", canonical_url: "https://example.test/1", location_text: "Pocitos")
     Listing.create!(listing_source: source, title: "Centro Loft", canonical_url: "https://example.test/2", location_text: "Centro")
-    search = SearchPreference.create!(name: "Pocitos search", location_query: "Pocitos")
+    search = user.search_preferences.create!(name: "Pocitos search", location_query: "Pocitos")
 
     assert_equal [matching], Listing.for_search_feed(search).to_a
   end
 
   test "for_search_feed applies partial location, price, and bedroom filters" do
+    user = User.create!(
+      first_name: "Listing",
+      last_name: "Owner",
+      email: "listing-owner-2@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     matching = Listing.create!(
       listing_source: source,
@@ -52,7 +66,7 @@ class ListingTest < ActiveSupport::TestCase
       price_cents: 2600000,
       bedrooms: 2
     )
-    search = SearchPreference.create!(
+    search = user.search_preferences.create!(
       name: "Pocitos two bedrooms",
       location_query: "pocitos",
       min_price_cents: 1800000,

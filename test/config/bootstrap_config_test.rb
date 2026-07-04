@@ -92,11 +92,18 @@ class BootstrapConfigTest < ActiveSupport::TestCase
   end
 
   test "seeds correct demo saved search locations on repeated runs" do
-    SearchPreference.create!(name: "Pocitos", location_query: "Wrong")
+    demo_user = User.create!(
+      first_name: "Demo",
+      last_name: "User",
+      email: "demo@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
+    demo_user.search_preferences.create!(name: "Pocitos", location_query: "Wrong")
 
     load Rails.root.join("db/seeds.rb")
 
-    assert_equal "Pocitos", SearchPreference.find_by!(name: "Pocitos").location_query
+    assert_equal "Pocitos", demo_user.search_preferences.find_by!(name: "Pocitos").location_query
   end
 
   private

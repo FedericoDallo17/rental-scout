@@ -11,7 +11,32 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="<%= user_signed_in? ? "app-body" : "auth-body" %>">
+    <% if user_signed_in? %>
+      <header>
+        <nav>
+          <span><%= current_user.email %></span>
+          <%= button_to "Sign out", destroy_user_session_path, method: :delete %>
+        </nav>
+      </header>
+
+      <% flash.each do |key, message| %>
+        <p class="flash app-flash flash--<%= key %>"><%= message %></p>
+      <% end %>
+
+      <%= yield %>
+    <% else %>
+      <main class="auth-shell">
+        <section class="auth-card">
+          <div class="auth-brand">Rental Scout Lite</div>
+
+          <% flash.each do |key, message| %>
+            <p class="flash auth-flash flash--<%= key %>"><%= message %></p>
+          <% end %>
+
+          <%= yield %>
+        </section>
+      </main>
+    <% end %>
   </body>
 </html>

@@ -1,15 +1,14 @@
 require "test_helper"
 
 class ListingsFlowTest < ActionDispatch::IntegrationTest
-  test "root redirects into listings portal" do
+  test "guest root redirects to sign in" do
     get root_url
 
-    assert_response :success
-    assert_includes response.body, "Scraped Apartments"
+    assert_redirected_to new_user_session_path
   end
 
   test "layout includes the application stylesheet asset" do
-    get root_url
+    get new_user_session_url
 
     assert_response :success
     assert_match %r{<link[^>]+href="[^"]*application[^"]*\.css[^"]*"}, response.body
@@ -20,13 +19,31 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match ":root", response.body
+    assert_includes response.body, ".auth-body"
+    assert_includes response.body, ".auth-card"
+    assert_includes response.body, ".auth-submit"
+    assert_includes response.body, ".auth-flash"
+    assert_includes response.body, ".app-flash"
+    refute_includes response.body, ".flash {"
   end
 
-  test "root defaults to the first saved search feed" do
-    SearchPreference.create!(name: "Centro", location_query: "Centro")
-    SearchPreference.create!(name: "Pocitos", location_query: "Pocitos")
+  test "signed in user root goes to the listings portal" do
+    sign_in create_user!(email: "portal@example.com")
 
     get root_url
+
+    assert_response :success
+    assert_includes response.body, "Scraped Apartments"
+  end
+
+  test "signed in root defaults to the first saved search feed" do
+    user = create_user!(email: "root-feed@example.com")
+    sign_in user
+
+    user.search_preferences.create!(name: "Centro", location_query: "Centro")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+
+    get listings_url
 
     assert_response :success
     assert_includes response.body, "Centro"
@@ -35,7 +52,9 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__name", text: "Centro"
   end
 
-  test "root shows an empty saved-search state when none exist" do
+  test "signed in listings route shows an empty saved-search state when none exist" do
+    sign_in create_user!(email: "empty-root@example.com")
+
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     create_listing!(
       listing_source: source,
@@ -44,7 +63,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
       location_text: "Centro"
     )
 
-    get root_url
+    get listings_url
 
     assert_response :success
     assert_select ".feed-header__context", count: 0
@@ -54,9 +73,12 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_no_match "Centro Loft", response.body
   end
 
-  test "homepage shows saved searches sidebar and listings grid" do
-    pocitos = SearchPreference.create!(name: "Pocitos", location_query: "Pocitos")
-    SearchPreference.create!(name: "Centro", location_query: "Centro")
+  test "signed in listings route shows saved searches sidebar and listings grid" do
+    user = create_user!(email: "homepage@example.com")
+    sign_in user
+
+    pocitos = user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    user.search_preferences.create!(name: "Centro", location_query: "Centro")
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
 
     create_listing!(
@@ -86,7 +108,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
       square_meters: 41
     )
 
-    get root_url(search_id: pocitos.id)
+    get listings_url(search_id: pocitos.id)
 
     assert_response :success
     assert_select "aside.search-sidebar h2", text: "Saved searches"
@@ -109,11 +131,35 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_no_match "Centro Loft", response.body
   end
 
-  test "listings index is available" do
+  test "signed in listings route scopes saved searches to the current user" do
+    current_user = create_user!(email: "scoped-flow@example.com")
+    other_user = create_user!(email: "hidden-flow@example.com")
+    sign_in current_user
+
+    current_user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    other_user.search_preferences.create!(name: "Centro", location_query: "Centro")
+
     get listings_url
 
     assert_response :success
-    assert_includes response.body, "Scraped Apartments"
+    assert_select "nav.search-sidebar__nav a.search-link .search-link__name", text: "Pocitos"
+    assert_select "nav.search-sidebar__nav a.search-link .search-link__name", text: "Centro", count: 0
+  end
+
+  test "signed in listings route stays on the listings layout" do
+    sign_in create_user!(email: "listings-layout@example.com")
+
+    get listings_url
+
+    assert_response :success
+    assert_includes response.body, "feed-layout"
+    refute_includes response.body, "auth-shell"
+  end
+
+  test "guest is redirected away from listings route" do
+    get listings_url
+
+    assert_redirected_to new_user_session_path
   end
 
   private
@@ -124,5 +170,15 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
       raw_payload: {},
       external_id: SecureRandom.uuid
     }.merge(attributes))
+  end
+
+  def create_user!(email:)
+    User.create!(
+      first_name: "Flow",
+      last_name: "User",
+      email: email,
+      password: "password123",
+      password_confirmation: "password123"
+    )
   end
 end

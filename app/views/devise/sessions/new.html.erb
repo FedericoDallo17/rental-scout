@@ -1,0 +1,27 @@
+<div class="auth-header">
+  <h1 class="auth-title">Sign in</h1>
+  <p class="auth-copy">Sign in to continue to your private rental scouting workspace.</p>
+</div>
+
+<%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "auth-form" }) do |f| %>
+  <div class="auth-field">
+    <%= f.label :email %>
+    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  </div>
+
+  <div class="auth-field">
+    <%= f.label :password %>
+    <%= f.password_field :password, autocomplete: "current-password" %>
+  </div>
+
+  <% if devise_mapping.rememberable? %>
+    <label class="auth-checkbox-row">
+      <%= f.check_box :remember_me %>
+      <span>Remember me</span>
+    </label>
+  <% end %>
+
+  <%= f.button "Sign in", class: "auth-submit" %>
+<% end %>
+
+<%= render "devise/shared/links" %>
