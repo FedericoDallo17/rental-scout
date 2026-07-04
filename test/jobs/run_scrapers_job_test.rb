@@ -75,6 +75,54 @@ class RunScrapersJobTest < ActiveJob::TestCase
     assert_equal "https://example.test/listings/stub-1", Listing.last.canonical_url
   end
 
+  test "ingests listings from the info casas api adapter through the orchestrator" do
+    ListingSource.create!(name: "InfoCasas API", adapter_key: "info_casas_api")
+
+    adapter = Object.new
+    adapter.define_singleton_method(:fetch_listings) do
+      [{
+        external_id: "123",
+        title: "Apartamento en Pocitos",
+        canonical_url: "https://www.infocasas.com.uy/alquiler/apartamento/pocitos/123",
+        description: "Apartamento luminoso con terraza",
+        price_cents: 3_500_000,
+        currency: "UYU",
+        location_text: "Pocitos, Montevideo",
+        bedrooms: 2,
+        square_meters: 58
+      }]
+    end
+
+    original_new = Sources::InfoCasasApiAdapter.method(:new)
+
+    begin
+      Sources::InfoCasasApiAdapter.define_singleton_method(:new) { adapter }
+      run = RunScrapersJob.perform_now
+
+      assert_equal "succeeded", run.status
+      assert_equal 1, run.listings_seen_count
+      assert_equal 1, run.listings_created_count
+      assert_equal 1, run.scraping_source_runs.count
+
+      source_run = run.scraping_source_runs.first
+      assert_equal "info_casas_api", source_run.listing_source.adapter_key
+      assert_equal "succeeded", source_run.status
+      assert_equal 1, source_run.listings_seen_count
+      assert_equal 1, source_run.listings_created_count
+
+      listing = Listing.last
+      assert_equal "123", listing.external_id
+      assert_equal "https://www.infocasas.com.uy/alquiler/apartamento/pocitos/123", listing.canonical_url
+      assert_equal "Pocitos, Montevideo", listing.location_text
+      assert_equal 3_500_000, listing.price_cents
+      assert_equal "UYU", listing.currency
+      assert_equal "Apartamento luminoso con terraza", listing.description
+      assert_equal listing.id, SeenListing.last.listing_id
+    ensure
+      Sources::InfoCasasApiAdapter.define_singleton_method(:new, original_new)
+    end
+  end
+
   test "records a failed source run for unsupported adapters and continues" do
     ListingSource.create!(name: "Broken Source", adapter_key: "missing_source")
     ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
