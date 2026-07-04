@@ -189,7 +189,7 @@ Finished in 0.048980s, 61.2495 runs/s, 81.6660 assertions/s.
 ```
 
 Git commit(s) created:
-- Pending
+- 7bc0c204f43f2aed5584de43be6c58dc9efc5be8 `fix: tighten info casas adapter error handling`
 
 Notes:
 - Removed `.to_a` from `payload.dig(...).map` so malformed InfoCasas API payloads raise naturally instead of silently becoming an empty listing array.
