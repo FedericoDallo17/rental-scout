@@ -6,6 +6,8 @@ module Sources
   class InfoCasasApiAdapter
     ENDPOINT_URI = URI("https://graph.infocasas.com.uy/graphql")
     FRONTEND_BASE_URL = "https://www.infocasas.com.uy"
+    OPEN_TIMEOUT_SECONDS = 5
+    READ_TIMEOUT_SECONDS = 15
 
     def fetch_listings
       payload.dig(0, :data, :searchFast, :data).map do |entry|
@@ -30,7 +32,13 @@ module Sources
     end
 
     def http_response
-      Net::HTTP.start(ENDPOINT_URI.host, ENDPOINT_URI.port, use_ssl: true) do |http|
+      Net::HTTP.start(
+        ENDPOINT_URI.host,
+        ENDPOINT_URI.port,
+        use_ssl: true,
+        open_timeout: OPEN_TIMEOUT_SECONDS,
+        read_timeout: READ_TIMEOUT_SECONDS
+      ) do |http|
         request = Net::HTTP::Post.new(ENDPOINT_URI)
         request["accept"] = "*/*"
         request["content-type"] = "application/json"

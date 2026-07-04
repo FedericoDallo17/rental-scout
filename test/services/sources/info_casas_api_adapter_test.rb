@@ -45,6 +45,35 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings uses explicit HTTP timeouts for the InfoCasas request" do
+    adapter = Sources::InfoCasasApiAdapter.new
+    test_case = self
+    response = Struct.new(:body).new(sample_response_body)
+    request_received = false
+    http = Object.new
+    http.define_singleton_method(:request) do |request|
+      request_received = true
+      test_case.assert_instance_of Net::HTTP::Post, request
+      response
+    end
+
+    net_http_start = lambda do |host, port, **options, &block|
+      test_case.assert_equal "graph.infocasas.com.uy", host
+      test_case.assert_equal 443, port
+      test_case.assert_equal true, options[:use_ssl]
+      test_case.assert options.key?(:open_timeout), "expected open_timeout to be set"
+      test_case.assert options.key?(:read_timeout), "expected read_timeout to be set"
+
+      block.call(http)
+    end
+
+    stub_net_http_start(net_http_start) do
+      adapter.fetch_listings
+    end
+
+    assert_equal true, request_received
+  end
+
   private
 
   def sample_response_body
@@ -82,5 +111,15 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     yield
   ensure
     adapter.singleton_class.remove_method(:http_response)
+  end
+
+  def stub_net_http_start(callable)
+    original_start = Net::HTTP.method(:start)
+    Net::HTTP.define_singleton_method(:start, callable)
+    yield
+  ensure
+    Net::HTTP.define_singleton_method(:start) do |*args, **kwargs, &block|
+      original_start.call(*args, **kwargs, &block)
+    end
   end
 end
