@@ -8,7 +8,7 @@ module Sources
     FRONTEND_BASE_URL = "https://www.infocasas.com.uy"
 
     def fetch_listings
-      payload.dig(0, :data, :searchFast, :data).to_a.map do |entry|
+      payload.dig(0, :data, :searchFast, :data).map do |entry|
         {
           external_id: entry[:id].to_s,
           title: entry[:title],

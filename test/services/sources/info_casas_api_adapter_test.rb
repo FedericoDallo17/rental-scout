@@ -4,14 +4,7 @@ require "net/http"
 class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
   test "fetch_listings normalizes the legacy info casas payload into listing intake attributes" do
     adapter = Sources::InfoCasasApiAdapter.new
-    response = Struct.new(:body).new(sample_response_body)
-
-    original_start = Net::HTTP.method(:start)
-    Net::HTTP.define_singleton_method(:start) do |*args, **kwargs, &block|
-      block.call(FakeHttp.new(response))
-    end
-
-    begin
+    stub_http_response(adapter, sample_response_body) do
       listings = adapter.fetch_listings
 
       assert_equal 1, listings.size
@@ -39,18 +32,20 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
           :square_meters
         )
       )
-    ensure
-      Net::HTTP.define_singleton_method(:start, original_start)
+    end
+  end
+
+  test "fetch_listings raises when the payload is malformed" do
+    adapter = Sources::InfoCasasApiAdapter.new
+
+    stub_http_response(adapter, JSON.generate([{ data: {} }])) do
+      assert_raises(NoMethodError) do
+        adapter.fetch_listings
+      end
     end
   end
 
   private
-
-  FakeHttp = Struct.new(:response) do
-    def request(_request)
-      response
-    end
-  end
 
   def sample_response_body
     JSON.generate([
@@ -75,5 +70,17 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
         }
       }
     ])
+  end
+
+  def stub_http_response(adapter, body)
+    response = Struct.new(:body).new(body)
+
+    adapter.define_singleton_method(:http_response) do
+      response
+    end
+
+    yield
+  ensure
+    adapter.singleton_class.remove_method(:http_response)
   end
 end
