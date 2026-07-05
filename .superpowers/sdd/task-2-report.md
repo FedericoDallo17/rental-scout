@@ -116,3 +116,69 @@ Concerns:
 
 Git commit(s) created:
 - 7c4dc04589f01c14e30e4f4a027cecd4e9f8fc6f `feat: persist listing geometry`
+
+Review fix follow-up:
+
+1. Added failing regression coverage for Task 2 review findings:
+   - `Scraping::ListingGeometryBuilder` now has direct fallback/unresolved assertions that coordinates, latitude, and longitude are all cleared when no spatial point exists.
+   - `Scraping::ListingIntake` now covers downgrading an existing listing from `spatial` to `fallback` and verifies stale persisted geometry is removed.
+   - `Listing.spatially_resolvable` now has a direct model test proving the scope follows `coordinates` presence rather than the status string.
+
+2. Ran `bin/rails test test/services/scraping/listing_geometry_builder_test.rb test/services/scraping/listing_intake_test.rb test/models/listing_test.rb` before the fix and observed the expected failures:
+
+```text
+Running 19 tests in a single process (parallelization threshold is 50)
+Run options: --seed 60663
+
+# Running:
+
+.F
+
+Failure:
+ListingTest#test_spatially_resolvable_scope_returns_listings_with_coordinates [test/models/listing_test.rb:10]:
+--- expected
++++ actual
+@@ -1 +1 @@
+-["Coordinates Only", "Spatial"]
++["Spatial", "Status Only"]
+
+
+bin/rails test test/models/listing_test.rb:4
+
+......F
+
+Failure:
+Scraping::ListingGeometryBuilderTest#test_marks_listing_fallback_from_source_neighborhood_and_clears_stale_geometry [test/services/scraping/listing_geometry_builder_test.rb:37]:
+Expected "" to be nil.
+
+bin/rails test test/services/scraping/listing_geometry_builder_test.rb:28
+
+.F
+
+Failure:
+Scraping::ListingIntakeTest#test_clears_persisted_geometry_when_a_spatial_listing_falls_back_to_source_neighborhood_only [test/services/scraping/listing_intake_test.rb:52]:
+Expected -0.349012e2 to be nil.
+
+bin/rails test test/services/scraping/listing_intake_test.rb:25
+
+........
+
+Finished in 0.296775s, 64.0216 runs/s, 175.2169 assertions/s.
+19 runs, 52 assertions, 3 failures, 0 errors, 0 skips
+```
+
+3. Updated `Scraping::ListingGeometryBuilder` so every non-spatial branch clears `latitude`, `longitude`, and `coordinates`, and updated `Listing.spatially_resolvable` to require persisted coordinates.
+
+4. Re-ran `bin/rails test test/services/scraping/listing_geometry_builder_test.rb test/services/scraping/listing_intake_test.rb test/models/listing_test.rb`
+
+```text
+Running 19 tests in a single process (parallelization threshold is 50)
+Run options: --seed 61908
+
+# Running:
+
+...................
+
+Finished in 0.222922s, 85.2316 runs/s, 251.2089 assertions/s.
+19 runs, 56 assertions, 0 failures, 0 errors, 0 skips
+```

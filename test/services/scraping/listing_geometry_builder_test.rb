@@ -20,6 +20,22 @@ class Scraping::ListingGeometryBuilderTest < ActiveSupport::TestCase
     })
 
     assert_equal "unresolved", result[:location_resolution_status]
+    assert_nil result[:latitude]
+    assert_nil result[:longitude]
+    assert_nil result[:coordinates]
+  end
+
+  test "marks listing fallback from source neighborhood and clears stale geometry" do
+    result = Scraping::ListingGeometryBuilder.new.call(attributes: {
+      latitude: "",
+      longitude: "",
+      source_neighborhood: "Pocitos"
+    })
+
+    assert_equal "fallback", result[:location_resolution_status]
+    assert_equal "Pocitos", result[:source_neighborhood]
+    assert_nil result[:latitude]
+    assert_nil result[:longitude]
     assert_nil result[:coordinates]
   end
 end

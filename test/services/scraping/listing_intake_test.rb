@@ -22,6 +22,38 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
     assert listing.coordinates.present?
   end
 
+  test "clears persisted geometry when a spatial listing falls back to source neighborhood only" do
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    intake = Scraping::ListingIntake.new
+
+    listing = intake.call(
+      listing_source: source,
+      attributes: {
+        title: "Apto Pocitos",
+        canonical_url: "https://example.test/a",
+        external_id: "1",
+        latitude: -34.9012,
+        longitude: -56.1645,
+        source_neighborhood: "Pocitos"
+      }
+    )
+
+    listing = intake.call(
+      listing_source: source,
+      attributes: {
+        title: "Apto Pocitos",
+        canonical_url: "https://example.test/a",
+        external_id: "1",
+        source_neighborhood: "Pocitos"
+      }
+    )
+
+    assert_equal "fallback", listing.location_resolution_status
+    assert_nil listing.latitude
+    assert_nil listing.longitude
+    assert_nil listing.coordinates
+  end
+
   test "does not create duplicate listing for same source and external id" do
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     attrs = { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "1" }

@@ -11,7 +11,7 @@ class Listing < ApplicationRecord
 
   scope :recent_first, -> { order(created_at: :desc) }
   scope :in_scope_inventory, -> { where(in_scope: true) }
-  scope :spatially_resolvable, -> { where(location_resolution_status: "spatial") }
+  scope :spatially_resolvable, -> { where.not(coordinates: nil) }
   scope :fallback_only, -> { where(location_resolution_status: "fallback") }
   scope :unresolved_location, -> { where(location_resolution_status: "unresolved") }
 

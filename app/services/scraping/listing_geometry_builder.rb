@@ -11,10 +11,10 @@ module Scraping
         attrs[:coordinates] = Zone::FACTORY.point(longitude, latitude)
         attrs[:location_resolution_status] = "spatial"
       elsif attrs[:source_neighborhood].present?
-        attrs[:coordinates] = nil
+        clear_geometry!(attrs)
         attrs[:location_resolution_status] = "fallback"
       else
-        attrs[:coordinates] = nil
+        clear_geometry!(attrs)
         attrs[:location_resolution_status] = "unresolved"
       end
 
@@ -27,6 +27,12 @@ module Scraping
       return if value.blank?
 
       BigDecimal(value.to_s)
+    end
+
+    def clear_geometry!(attrs)
+      attrs[:latitude] = nil
+      attrs[:longitude] = nil
+      attrs[:coordinates] = nil
     end
   end
 end
