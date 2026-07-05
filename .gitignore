@@ -2,6 +2,7 @@
 /log/*
 /tmp/*
 /storage/*
+/.worktrees/
 /.env
 /config/master.key
 /config/credentials/*.key
