@@ -237,6 +237,28 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
     assert_equal "spatial", listing.location_resolution_status
   end
 
+  test "marks leaked provider records out of scope using adapter metadata" do
+    source = ListingSource.create!(name: "InfoCasas API", adapter_key: "info_casas_api")
+    intake = Scraping::ListingIntake.new
+
+    listing = intake.call(
+      listing_source: source,
+      attributes: {
+        title: "Casa en Peninsula",
+        canonical_url: "https://www.infocasas.com.uy/venta/casa/peninsula/456",
+        external_id: "456",
+        operation_type: "venta",
+        source_city: "Punta del Este",
+        source_neighborhood: "Peninsula, Punta del Este",
+        latitude: -34.962,
+        longitude: -54.947
+      }
+    )
+
+    assert_equal false, listing.in_scope
+    assert_equal "outside_montevideo", listing.scope_rejection_reason
+  end
+
   test "persists description from normalized adapter attributes" do
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     intake = Scraping::ListingIntake.new

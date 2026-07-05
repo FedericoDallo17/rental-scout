@@ -41,6 +41,8 @@ module Sources
 
     def fetch_listings
       payload.dig(0, :data, :searchFast, :data).map do |entry|
+        location_name = entry.dig(:location, :name)
+
         {
           external_id: entry[:id].to_s,
           title: entry[:title],
@@ -48,10 +50,10 @@ module Sources
           description: entry[:description],
           price_cents: normalize_price(entry[:price]),
           currency: "UYU",
-          location_text: entry.dig(:location, :name),
-          source_neighborhood: entry.dig(:location, :name),
-          source_city: "Montevideo",
-          operation_type: "alquiler",
+          location_text: location_name,
+          source_neighborhood: location_name,
+          source_city: source_city(location_name),
+          operation_type: operation_type(entry[:link]),
           bedrooms: integer_or_nil(entry[:bedrooms]),
           square_meters: integer_or_nil(entry[:area]),
           latitude: entry[:lat] || entry.dig(:location, :lat),
@@ -137,6 +139,16 @@ module Sources
       return if value.blank?
 
       value.to_i
+    end
+
+    def source_city(location_name)
+      return if location_name.blank? || !location_name.include?(",")
+
+      location_name.split(",").last.strip.presence
+    end
+
+    def operation_type(link)
+      link.to_s.split("/").reject(&:blank?).first.presence
     end
   end
 end

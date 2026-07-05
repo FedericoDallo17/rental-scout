@@ -61,7 +61,7 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     response = stubbed_info_casas_response(
       id: 123,
       title: "Apto Malvin",
-      location_name: "Malvín",
+      location_name: "Malvín, Montevideo",
       latitude: -34.885,
       longitude: -56.082
     )
@@ -71,8 +71,28 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
 
       assert_equal -34.885, listing[:latitude]
       assert_equal -56.082, listing[:longitude]
-      assert_equal "Malvín", listing[:source_neighborhood]
+      assert_equal "Malvín, Montevideo", listing[:source_neighborhood]
       assert_equal "Montevideo", listing[:source_city]
+    end
+  end
+
+  test "fetch_listings derives scope metadata from the provider payload" do
+    adapter = Sources::InfoCasasApiAdapter.new
+
+    response = stubbed_info_casas_response(
+      id: 456,
+      title: "Casa en Peninsula",
+      link: "/venta/casa/peninsula/456",
+      location_name: "Peninsula, Punta del Este",
+      latitude: -34.962,
+      longitude: -54.947
+    )
+
+    stub_http_response(adapter, response) do
+      listing = adapter.fetch_listings.first
+
+      assert_equal "Punta del Este", listing[:source_city]
+      assert_equal "venta", listing[:operation_type]
     end
   end
 

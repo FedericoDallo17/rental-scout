@@ -18,6 +18,11 @@ Verification:
 - Command: `bin/rails test test/services/scraping/listing_scope_validator_test.rb test/services/sources/info_casas_api_adapter_test.rb test/services/scraping/listing_intake_test.rb`
 - Result: 18 runs, 64 assertions, 0 failures, 0 errors, 0 skips
 
+Review follow-up:
+- Updated `Sources::InfoCasasApiAdapter` to derive `source_city` from provider location text and `operation_type` from the provider listing path instead of hardcoding Montevideo rentals.
+- Added regression coverage proving provider payload metadata survives normalization and can drive `Scraping::ListingScopeValidator` to mark leaked out-of-scope records.
+- Re-ran `bin/rails test test/services/scraping/listing_scope_validator_test.rb test/services/sources/info_casas_api_adapter_test.rb test/services/scraping/listing_intake_test.rb` with 20 runs, 68 assertions, 0 failures, 0 errors, 0 skips.
+
 Files changed:
 - `app/services/scraping/listing_scope_validator.rb`
 - `app/services/scraping/listing_intake.rb`
