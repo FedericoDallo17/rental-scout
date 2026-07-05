@@ -1,6 +1,7 @@
 require "json"
 require "net/http"
 require "uri"
+require_relative "info_casas_legacy_map"
 
 module Sources
   class InfoCasasApiAdapter
@@ -8,6 +9,35 @@ module Sources
     FRONTEND_BASE_URL = "https://www.infocasas.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
     READ_TIMEOUT_SECONDS = 15
+    LEGACY_HEADERS = {
+      accept: "*/*",
+      "accept-language": "es-419,es;q=0.9",
+      authorization: "",
+      "content-type": "application/json",
+      "ic-user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+      priority: "u=1, i",
+      "sec-ch-ua": "  \"Chromium\";v=\"136\", \"Google Chrome\";v=\"136\", \"Not.A/Brand\";v=\"99\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-site",
+      "x-cookiepot": "3",
+      "x-origin": "www.infocasas.com.uy"
+    }.freeze
+    RESULTS_GRID_QUERY = <<~GRAPHQL.freeze
+      query ResultsGird_v2($rows: Int!, $params: SearchParamsInput!, $page: Int, $source: Int) {
+        searchFast(params: $params, first: $rows, page: $page, source: $source)
+      }
+    GRAPHQL
+    SEARCH_URL_QUERY = <<~GRAPHQL.chomp.freeze
+      query searchUrl($params: SearchParamsInput!) {
+        searchUrl(params: $params) {
+          url
+          __typename
+        }
+      }
+    GRAPHQL
 
     def fetch_listings
       payload.dig(0, :data, :searchFast, :data).map do |entry|
@@ -40,9 +70,9 @@ module Sources
         read_timeout: READ_TIMEOUT_SECONDS
       ) do |http|
         request = Net::HTTP::Post.new(ENDPOINT_URI)
-        request["accept"] = "*/*"
-        request["content-type"] = "application/json"
-        request["x-origin"] = "www.infocasas.com.uy"
+        LEGACY_HEADERS.each do |header, value|
+          request[header] = value
+        end
         request.body = request_body
         http.request(request)
       end
@@ -54,22 +84,51 @@ module Sources
           operationName: "ResultsGird_v2",
           variables: {
             rows: 50,
-            params: {
-              page: 1,
-              order: 2,
-              operation_type_id: 2,
-              property_type_id: [2],
-              currencyID: 2,
-              maxPrice: 42000,
-              bedrooms: [1],
-              m2Min: 45
-            },
+            params: legacy_search_params,
             page: 1,
             source: 0
           },
-          query: "query ResultsGird_v2($rows: Int!, $params: SearchParamsInput!, $page: Int, $source: Int) { searchFast(params: $params, first: $rows, page: $page, source: $source) }"
+          query: RESULTS_GRID_QUERY
+        },
+        {
+          operationName: "searchUrl",
+          variables: {
+            params: legacy_search_params
+          },
+          query: SEARCH_URL_QUERY
         }
       ])
+    end
+
+    def legacy_search_params
+      {
+        page: 1,
+        order: 2,
+        bedroomsExactMode: false,
+        bathroomsExactMode: false,
+        operation_type_id: 2,
+        property_type_id: [2],
+        season: nil,
+        dateFrom: nil,
+        dateTo: nil,
+        currencyID: 2,
+        m2Currency: 2,
+        guests: nil,
+        projects: nil,
+        minPrice: nil,
+        maxPrice: 42_000,
+        commonExpenses: nil,
+        rooms: nil,
+        mapView: false,
+        neighborhood_id: [],
+        estate_id: nil,
+        bedrooms: [1],
+        publicationDate: 0,
+        m2Min: 45,
+        m2Max: nil,
+        map_polygon: Sources::InfoCasasLegacyMap::MAP_POLYGON,
+        map_bounds: Sources::InfoCasasLegacyMap::MAP_BOUNDS
+      }
     end
 
     def normalize_price(price)
