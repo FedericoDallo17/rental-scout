@@ -13,6 +13,8 @@ class SearchPreference < ApplicationRecord
   private
 
   def must_have_at_least_one_zone
-    errors.add(:zones, "must include at least one zone") if zones.empty?
+    active_search_zones = search_zones.reject(&:marked_for_destruction?)
+
+    errors.add(:zones, "must include at least one zone") if active_search_zones.empty?
   end
 end

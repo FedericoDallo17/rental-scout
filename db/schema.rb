@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_04_110000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_05_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "postgis"
 
   create_table "listing_sources", force: :cascade do |t|
     t.string "name", null: false
@@ -101,6 +102,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_110000) do
     t.index ["user_id"], name: "index_search_preferences_on_user_id"
   end
 
+  create_table "search_zones", force: :cascade do |t|
+    t.bigint "search_preference_id", null: false
+    t.bigint "zone_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["search_preference_id", "zone_id"], name: "index_search_zones_on_search_preference_id_and_zone_id", unique: true
+    t.index ["search_preference_id"], name: "index_search_zones_on_search_preference_id"
+    t.index ["zone_id"], name: "index_search_zones_on_zone_id"
+  end
+
   create_table "seen_listings", force: :cascade do |t|
     t.bigint "listing_source_id", null: false
     t.bigint "listing_id"
@@ -133,6 +144,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_110000) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "zones", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "aliases", default: [], null: false, array: true
+    t.geography "geom", limit: {:srid=>4326, :type=>"multi_polygon", :geographic=>true}, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["geom"], name: "index_zones_on_geom", using: :gist
+    t.index ["slug"], name: "index_zones_on_slug", unique: true
+  end
+
   add_foreign_key "listings", "listing_sources"
   add_foreign_key "listings", "scraping_runs"
   add_foreign_key "notification_events", "listing_sources"
@@ -141,6 +164,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_110000) do
   add_foreign_key "scraping_source_runs", "listing_sources"
   add_foreign_key "scraping_source_runs", "scraping_runs"
   add_foreign_key "search_preferences", "users"
+  add_foreign_key "search_zones", "search_preferences"
+  add_foreign_key "search_zones", "zones"
   add_foreign_key "seen_listings", "listing_sources"
   add_foreign_key "seen_listings", "listings"
   add_foreign_key "seen_listings", "scraping_runs"

@@ -48,4 +48,21 @@ class SearchPreferenceTest < ActiveSupport::TestCase
     assert_not search_preference.valid?
     assert_includes search_preference.errors[:zones], "must include at least one zone"
   end
+
+  test "accepts a built search zone before persistence" do
+    user = User.create!(first_name: "Search", last_name: "Owner", email: "search-owner-3@example.com", password: "password123", password_confirmation: "password123")
+    zone = Zone.create!(
+      name: "Punta Carretas",
+      slug: "punta-carretas",
+      aliases: ["punta carretas"],
+      geom: Zone.polygon_from_coordinates([
+        [-56.17, -34.93], [-56.15, -34.93], [-56.15, -34.91], [-56.17, -34.91], [-56.17, -34.93]
+      ])
+    )
+    search_preference = user.search_preferences.build(name: "Punta", location_query: "legacy")
+
+    search_preference.search_zones.build(zone: zone)
+
+    assert search_preference.valid?
+  end
 end
