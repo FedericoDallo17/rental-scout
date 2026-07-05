@@ -13,6 +13,8 @@ module Scraping
 
     def listing_attributes(attributes)
       attrs = Scraping::ListingGeometryBuilder.new.call(attributes: attributes.dup)
+      attrs = Scraping::ListingScopeValidator.new.call(attributes: attrs)
+      attrs = attrs.slice(*Listing.attribute_names.map(&:to_sym))
       attrs[:raw_payload] = attributes
       attrs
     end

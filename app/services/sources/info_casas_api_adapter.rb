@@ -49,8 +49,13 @@ module Sources
           price_cents: normalize_price(entry[:price]),
           currency: "UYU",
           location_text: entry.dig(:location, :name),
+          source_neighborhood: entry.dig(:location, :name),
+          source_city: "Montevideo",
+          operation_type: "alquiler",
           bedrooms: integer_or_nil(entry[:bedrooms]),
-          square_meters: integer_or_nil(entry[:area])
+          square_meters: integer_or_nil(entry[:area]),
+          latitude: entry[:lat] || entry.dig(:location, :lat),
+          longitude: entry[:lng] || entry.dig(:location, :lng)
         }
       end
     end
@@ -104,30 +109,21 @@ module Sources
       {
         page: 1,
         order: 2,
-        bedroomsExactMode: false,
-        bathroomsExactMode: false,
         operation_type_id: 2,
         property_type_id: [2],
-        season: nil,
-        dateFrom: nil,
-        dateTo: nil,
         currencyID: 2,
         m2Currency: 2,
-        guests: nil,
-        projects: nil,
-        minPrice: nil,
-        maxPrice: 42_000,
-        commonExpenses: nil,
-        rooms: nil,
         mapView: false,
+        estate_id: [10],
         neighborhood_id: [],
-        estate_id: nil,
-        bedrooms: [1],
-        publicationDate: 0,
-        m2Min: 45,
+        bedrooms: nil,
+        publicationDate: nil,
+        minPrice: nil,
+        maxPrice: nil,
+        m2Min: nil,
         m2Max: nil,
-        map_polygon: Sources::InfoCasasLegacyMap::MAP_POLYGON,
-        map_bounds: Sources::InfoCasasLegacyMap::MAP_BOUNDS
+        map_polygon: [],
+        map_bounds: []
       }
     end
 

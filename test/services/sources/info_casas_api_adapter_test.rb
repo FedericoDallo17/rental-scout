@@ -17,8 +17,13 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
           price_cents: 3_500_000,
           currency: "UYU",
           location_text: "Pocitos, Montevideo",
+          source_neighborhood: "Pocitos, Montevideo",
+          source_city: "Montevideo",
+          operation_type: "alquiler",
           bedrooms: 2,
-          square_meters: 58
+          square_meters: 58,
+          latitude: -34.885,
+          longitude: -56.082
         },
         listings.first.slice(
           :external_id,
@@ -28,10 +33,46 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
           :price_cents,
           :currency,
           :location_text,
+          :source_neighborhood,
+          :source_city,
+          :operation_type,
           :bedrooms,
-          :square_meters
+          :square_meters,
+          :latitude,
+          :longitude
         )
       )
+    end
+  end
+
+  test "fetch_listings requests broad montevideo inventory without legacy map filters" do
+    adapter = Sources::InfoCasasApiAdapter.new
+
+    params = adapter.send(:legacy_search_params)
+
+    assert_equal [], params[:map_polygon]
+    assert_equal [], params[:map_bounds]
+    assert_equal [10], params[:estate_id]
+  end
+
+  test "fetch_listings returns coordinates and source metadata" do
+    adapter = Sources::InfoCasasApiAdapter.new
+
+    response = stubbed_info_casas_response(
+      id: 123,
+      title: "Apto Malvin",
+      location_name: "Malvín",
+      latitude: -34.885,
+      longitude: -56.082
+    )
+
+    stub_http_response(adapter, response) do
+      listing = adapter.fetch_listings.first
+
+      assert_equal -34.885, listing[:latitude]
+      assert_equal -56.082, listing[:longitude]
+      assert_equal "Malvín", listing[:source_neighborhood]
+      assert_equal "Montevideo", listing[:source_city]
     end
   end
 
@@ -94,8 +135,8 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
 
       results_grid_request = request_body.fetch(0)
       search_url_request = request_body.fetch(1)
-      test_case.send(:assert_legacy_map_polygon, results_grid_request.dig("variables", "params", "map_polygon"))
-      test_case.send(:assert_legacy_map_polygon, search_url_request.dig("variables", "params", "map_polygon"))
+      test_case.assert_equal [], results_grid_request.dig("variables", "params", "map_polygon")
+      test_case.assert_equal [], search_url_request.dig("variables", "params", "map_polygon")
 
       test_case.assert_equal "ResultsGird_v2", results_grid_request.fetch("operationName")
       test_case.assert_equal expected_results_grid_variables, test_case.send(:strip_map_polygon, results_grid_request.fetch("variables"))
@@ -116,22 +157,39 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
   private
 
   def sample_response_body
+    stubbed_info_casas_response(
+      id: "123",
+      title: "Apartamento en Pocitos",
+      description: "Apartamento luminoso con terraza",
+      link: "/alquiler/apartamento/pocitos/123",
+      price: 35000,
+      location_name: "Pocitos, Montevideo",
+      bedrooms: 2,
+      area: 58,
+      latitude: -34.885,
+      longitude: -56.082
+    )
+  end
+
+  def stubbed_info_casas_response(id:, title:, location_name:, latitude:, longitude:, description: "Apartamento luminoso con terraza", link: "/alquiler/apartamento/pocitos/123", price: 35000, bedrooms: 2, area: 58)
     JSON.generate([
       {
         data: {
           searchFast: {
             data: [
               {
-                id: "123",
-                title: "Apartamento en Pocitos",
-                description: "Apartamento luminoso con terraza",
-                link: "/alquiler/apartamento/pocitos/123",
-                price: 35000,
+                id: id,
+                title: title,
+                description: description,
+                link: link,
+                price: price,
                 commonExpenses: 4500,
                 facilities: ["9"],
-                location: { name: "Pocitos, Montevideo" },
-                bedrooms: 2,
-                area: 58
+                location: { name: location_name, lat: latitude, lng: longitude },
+                lat: latitude,
+                lng: longitude,
+                bedrooms: bedrooms,
+                area: area
               }
             ]
           }
@@ -194,29 +252,20 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     {
       "page" => 1,
       "order" => 2,
-      "bedroomsExactMode" => false,
-      "bathroomsExactMode" => false,
       "operation_type_id" => 2,
       "property_type_id" => [2],
-      "season" => nil,
-      "dateFrom" => nil,
-      "dateTo" => nil,
       "currencyID" => 2,
       "m2Currency" => 2,
-      "guests" => nil,
-      "projects" => nil,
-      "minPrice" => nil,
-      "maxPrice" => 42_000,
-      "commonExpenses" => nil,
-      "rooms" => nil,
       "mapView" => false,
+      "estate_id" => [10],
       "neighborhood_id" => [],
-      "estate_id" => nil,
-      "bedrooms" => [1],
-      "publicationDate" => 0,
-      "m2Min" => 45,
+      "bedrooms" => nil,
+      "publicationDate" => nil,
+      "minPrice" => nil,
+      "maxPrice" => nil,
+      "m2Min" => nil,
       "m2Max" => nil,
-      "map_bounds" => expected_legacy_map_bounds
+      "map_bounds" => []
     }
   end
 
@@ -234,37 +283,4 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     "query searchUrl($params: SearchParamsInput!) {\n  searchUrl(params: $params) {\n    url\n    __typename\n  }\n}"
   end
 
-  def expected_legacy_map_bounds
-    [
-      { "latitude" => -34.90992011790014, "longitude" => -56.144040857363876 },
-      { "latitude" => -34.9071574328263, "longitude" => -56.14689472775572 },
-      { "latitude" => -34.90706944769785, "longitude" => -56.150542532015976 },
-      { "latitude" => -34.90889951895506, "longitude" => -56.15341786007994 },
-      { "latitude" => -34.912717901670106, "longitude" => -56.15320328335875 },
-      { "latitude" => -34.91354490125635, "longitude" => -56.15071419339293 },
-      { "latitude" => -34.913527305607225, "longitude" => -56.14773157696837 },
-      { "latitude" => -34.91006088917279, "longitude" => -56.14386919598692 },
-      { "latitude" => -34.90992011790014, "longitude" => -56.144040857363876 }
-    ]
-  end
-
-  def assert_legacy_map_polygon(actual_points)
-    assert_equal 1073, actual_points.length
-    assert_equal(
-      [
-        { "latitude" => -34.90992011790014, "longitude" => -56.144040857363876 },
-        { "latitude" => -34.9099025214741, "longitude" => -56.144040857363876 },
-        { "latitude" => -34.90988492504427, "longitude" => -56.144040857363876 }
-      ],
-      actual_points.first(3)
-    )
-    assert_equal(
-      [
-        { "latitude" => -34.91007848556491, "longitude" => -56.14389065365904 },
-        { "latitude" => -34.91006088917279, "longitude" => -56.14389065365904 },
-        { "latitude" => -34.91006088917279, "longitude" => -56.14386919598692 }
-      ],
-      actual_points.last(3)
-    )
-  end
 end

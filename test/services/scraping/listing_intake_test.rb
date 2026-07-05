@@ -214,6 +214,29 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
     assert_equal attributes, listing.raw_payload.symbolize_keys.slice(*attributes.keys)
   end
 
+  test "persists in scope fields after geometry normalization" do
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    intake = Scraping::ListingIntake.new
+
+    listing = intake.call(
+      listing_source: source,
+      attributes: {
+        title: "Apto Malvin",
+        canonical_url: "https://example.test/malvin",
+        external_id: "scope-1",
+        operation_type: "alquiler",
+        source_city: "Montevideo",
+        source_neighborhood: "Malvin",
+        latitude: -34.885,
+        longitude: -56.082
+      }
+    )
+
+    assert_equal true, listing.in_scope
+    assert_nil listing.scope_rejection_reason
+    assert_equal "spatial", listing.location_resolution_status
+  end
+
   test "persists description from normalized adapter attributes" do
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     intake = Scraping::ListingIntake.new
