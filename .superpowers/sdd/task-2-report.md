@@ -115,4 +115,4 @@ Concerns:
 - The brief is internally inconsistent on fallback resolution: the prose test says `location_text: "Montevideo"` should remain `unresolved`, while the sample implementation would mark any present `location_text` as `fallback`. I implemented the tested behavior, so `source_neighborhood` is the fallback trigger and `location_text` alone remains `unresolved`.
 
 Git commit(s) created:
-- Pending at report write time
+- 7c4dc04589f01c14e30e4f4a027cecd4e9f8fc6f `feat: persist listing geometry`
