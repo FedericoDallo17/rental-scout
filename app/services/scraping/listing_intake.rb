@@ -12,7 +12,7 @@ module Scraping
     private
 
     def listing_attributes(attributes)
-      attrs = attributes.dup
+      attrs = Scraping::ListingGeometryBuilder.new.call(attributes: attributes.dup)
       attrs[:raw_payload] = attributes
       attrs
     end

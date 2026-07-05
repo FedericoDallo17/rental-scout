@@ -1,6 +1,14 @@
 require "test_helper"
 
 class ListingTest < ActiveSupport::TestCase
+  test "spatially_resolvable scope returns listings with coordinates" do
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    Listing.create!(listing_source: source, title: "Spatial", canonical_url: "https://example.test/spatial", location_resolution_status: "spatial", latitude: -34.90, longitude: -56.16, coordinates: Zone::FACTORY.point(-56.16, -34.90))
+    Listing.create!(listing_source: source, title: "Fallback", canonical_url: "https://example.test/fallback", location_resolution_status: "fallback", source_neighborhood: "Pocitos")
+
+    assert_equal ["Spatial"], Listing.spatially_resolvable.pluck(:title)
+  end
+
   test "for_search_feed scopes listings by location query" do
     user = User.create!(
       first_name: "Listing",

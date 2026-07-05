@@ -1,6 +1,27 @@
 require "test_helper"
 
 class Scraping::ListingIntakeTest < ActiveSupport::TestCase
+  test "persists coordinates neighborhood and resolution status from normalized attributes" do
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    intake = Scraping::ListingIntake.new
+
+    listing = intake.call(
+      listing_source: source,
+      attributes: {
+        title: "Apto Pocitos",
+        canonical_url: "https://example.test/a",
+        external_id: "1",
+        latitude: -34.9012,
+        longitude: -56.1645,
+        source_neighborhood: "Pocitos"
+      }
+    )
+
+    assert_equal "spatial", listing.location_resolution_status
+    assert_equal "Pocitos", listing.source_neighborhood
+    assert listing.coordinates.present?
+  end
+
   test "does not create duplicate listing for same source and external id" do
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     attrs = { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "1" }

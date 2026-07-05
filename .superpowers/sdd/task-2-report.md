@@ -1,197 +1,118 @@
-Status: DONE
+Status: DONE_WITH_CONCERNS
 
 Files changed:
-- app/services/sources/info_casas_api_adapter.rb
-- test/services/sources/info_casas_api_adapter_test.rb
+- db/migrate/20260705121000_add_location_fields_to_listings.rb
+- app/services/scraping/listing_geometry_builder.rb
+- app/services/scraping/listing_intake.rb
+- app/models/listing.rb
+- test/services/scraping/listing_geometry_builder_test.rb
+- test/services/scraping/listing_intake_test.rb
+- test/models/listing_test.rb
+- db/schema.rb
 - .superpowers/sdd/task-2-report.md
 
-Test commands run and outputs:
+TDD evidence:
 
-1. `bin/rails test test/services/sources/info_casas_api_adapter_test.rb`
+1. Added failing tests for listing geometry building, intake persistence, and the `Listing.spatially_resolvable` scope.
+
+2. Ran `bin/rails test test/services/scraping/listing_geometry_builder_test.rb test/services/scraping/listing_intake_test.rb test/models/listing_test.rb`
 
 ```text
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 57226
+Running 17 tests in a single process (parallelization threshold is 50)
+Run options: --seed 39492
 
 # Running:
 
 E
 
 Error:
-Sources::InfoCasasApiAdapterTest#test_fetch_listings_normalizes_the_legacy_info_casas_payload_into_listing_intake_attributes:
-NameError: uninitialized constant Sources::InfoCasasApiAdapterTest::Net
-    test/services/sources/info_casas_api_adapter_test.rb:8:in `block in <class:InfoCasasApiAdapterTest>'
+Scraping::ListingIntakeTest#test_persists_coordinates_neighborhood_and_resolution_status_from_normalized_attributes:
+ActiveModel::UnknownAttributeError: unknown attribute 'latitude' for Listing.
+    app/services/scraping/listing_intake.rb:30:in `persist_listing'
+    app/services/scraping/listing_intake.rb:4:in `call'
+    test/services/scraping/listing_intake_test.rb:8:in `block in <class:ListingIntakeTest>'
 
-bin/rails test test/services/sources/info_casas_api_adapter_test.rb:4
+bin/rails test test/services/scraping/listing_intake_test.rb:4
 
+.......E
 
+Error:
+Scraping::ListingGeometryBuilderTest#test_marks_listing_unresolved_when_no_coordinates_or_fallback_neighborhood_exist:
+NameError: uninitialized constant Scraping::ListingGeometryBuilder
+    test/services/scraping/listing_geometry_builder_test.rb:18:in `block in <class:ListingGeometryBuilderTest>'
 
-Finished in 0.013844s, 72.2335 runs/s, 0.0000 assertions/s.
-1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
-```
-
-2. `bin/rails test test/services/sources/info_casas_api_adapter_test.rb`
-
-```text
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 13846
-
-# Running:
+bin/rails test test/services/scraping/listing_geometry_builder_test.rb:17
 
 E
 
 Error:
-Sources::InfoCasasApiAdapterTest#test_fetch_listings_normalizes_the_legacy_info_casas_payload_into_listing_intake_attributes:
-NoMethodError: undefined method `stub' for class Net::HTTP
-    test/services/sources/info_casas_api_adapter_test.rb:9:in `block in <class:InfoCasasApiAdapterTest>'
+Scraping::ListingGeometryBuilderTest#test_builds_coordinates_and_marks_listing_spatially_resolvable:
+NameError: uninitialized constant Scraping::ListingGeometryBuilder
+    test/services/scraping/listing_geometry_builder_test.rb:5:in `block in <class:ListingGeometryBuilderTest>'
 
-bin/rails test test/services/sources/info_casas_api_adapter_test.rb:5
+bin/rails test test/services/scraping/listing_geometry_builder_test.rb:4
 
+.....E
 
+Error:
+ListingTest#test_spatially_resolvable_scope_returns_listings_with_coordinates:
+ActiveModel::UnknownAttributeError: unknown attribute 'location_resolution_status' for Listing.
+    test/models/listing_test.rb:6:in `block in <class:ListingTest>'
 
-Finished in 0.016113s, 62.0617 runs/s, 0.0000 assertions/s.
-1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
-```
-
-3. `bin/rails test test/services/sources/info_casas_api_adapter_test.rb`
-
-```text
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 64268
-
-# Running:
-
-F
-
-Failure:
-Sources::InfoCasasApiAdapterTest#test_fetch_listings_normalizes_the_legacy_info_casas_payload_into_listing_intake_attributes [test/services/sources/info_casas_api_adapter_test.rb:17]:
-Expected: 1
-  Actual: 0
-
-bin/rails test test/services/sources/info_casas_api_adapter_test.rb:5
-
-
-
-Finished in 0.011229s, 89.0551 runs/s, 89.0551 assertions/s.
-1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
-```
-
-4. `bin/rails test test/services/sources/info_casas_api_adapter_test.rb`
-
-```text
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 12649
-
-# Running:
+bin/rails test test/models/listing_test.rb:4
 
 .
 
-Finished in 0.011688s, 85.5578 runs/s, 171.1157 assertions/s.
-1 runs, 2 assertions, 0 failures, 0 errors, 0 skips
+Finished in 0.189987s, 89.4798 runs/s, 184.2231 assertions/s.
+17 runs, 35 assertions, 0 failures, 4 errors, 0 skips
 ```
 
-5. `bin/rails test test/services/sources/adapter_registry_test.rb test/services/sources/info_casas_api_adapter_test.rb`
+3. Implemented the listing location migration, `Scraping::ListingGeometryBuilder`, intake integration, and listing scopes.
+
+4. Ran `bin/rails db:migrate test:prepare && bin/rails test test/services/scraping/listing_geometry_builder_test.rb test/services/scraping/listing_intake_test.rb test/models/listing_test.rb`
 
 ```text
-Running 2 tests in a single process (parallelization threshold is 50)
-Run options: --seed 64109
+== 20260705121000 AddLocationFieldsToListings: migrating ======================
+-- add_column(:listings, :latitude, :decimal, {:precision=>10, :scale=>6})
+   -> 0.0011s
+-- add_column(:listings, :longitude, :decimal, {:precision=>10, :scale=>6})
+   -> 0.0003s
+-- add_column(:listings, :source_neighborhood, :string)
+   -> 0.0003s
+-- add_column(:listings, :location_resolution_status, :string, {:null=>false, :default=>"unresolved"})
+   -> 0.0013s
+-- add_column(:listings, :in_scope, :boolean, {:null=>false, :default=>true})
+   -> 0.0006s
+-- add_column(:listings, :scope_rejection_reason, :string)
+   -> 0.0003s
+-- add_column(:listings, :coordinates, :st_point, {:geographic=>true, :srid=>4326})
+   -> 0.0458s
+-- add_index(:listings, :coordinates, {:using=>:gist})
+   -> 0.0029s
+-- add_index(:listings, :location_resolution_status)
+   -> 0.0011s
+-- add_index(:listings, :in_scope)
+   -> 0.0011s
+== 20260705121000 AddLocationFieldsToListings: migrated (0.0549s) =============
+
+Running 17 tests in a single process (parallelization threshold is 50)
+Run options: --seed 34268
 
 # Running:
 
-..
+.................
 
-Finished in 0.026862s, 74.4546 runs/s, 111.6819 assertions/s.
-2 runs, 3 assertions, 0 failures, 0 errors, 0 skips
+Finished in 0.156246s, 108.8028 runs/s, 288.0074 assertions/s.
+17 runs, 45 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-6. `bin/rails test test/services/sources/adapter_registry_test.rb test/services/sources/info_casas_api_adapter_test.rb`
+Verification notes:
+- Listing intake still persists the normalized adapter hash in `raw_payload` and only adds location enrichment before assignment.
+- No zone-matching query logic was added.
+- Existing `Listing.for_search_feed` behavior was left unchanged.
 
-```text
-Running 2 tests in a single process (parallelization threshold is 50)
-Run options: --seed 64869
-
-# Running:
-
-..
-
-Finished in 0.030426s, 65.7333 runs/s, 98.5999 assertions/s.
-2 runs, 3 assertions, 0 failures, 0 errors, 0 skips
-```
+Concerns:
+- The brief is internally inconsistent on fallback resolution: the prose test says `location_text: "Montevideo"` should remain `unresolved`, while the sample implementation would mark any present `location_text` as `fallback`. I implemented the tested behavior, so `source_neighborhood` is the fallback trigger and `location_text` alone remains `unresolved`.
 
 Git commit(s) created:
-- 7f9f2daf71c912cea1ea9b2cf6ca68e79914fa16 `feat: add info casas api adapter`
-
-Concerns / self-review notes:
-- The brief's `Net::HTTP.stub` setup was not supported in this test environment, so the test uses a temporary singleton-method override to reach the intended red state without changing production behavior.
-- I intentionally did not touch Task 3 or the existing orchestration/intake flow.
-
----
-
-Task 2 review-fix follow-up
-
-Status: DONE
-
-Files changed:
-- app/services/sources/info_casas_api_adapter.rb
-- test/services/sources/info_casas_api_adapter_test.rb
-- .superpowers/sdd/task-2-report.md
-
-Test commands run and outputs:
-
-1. `bin/rails test test/services/sources/info_casas_api_adapter_test.rb`
-
-```text
-Running 2 tests in a single process (parallelization threshold is 50)
-Run options: --seed 62937
-
-# Running:
-
-F
-
-Failure:
-Sources::InfoCasasApiAdapterTest#test_fetch_listings_raises_when_the_payload_is_malformed [test/services/sources/info_casas_api_adapter_test.rb:42]:
-NoMethodError expected but nothing was raised.
-
-bin/rails test test/services/sources/info_casas_api_adapter_test.rb:38
-
-.
-
-Finished in 0.015830s, 126.3424 runs/s, 189.5136 assertions/s.
-2 runs, 3 assertions, 1 failures, 0 errors, 0 skips
-```
-
-2. `bin/rails test test/services/sources/info_casas_api_adapter_test.rb`
-
-```text
-Running 2 tests in a single process (parallelization threshold is 50)
-Run options: --seed 47032
-
-# Running:
-
-..
-
-Finished in 0.016903s, 118.3222 runs/s, 177.4833 assertions/s.
-2 runs, 3 assertions, 0 failures, 0 errors, 0 skips
-```
-
-3. `bin/rails test test/services/sources/adapter_registry_test.rb test/services/sources/info_casas_api_adapter_test.rb`
-
-```text
-Running 3 tests in a single process (parallelization threshold is 50)
-Run options: --seed 12521
-
-# Running:
-
-...
-
-Finished in 0.048980s, 61.2495 runs/s, 81.6660 assertions/s.
-3 runs, 4 assertions, 0 failures, 0 errors, 0 skips
-```
-
-Git commit(s) created:
-- 7bc0c204f43f2aed5584de43be6c58dc9efc5be8 `fix: tighten info casas adapter error handling`
-
-Notes:
-- Removed `.to_a` from `payload.dig(...).map` so malformed InfoCasas API payloads raise naturally instead of silently becoming an empty listing array.
-- Replaced the class-level `Net::HTTP.start` monkey-patch in the adapter test with an adapter-scoped `http_response` singleton override to keep test isolation narrower without changing the production flow.
-- Kept the existing orchestration and intake flow unchanged and did not work on Task 3.
+- Pending at report write time

@@ -10,6 +10,10 @@ class Listing < ApplicationRecord
   validates :external_id, uniqueness: { scope: :listing_source_id }, allow_nil: true
 
   scope :recent_first, -> { order(created_at: :desc) }
+  scope :in_scope_inventory, -> { where(in_scope: true) }
+  scope :spatially_resolvable, -> { where(location_resolution_status: "spatial") }
+  scope :fallback_only, -> { where(location_resolution_status: "fallback") }
+  scope :unresolved_location, -> { where(location_resolution_status: "unresolved") }
 
   def self.for_search_feed(search_preference)
     return recent_first unless search_preference

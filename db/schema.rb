@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_05_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_05_121000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -39,9 +39,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_120000) do
     t.datetime "updated_at", null: false
     t.integer "square_meters"
     t.text "description"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.string "source_neighborhood"
+    t.string "location_resolution_status", default: "unresolved", null: false
+    t.boolean "in_scope", default: true, null: false
+    t.string "scope_rejection_reason"
+    t.geography "coordinates", limit: {:srid=>4326, :type=>"st_point", :geographic=>true}
+    t.index ["coordinates"], name: "index_listings_on_coordinates", using: :gist
+    t.index ["in_scope"], name: "index_listings_on_in_scope"
     t.index ["listing_source_id", "canonical_url"], name: "index_listings_on_listing_source_id_and_canonical_url", unique: true
     t.index ["listing_source_id", "external_id"], name: "index_listings_on_listing_source_id_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
     t.index ["listing_source_id"], name: "index_listings_on_listing_source_id"
+    t.index ["location_resolution_status"], name: "index_listings_on_location_resolution_status"
     t.index ["scraping_run_id"], name: "index_listings_on_scraping_run_id"
   end
 
