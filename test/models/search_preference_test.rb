@@ -39,14 +39,14 @@ class SearchPreferenceTest < ActiveSupport::TestCase
 
     assert_equal user, owned_search.user
     assert_includes user.search_preferences, owned_search
+    assert_equal [zone], owned_search.zones
   end
 
-  test "requires at least one zone once zone search is enabled" do
+  test "allows existing saved searches without zones until rollout" do
     user = User.create!(first_name: "Search", last_name: "Owner", email: "search-owner-2@example.com", password: "password123", password_confirmation: "password123")
     search_preference = user.search_preferences.build(name: "Pocitos", location_query: "legacy")
 
-    assert_not search_preference.valid?
-    assert_includes search_preference.errors[:zones], "must include at least one zone"
+    assert search_preference.valid?
   end
 
   test "accepts a built search zone before persistence" do
