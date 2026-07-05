@@ -53,6 +53,9 @@ GEM
       activemodel (= 8.0.5)
       activesupport (= 8.0.5)
       timeout (>= 0.4.0)
+    activerecord-postgis-adapter (11.0.0)
+      activerecord (~> 8.0.0)
+      rgeo-activerecord (~> 8.0.0)
     activestorage (8.0.5)
       actionpack (= 8.0.5)
       activejob (= 8.0.5)
@@ -221,6 +224,10 @@ GEM
     responders (3.2.0)
       actionpack (>= 7.0)
       railties (>= 7.0)
+    rgeo (3.1.0)
+    rgeo-activerecord (8.0.0)
+      activerecord (>= 7.0)
+      rgeo (>= 3.0)
     securerandom (0.4.1)
     solid_cache (1.0.10)
       activejob (>= 7.2)
@@ -261,12 +268,14 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  activerecord-postgis-adapter
   bootsnap
   debug
   devise
   pg (>= 1.5)
   puma
   rails (~> 8.0.2)
+  rgeo
   solid_cache
   solid_queue
 

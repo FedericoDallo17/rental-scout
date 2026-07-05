@@ -2,6 +2,8 @@ source "https://rubygems.org"
 
 gem "rails", "~> 8.0.2"
 gem "pg", ">= 1.5"
+gem "activerecord-postgis-adapter"
+gem "rgeo"
 gem "puma"
 gem "solid_cache"
 gem "solid_queue"
