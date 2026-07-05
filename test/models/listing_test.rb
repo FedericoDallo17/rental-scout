@@ -10,54 +10,27 @@ class ListingTest < ActiveSupport::TestCase
     assert_equal ["Coordinates Only", "Spatial"], Listing.spatially_resolvable.order(:title).pluck(:title)
   end
 
-  test "for_search_feed scopes listings by location query" do
-    user = User.create!(
-      first_name: "Listing",
-      last_name: "Owner",
-      email: "listing-owner@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
+  test "for_search_feed scopes listings by location query for searches without zones" do
+    user = create_user!("listing-owner@example.com")
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
-    matching = Listing.create!(listing_source: source, title: "Apto Pocitos", canonical_url: "https://example.test/1", location_text: "Pocitos")
-    Listing.create!(listing_source: source, title: "Centro Loft", canonical_url: "https://example.test/2", location_text: "Centro")
+    matching = Listing.create!(listing_source: source, title: "Apto Pocitos", canonical_url: "https://example.test/1", location_text: "Pocitos", in_scope: true)
+    Listing.create!(listing_source: source, title: "Centro Loft", canonical_url: "https://example.test/2", location_text: "Centro", in_scope: true)
     search = user.search_preferences.create!(name: "Pocitos search", location_query: "Pocitos")
 
     assert_equal [matching], Listing.for_search_feed(search).to_a
   end
 
-  test "for_search_feed applies partial location, price, and bedroom filters" do
-    user = User.create!(
-      first_name: "Listing",
-      last_name: "Owner",
-      email: "listing-owner-2@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
+  test "for_search_feed applies scalar filters" do
+    user = create_user!("listing-owner-2@example.com")
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     matching = Listing.create!(
       listing_source: source,
-      title: "Pocitos Two Bedroom",
-      canonical_url: "https://example.test/3",
-      location_text: "Pocitos, Montevideo",
-      price_cents: 2200000,
-      bedrooms: 2
-    )
-    Listing.create!(
-      listing_source: source,
-      title: "Pocitos Too Cheap",
-      canonical_url: "https://example.test/4",
-      location_text: "Pocitos Nuevo",
-      price_cents: 1400000,
-      bedrooms: 2
-    )
-    Listing.create!(
-      listing_source: source,
-      title: "Pocitos Studio",
+      title: "Pocitos Match",
       canonical_url: "https://example.test/5",
-      location_text: "POCITOS",
+      location_text: "Pocitos",
       price_cents: 2100000,
-      bedrooms: 0
+      bedrooms: 2,
+      in_scope: true
     )
     Listing.create!(
       listing_source: source,
@@ -65,7 +38,8 @@ class ListingTest < ActiveSupport::TestCase
       canonical_url: "https://example.test/6",
       location_text: "Centro, Montevideo",
       price_cents: 2100000,
-      bedrooms: 2
+      bedrooms: 2,
+      in_scope: true
     )
     Listing.create!(
       listing_source: source,
@@ -73,7 +47,8 @@ class ListingTest < ActiveSupport::TestCase
       canonical_url: "https://example.test/7",
       location_text: "Pocitos",
       price_cents: 2600000,
-      bedrooms: 2
+      bedrooms: 2,
+      in_scope: true
     )
     search = user.search_preferences.create!(
       name: "Pocitos two bedrooms",
@@ -86,7 +61,70 @@ class ListingTest < ActiveSupport::TestCase
     assert_equal [matching], Listing.for_search_feed(search).to_a
   end
 
-  test "requires source and canonical url" do
+  test "for_search_feed matches any attached zone spatially" do
+    user = create_user!("listing-owner-3@example.com")
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    pocitos = create_zone("Pocitos", "pocitos", ["pocitos"], [[-56.17, -34.92], [-56.14, -34.92], [-56.14, -34.89], [-56.17, -34.89], [-56.17, -34.92]])
+    malvin = create_zone("Malvin", "malvin", ["malvin", "malvín"], [[-56.11, -34.91], [-56.06, -34.91], [-56.06, -34.87], [-56.11, -34.87], [-56.11, -34.91]])
+    matching = Listing.create!(
+      listing_source: source,
+      title: "Apto Malvin",
+      canonical_url: "https://example.test/8",
+      latitude: -34.885,
+      longitude: -56.082,
+      coordinates: Zone::FACTORY.point(-56.082, -34.885),
+      location_resolution_status: "spatial",
+      in_scope: true
+    )
+    Listing.create!(
+      listing_source: source,
+      title: "Centro Loft",
+      canonical_url: "https://example.test/9",
+      latitude: -34.905,
+      longitude: -56.19,
+      coordinates: Zone::FACTORY.point(-56.19, -34.905),
+      location_resolution_status: "spatial",
+      in_scope: true
+    )
+    search = user.search_preferences.create!(name: "Coast", location_query: "legacy", zones: [pocitos, malvin])
+
+    assert_equal [matching], Listing.for_search_feed(search).to_a
+  end
+
+  test "for_search_feed falls back to aliases and excludes unresolved records" do
+    user = create_user!("listing-owner-4@example.com")
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    malvin = create_zone("Malvin", "malvin", ["malvin", "malvín"], [[-56.11, -34.91], [-56.06, -34.91], [-56.06, -34.87], [-56.11, -34.87], [-56.11, -34.91]])
+    matching = Listing.create!(
+      listing_source: source,
+      title: "Fallback Malvin",
+      canonical_url: "https://example.test/fallback-malvin",
+      source_neighborhood: "Malvín",
+      location_resolution_status: "fallback",
+      in_scope: true
+    )
+    Listing.create!(
+      listing_source: source,
+      title: "Unresolved Malvin",
+      canonical_url: "https://example.test/unresolved-malvin",
+      source_neighborhood: "Malvín",
+      location_resolution_status: "unresolved",
+      in_scope: true
+    )
+    Listing.create!(
+      listing_source: source,
+      title: "Rejected Malvin",
+      canonical_url: "https://example.test/rejected-malvin",
+      source_neighborhood: "Malvín",
+      location_resolution_status: "fallback",
+      in_scope: false
+    )
+    search = user.search_preferences.create!(name: "Malvin", location_query: "legacy", zones: [malvin])
+
+    assert_equal [matching], Listing.for_search_feed(search).to_a
+  end
+
+  test "requires source canonical url" do
     listing = Listing.new(title: "Apto")
 
     assert_not listing.valid?
@@ -110,7 +148,7 @@ class ListingTest < ActiveSupport::TestCase
     end
   end
 
-  test "validates external id uniqueness within a source" do
+  test "validates external id uniqueness within source" do
     source = ListingSource.create!(name: "mock_source", adapter_key: "mock")
     Listing.create!(listing_source: source, title: "Apto 1", canonical_url: "https://example.test/1", external_id: "abc")
 
@@ -120,7 +158,7 @@ class ListingTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:external_id], "has already been taken"
   end
 
-  test "enforces external id uniqueness at the database layer within a source" do
+  test "enforces external id uniqueness database layer within source" do
     source = ListingSource.create!(name: "mock_source", adapter_key: "mock")
     Listing.create!(listing_source: source, title: "Apto 1", canonical_url: "https://example.test/1", external_id: "abc")
 
@@ -129,5 +167,26 @@ class ListingTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordNotUnique) do
       duplicate.save!(validate: false)
     end
+  end
+
+  private
+
+  def create_user!(email)
+    User.create!(
+      first_name: "Listing",
+      last_name: "Owner",
+      email: email,
+      password: "password123",
+      password_confirmation: "password123"
+    )
+  end
+
+  def create_zone(name, slug, aliases, coordinates)
+    Zone.create!(
+      name: name,
+      slug: slug,
+      aliases: aliases,
+      geom: Zone.polygon_from_coordinates(coordinates)
+    )
   end
 end

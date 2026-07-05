@@ -75,14 +75,14 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     assert_match(/listing_source_id/i, migration)
   end
 
-  test "seeds bootstrap the mock source outside production" do
+  test "seeds bootstrap listing sources outside production" do
     ListingSource.delete_all
 
-    assert_difference("ListingSource.count", 1) do
+    assert_difference("ListingSource.count", 2) do
       load Rails.root.join("db/seeds.rb")
     end
 
-    assert_equal "mock_source", ListingSource.last.adapter_key
+    assert_equal ["info_casas_api", "mock_source"], ListingSource.order(:adapter_key).pluck(:adapter_key)
   end
 
   test "seeds avoid registering the mock source in production" do
@@ -91,19 +91,23 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     assert_match(/unless\s+Rails\.env\.production\?/, seeds)
   end
 
-  test "seeds correct demo saved search locations on repeated runs" do
-    demo_user = User.create!(
-      first_name: "Demo",
-      last_name: "User",
-      email: "demo@example.com",
-      password: "password123",
-      password_confirmation: "password123"
-    )
-    demo_user.search_preferences.create!(name: "Pocitos", location_query: "Wrong")
+  test "seeds correct zone backed demo saved searches on repeated runs" do
+    demo_user = User.find_or_create_by!(email: "demo@example.com") do |user|
+      user.first_name = "Demo"
+      user.last_name = "User"
+      user.password = "password123"
+      user.password_confirmation = "password123"
+    end
+    search = demo_user.search_preferences.find_or_initialize_by(name: "Pocitos")
+    search.location_query = "Wrong"
+    search.save!
 
     load Rails.root.join("db/seeds.rb")
 
-    assert_equal "Pocitos", demo_user.search_preferences.find_by!(name: "Pocitos").location_query
+    seeded_search = demo_user.search_preferences.find_by!(name: "Pocitos")
+    assert_equal "Pocitos", seeded_search.location_query
+    assert_equal ["Pocitos"], seeded_search.zones.pluck(:name)
+    assert_equal ["Carrasco", "Centro", "Costa Este", "Pocitos"], demo_user.search_preferences.order(:name).pluck(:name)
   end
 
   private

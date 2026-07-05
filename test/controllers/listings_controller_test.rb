@@ -141,6 +141,37 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Browsing <strong>#{foreign_search.name}</strong>"
   end
 
+  test "signed in user sees listings from any attached zone and not unresolved records" do
+    user = create_user!(email: "zones@example.com")
+    sign_in user
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    pocitos = create_zone("Pocitos", "pocitos", ["pocitos"], [[-56.17, -34.92], [-56.14, -34.92], [-56.14, -34.89], [-56.17, -34.89], [-56.17, -34.92]])
+    malvin = create_zone("Malvin", "malvin", ["malvin", "malvín"], [[-56.11, -34.91], [-56.06, -34.91], [-56.06, -34.87], [-56.11, -34.87], [-56.11, -34.91]])
+    Listing.create!(listing_source: source, title: "Pocitos Match", canonical_url: "https://example.test/10", coordinates: Zone::FACTORY.point(-56.16, -34.90), latitude: -34.90, longitude: -56.16, location_resolution_status: "spatial", in_scope: true)
+    Listing.create!(listing_source: source, title: "Malvin Match", canonical_url: "https://example.test/11", coordinates: Zone::FACTORY.point(-56.082, -34.885), latitude: -34.885, longitude: -56.082, location_resolution_status: "spatial", in_scope: true)
+    Listing.create!(listing_source: source, title: "Unresolved", canonical_url: "https://example.test/12", source_neighborhood: "Malvín", location_resolution_status: "unresolved", in_scope: true)
+    search = user.search_preferences.create!(name: "Coast", location_query: "legacy", zones: [pocitos, malvin])
+
+    get listings_path(search_id: search.id)
+
+    assert_response :success
+    assert_includes response.body, "Pocitos Match"
+    assert_includes response.body, "Malvin Match"
+    refute_includes response.body, "Unresolved"
+  end
+
+  test "signed in user sidebar renders zone backed search names" do
+    user = create_user!(email: "sidebar-zones@example.com")
+    sign_in user
+    zone = create_zone("Pocitos", "pocitos", ["pocitos"], [[-56.17, -34.92], [-56.14, -34.92], [-56.14, -34.89], [-56.17, -34.89], [-56.17, -34.92]])
+    user.search_preferences.create!(name: "Pocitos", location_query: "legacy", zones: [zone])
+
+    get listings_path
+
+    assert_response :success
+    assert_includes response.body, "Pocitos"
+  end
+
   private
 
   def create_user!(email:)
@@ -150,6 +181,15 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
       email: email,
       password: "password123",
       password_confirmation: "password123"
+    )
+  end
+
+  def create_zone(name, slug, aliases, coordinates)
+    Zone.create!(
+      name: name,
+      slug: slug,
+      aliases: aliases,
+      geom: Zone.polygon_from_coordinates(coordinates)
     )
   end
 end

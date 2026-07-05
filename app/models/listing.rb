@@ -18,10 +18,31 @@ class Listing < ApplicationRecord
   def self.for_search_feed(search_preference)
     return recent_first unless search_preference
 
-    listings = where("LOWER(location_text) LIKE ?", "%#{sanitize_sql_like(search_preference.location_query.downcase)}%")
+    listings = in_scope_inventory
+    listings = if search_preference.zones.exists?
+      listings.where(id: zone_matching_ids(search_preference))
+    else
+      listings.where("LOWER(location_text) LIKE ?", "%#{sanitize_sql_like(search_preference.location_query.to_s.downcase)}%")
+    end
     listings = listings.where("price_cents >= ?", search_preference.min_price_cents) if search_preference.min_price_cents.present?
     listings = listings.where("price_cents <= ?", search_preference.max_price_cents) if search_preference.max_price_cents.present?
     listings = listings.where("bedrooms >= ?", search_preference.min_bedrooms) if search_preference.min_bedrooms.present?
     listings.recent_first
+  end
+
+  def self.zone_matching_ids(search_preference)
+    zone_ids = search_preference.zone_ids
+    aliases = search_preference.zones.flat_map(&:aliases).map(&:downcase).uniq
+
+    spatial_ids = joins("INNER JOIN zones feed_zones ON ST_Intersects(feed_zones.geom, listings.coordinates)")
+      .where(location_resolution_status: "spatial")
+      .where("feed_zones.id IN (?)", zone_ids)
+      .select(:id)
+
+    fallback_ids = fallback_only
+      .where("LOWER(source_neighborhood) IN (?)", aliases)
+      .select(:id)
+
+    where(id: spatial_ids).or(where(id: fallback_ids)).select(:id)
   end
 end
