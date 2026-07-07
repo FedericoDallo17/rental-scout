@@ -30,6 +30,11 @@ neighborhood aliases for coordinate-less listings.
 - Scrape window (currently last-hour) vs backfill strategy for older inventory.
 
 ## Consequences
+- Steady-state acquisition volume is intentionally small (human-validated 2026-07-06):
+  last-hour publications fetched hourly ≈ 2-3 search pages per source per hour. The
+  rate limiting and MAX_PAGES guard in Ticket 014 protect the abnormal paths (per-listing
+  detail-page fetch bursts when the payload lacks coordinates, runaway pagination if the
+  API ignores paging params) — do not over-engineer beyond that.
 - Inventory is shared across users; data scoping applies to searches, not listings.
 - Requires PostGIS everywhere (dev/test/prod) — accepted, encoded in `bin/setup`.
 - Scrape parameters are source-level, not user-level; user preferences never reach the
