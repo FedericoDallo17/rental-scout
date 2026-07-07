@@ -23,8 +23,8 @@ this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-proj
   docs/superpowers/plans/2026-07-06-ticket-016-adapter-contract-and-mock-fix.md
 
 ## Later
-- Ticket 017: inventory lifecycle/staleness (consequence of the search-engine pivot;
-  needs its own ADR before implementation)
+- Ticket 017: purge stale listings after one week (decided in
+  adr-freshness-first-inventory; ready to plan)
 - Second real source (MercadoLibre) — gated on Ticket 016; must address currency
   handling and cross-source dedup
 - Listing scoring/ranking (Ticket 006) — deferred per adr-notifications-over-ranking

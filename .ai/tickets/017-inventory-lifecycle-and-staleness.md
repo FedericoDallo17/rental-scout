@@ -1,19 +1,21 @@
-# Ticket: 017 - Inventory Lifecycle and Staleness
+# Ticket: 017 - Purge Stale Listings After One Week
 
 ## Goal
-Handle the consequence of the app-as-search-engine pivot (adr-postgis-app-as-search-engine):
-the app now owns a growing shared inventory, but nothing ever detects that a listing was
-rented or delisted, so the feed accumulates stale results forever.
+Implement the freshness-first inventory lifecycle (adr-freshness-first-inventory):
+hard-delete listings not seen in 7 days so the inventory stays a rolling one-week
+window of fresh publications.
 
 ## Acceptance Criteria
-- Listings not seen by any scrape for a defined window (proposal: 7 days, using
-  `seen_listings.last_seen_at`) are marked inactive (e.g. `delisted_at` timestamp).
-- `Listing.for_search_feed` excludes inactive listings.
-- Reappearing listings are reactivated by intake.
-- The window and mechanism are recorded as an ADR before implementation, including how
-  the last-hour scrape window interacts with staleness detection (a listing can be live
-  on InfoCasas yet unseen by us for weeks — the design must account for that, e.g. via
-  periodic detail-page liveness checks or a broader periodic re-scrape).
+- A daily Solid Queue recurring task deletes listings whose `updated_at` is older than
+  7 days (updated_at is touched by intake on re-ingest, so re-published/bumped listings
+  get a fresh week).
+- The purge deletes each listing's `notification_events` (the association is
+  `dependent: :restrict_with_exception` — handle explicitly, in batches, in a
+  transaction per batch).
+- `seen_listings` are nullified (existing `dependent: :nullify` behavior).
+- A purged listing that is re-published is ingested as a new listing (existing intake
+  behavior); re-notification is acceptable per the ADR.
+- Purge counts are logged.
 
 ## Human Approval Required?
-Yes (staleness window and re-check strategy)
+No (window and mechanism decided in adr-freshness-first-inventory)

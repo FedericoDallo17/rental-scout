@@ -4,6 +4,10 @@ Rental Scout Lite — Rails 8 pilot for an AI-driven dev workflow around a real 
 scrape rental sources hourly, dedupe into a shared Montevideo inventory, match against
 user-owned saved searches (PostGIS zones + price/bedrooms), and (eventually) notify.
 
+Product identity: **freshness-first** — "be the first to find a new listing," not a
+complete catalog. Inventory is a rolling ~1-week window (see
+`.ai/decisions/adr-freshness-first-inventory.md`); design features with that lens.
+
 ## Read first
 
 - `.ai/STATUS.md` — truthful current state and next step
