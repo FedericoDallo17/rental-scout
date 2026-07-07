@@ -37,4 +37,8 @@ In progress
 - Ticket 015 delivery channel (Pushover vs email) and credentials
 
 ## Next Step
-Execute Ticket 014, then 015, then 016 (priority order per the 2026-07-06 report)
+Execute the plans in order — each is execution-ready (exact code, TDD steps, commit
+boundaries), written for an agent with zero prior context:
+1. docs/superpowers/plans/2026-07-06-ticket-014-land-in-flight-info-casas-work.md
+2. docs/superpowers/plans/2026-07-06-ticket-015-notification-pipeline-mvp.md
+3. docs/superpowers/plans/2026-07-06-ticket-016-adapter-contract-and-mock-fix.md (requires 014 first)

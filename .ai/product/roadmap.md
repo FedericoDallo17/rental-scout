@@ -13,13 +13,18 @@ this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-proj
 - Hourly job configured (Solid Queue recurring) — not yet validated end-to-end
 
 ## Now
-- Ticket 014: land in-flight InfoCasas work (backfill fix, rate limiting, commit split)
+- Ticket 014: land in-flight InfoCasas work — execution-ready plan:
+  docs/superpowers/plans/2026-07-06-ticket-014-land-in-flight-info-casas-work.md
 
 ## Next
-- Ticket 015: notification pipeline MVP (validates hourly job end-to-end)
-- Ticket 016: adapter contract enforcement + mock adapter fix (unblocks demo, source #2)
+- Ticket 015: notification pipeline MVP — plan:
+  docs/superpowers/plans/2026-07-06-ticket-015-notification-pipeline-mvp.md
+- Ticket 016: adapter contract + mock adapter fix — plan:
+  docs/superpowers/plans/2026-07-06-ticket-016-adapter-contract-and-mock-fix.md
 
 ## Later
+- Ticket 017: inventory lifecycle/staleness (consequence of the search-engine pivot;
+  needs its own ADR before implementation)
 - Second real source (MercadoLibre) — gated on Ticket 016; must address currency
   handling and cross-source dedup
 - Listing scoring/ranking (Ticket 006) — deferred per adr-notifications-over-ranking
