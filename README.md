@@ -9,3 +9,7 @@ The AI workflow lives in the `.ai/` folder.
 Initial workflow:
 
 Discovery -> Look & Feel -> MVP Scope -> Orchestration -> Coding -> Review -> Knowledge Curation
+
+## Future work
+
+- Revisit an interactive zone map for the search form after the core search experience is settled.
