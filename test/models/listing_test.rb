@@ -2,7 +2,7 @@ require "test_helper"
 
 class ListingTest < ActiveSupport::TestCase
   test "spatially_resolvable scope returns listings with coordinates" do
-    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+ source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     Listing.create!(listing_source: source, title: "Spatial", canonical_url: "https://example.test/spatial", location_resolution_status: "spatial", latitude: -34.90, longitude: -56.16, coordinates: Zone::FACTORY.point(-56.16, -34.90))
     Listing.create!(listing_source: source, title: "Status Only", canonical_url: "https://example.test/status-only", location_resolution_status: "spatial")
     Listing.create!(listing_source: source, title: "Coordinates Only", canonical_url: "https://example.test/coordinates-only", location_resolution_status: "fallback", coordinates: Zone::FACTORY.point(-56.17, -34.91))
@@ -12,7 +12,7 @@ class ListingTest < ActiveSupport::TestCase
 
   test "for_search_feed scopes listings by location query for searches without zones" do
     user = create_user!("listing-owner@example.com")
-    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+ source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     matching = Listing.create!(listing_source: source, title: "Apto Pocitos", canonical_url: "https://example.test/1", location_text: "Pocitos", in_scope: true)
     Listing.create!(listing_source: source, title: "Centro Loft", canonical_url: "https://example.test/2", location_text: "Centro", in_scope: true)
     search = user.search_preferences.create!(name: "Pocitos search", location_query: "Pocitos")
@@ -20,36 +20,49 @@ class ListingTest < ActiveSupport::TestCase
     assert_equal [matching], Listing.for_search_feed(search).to_a
   end
 
-  test "for_search_feed applies scalar filters" do
-    user = create_user!("listing-owner-2@example.com")
-    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
-    matching = Listing.create!(
-      listing_source: source,
-      title: "Pocitos Match",
-      canonical_url: "https://example.test/5",
-      location_text: "Pocitos",
-      price_cents: 2100000,
-      bedrooms: 2,
-      in_scope: true
-    )
+test "for_search_feed applies scalar filters" do
+  user = create_user!("listing-owner-2@example.com")
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source_scalar_filters")
+  matching = Listing.create!(
+    listing_source: source,
+    title: "Pocitos Match",
+    canonical_url: "https://example.test/5",
+    location_text: "Pocitos",
+    price_cents: 2100000,
+    currency: "UYU",
+    bedrooms: 2,
+    in_scope: true
+  )
     Listing.create!(
       listing_source: source,
       title: "Centro Match Price",
-      canonical_url: "https://example.test/6",
-      location_text: "Centro, Montevideo",
-      price_cents: 2100000,
-      bedrooms: 2,
-      in_scope: true
-    )
+    canonical_url: "https://example.test/6",
+    location_text: "Centro, Montevideo",
+    price_cents: 2100000,
+    currency: "UYU",
+    bedrooms: 2,
+    in_scope: true
+  )
     Listing.create!(
       listing_source: source,
       title: "Pocitos Too Expensive",
-      canonical_url: "https://example.test/7",
-      location_text: "Pocitos",
-      price_cents: 2600000,
-      bedrooms: 2,
-      in_scope: true
-    )
+    canonical_url: "https://example.test/7",
+    location_text: "Pocitos",
+    price_cents: 2600000,
+    currency: "UYU",
+    bedrooms: 2,
+    in_scope: true
+  )
+  Listing.create!(
+    listing_source: source,
+    title: "Pocitos USD Looks Cheap",
+    canonical_url: "https://example.test/usd",
+    location_text: "Pocitos",
+    price_cents: 2000000,
+    currency: "USD",
+    bedrooms: 2,
+    in_scope: true
+  )
     search = user.search_preferences.create!(
       name: "Pocitos two bedrooms",
       location_query: "pocitos",

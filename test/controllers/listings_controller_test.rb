@@ -50,35 +50,39 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     Listing.create!(
       listing_source: source,
       title: "Pocitos Family Apartment",
-      canonical_url: "https://example.test/3",
-      location_text: "Pocitos, Montevideo",
-      price_cents: 2300000,
-      bedrooms: 2
-    )
+    canonical_url: "https://example.test/3",
+    location_text: "Pocitos, Montevideo",
+    price_cents: 2300000,
+    currency: "UYU",
+    bedrooms: 2
+  )
     Listing.create!(
       listing_source: source,
       title: "Pocitos Studio",
-      canonical_url: "https://example.test/4",
-      location_text: "Pocitos",
-      price_cents: 2100000,
-      bedrooms: 0
-    )
+    canonical_url: "https://example.test/4",
+    location_text: "Pocitos",
+    price_cents: 2100000,
+    currency: "UYU",
+    bedrooms: 0
+  )
     Listing.create!(
       listing_source: source,
       title: "Pocitos Luxury Penthouse",
-      canonical_url: "https://example.test/5",
-      location_text: "Pocitos Nuevo",
-      price_cents: 3200000,
-      bedrooms: 3
-    )
+    canonical_url: "https://example.test/5",
+    location_text: "Pocitos Nuevo",
+    price_cents: 3200000,
+    currency: "UYU",
+    bedrooms: 3
+  )
     Listing.create!(
       listing_source: source,
       title: "Centro Family Apartment",
-      canonical_url: "https://example.test/6",
-      location_text: "Centro, Montevideo",
-      price_cents: 2200000,
-      bedrooms: 2
-    )
+    canonical_url: "https://example.test/6",
+    location_text: "Centro, Montevideo",
+    price_cents: 2200000,
+    currency: "UYU",
+    bedrooms: 2
+  )
     pocitos = user.search_preferences.create!(
       name: "Pocitos families",
       location_query: "pocitos",
