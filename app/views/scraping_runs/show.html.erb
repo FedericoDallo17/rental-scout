@@ -1,0 +1,34 @@
+<main class="runs-page runs-workbench">
+  <header class="runs-header">
+    <div>
+      <p class="runs-header__eyebrow">Notification results</p>
+      <h1>Matches from run #<%= @scraping_run.id %></h1>
+    </div>
+    <div class="runs-header__tools">
+      <%= link_to "Feed", listings_path, class: "runs-header__link" %>
+      <%= link_to "All runs", scraping_runs_path, class: "runs-header__link" %>
+    </div>
+  </header>
+
+  <% if @matches.any? %>
+    <section class="runs-list" aria-label="Matches from this run">
+      <% @matches.each do |listing, events| %>
+        <article class="run-card">
+          <div class="run-card__summary">
+            <div>
+              <p class="runs-header__eyebrow"><%= listing.listing_source.name %></p>
+              <h2><%= link_to listing.title, listing.canonical_url, target: "_blank", rel: "noopener" %></h2>
+            </div>
+          </div>
+          <p><%= MoneyFormatter.call(listing.price_cents, listing.currency) if listing.price_cents.present? %></p>
+          <p>Matched <%= events.map { |event| event.search_preference.name }.uniq.to_sentence %></p>
+        </article>
+      <% end %>
+    </section>
+  <% else %>
+    <section class="empty-state">
+      <h2>No matches from this run.</h2>
+      <p>This run did not create any notification matches for your saved searches.</p>
+    </section>
+  <% end %>
+</main>

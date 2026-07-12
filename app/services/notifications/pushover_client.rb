@@ -9,11 +9,14 @@ module Notifications
 
     class DeliveryError < StandardError; end
 
-    def deliver(user_key:, title:, message:, url: nil)
-      api_token = ENV["PUSHOVER_API_TOKEN"]
-      raise DeliveryError, "PUSHOVER_API_TOKEN is not set" if api_token.blank?
+    def initialize(api_token: nil)
+      @api_token = api_token.presence || Rails.application.credentials.dig(:pushover, :api_token).presence || ENV["PUSHOVER_API_TOKEN"].presence
+    end
 
-      response = post_message(api_token: api_token, user_key: user_key, title: title, message: message, url: url)
+    def deliver(user_key:, title:, message:, url: nil)
+      raise DeliveryError, "Pushover API token is not configured" if @api_token.blank?
+
+      response = post_message(api_token: @api_token, user_key: user_key, title: title, message: message, url: url)
       raise DeliveryError, "pushover returned #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
 
       true

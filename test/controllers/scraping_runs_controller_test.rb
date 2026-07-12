@@ -64,6 +64,28 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action='#{listing_source_path(info_casas)}'] button", text: "Deactivate"
   end
 
+  test "signed in user sees only their persisted matches for a run" do
+    user = create_user!(email: "matches@example.com")
+    other_user = create_user!(email: "other-matches@example.com")
+    source = ListingSource.create!(name: "Match Source", adapter_key: "match_source")
+    run = ScrapingRun.create!(status: "succeeded", started_at: 1.minute.ago)
+    own_search = user.search_preferences.create!(name: "My Centro search", location_query: "centro")
+    other_search = other_user.search_preferences.create!(name: "Private search", location_query: "centro")
+    own_listing = Listing.create!(listing_source: source, scraping_run: run, title: "My matching rental", canonical_url: "https://example.com/own")
+    other_listing = Listing.create!(listing_source: source, scraping_run: run, title: "Someone else's rental", canonical_url: "https://example.com/other")
+    create_event!(own_search, own_listing, "own")
+    create_event!(other_search, other_listing, "other")
+    sign_in user
+
+    get scraping_run_path(run)
+
+    assert_response :success
+    assert_includes response.body, "My matching rental"
+    assert_includes response.body, "My Centro search"
+    assert_not_includes response.body, "Someone else&#39;s rental"
+    assert_not_includes response.body, "Private search"
+  end
+
   test "signed in user toggles listing source active state" do
     user = create_user!(email: "source-toggle@example.com")
     sign_in user
@@ -103,6 +125,18 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
       email: email,
       password: "password123",
       password_confirmation: "password123"
+    )
+  end
+
+  def create_event!(search, listing, suffix)
+    NotificationEvent.create!(
+      listing:,
+      listing_source: listing.listing_source,
+      search_preference: search,
+      event_kind: "new_listing",
+      channel: "pushover",
+      status: "sent",
+      idempotency_key: "controller-match-#{suffix}"
     )
   end
 end

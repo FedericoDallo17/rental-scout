@@ -22,6 +22,8 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
   proves queued intake, match, delivery, and repeat-run notification idempotency
 - Ticket 022: authenticated notification settings - users can configure or remove
   their Pushover key without the saved credential being rendered or logged
+- Ticket 023: grouped run notifications - one summary push per user and run links
+  to authenticated, persisted match results
 
 ## Now
 - Choose the next small unblocked product gap.

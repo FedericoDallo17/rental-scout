@@ -6,10 +6,10 @@ class NotifyNewListingsJob < ActiveJob::Base
   def perform(scraping_run_id)
     scraping_run = ScrapingRun.find(scraping_run_id)
     events = Notifications::NewListingFanOut.new.call(scraping_run: scraping_run)
-    deliverer = Notifications::Deliverer.new
+    deliverer = Notifications::RunSummaryDeliverer.new
 
-    events.each do |event|
-      deliverer.call(notification_event: event)
+    events.group_by { |event| event.search_preference.user }.each do |user, user_events|
+      deliverer.call(user:, events: user_events, scraping_run:)
     end
   end
 end

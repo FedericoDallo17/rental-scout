@@ -36,4 +36,26 @@ class NotifyNewListingsJobTest < ActiveJob::TestCase
   ensure
     Notifications::PushoverClient.define_singleton_method(:new, original_new)
   end
+
+  test "delivers one summary when a listing matches overlapping searches" do
+    source = ListingSource.create!(name: "Summary Source", adapter_key: "summary_source")
+    run = ScrapingRun.create!(status: "succeeded", started_at: 1.minute.ago, finished_at: Time.current)
+    user = User.create!(first_name: "Demo", last_name: "User", email: "summary@example.com", password: "password123", pushover_user_key: "u-summary")
+    2.times { |index| user.search_preferences.create!(name: "Centro #{index}", location_query: "centro", notifications_enabled: true) }
+    Listing.create!(listing_source: source, scraping_run: run, title: "Apto Centro", in_scope: true, canonical_url: "https://example.com/summary", external_id: "summary", location_text: "Centro")
+
+    delivered = []
+    client = Object.new
+    client.define_singleton_method(:deliver) { |**kwargs| delivered << kwargs; true }
+    original_new = Notifications::PushoverClient.method(:new)
+    Notifications::PushoverClient.define_singleton_method(:new) { client }
+
+    NotifyNewListingsJob.perform_now(run.id)
+
+    assert_equal 1, delivered.size
+    assert_match "1 new rental", delivered.first[:message]
+    assert_equal 2, NotificationEvent.where(status: "sent").count
+  ensure
+    Notifications::PushoverClient.define_singleton_method(:new, original_new)
+  end
 end

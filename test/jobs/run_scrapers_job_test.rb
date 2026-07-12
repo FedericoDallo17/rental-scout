@@ -185,7 +185,7 @@ class RunScrapersJobTest < ActiveJob::TestCase
           assert_equal 1, SeenListing.count
           assert_equal 1, NotificationEvent.where(status: "sent").count
           assert_equal 1, deliveries.size
-          assert_equal "https://www.remax.com.uy/listings/pocitos-lifecycle/91001", deliveries.first.fetch(:url)
+          assert_match %r{http://example.com/scraping_runs/\d+}, deliveries.first.fetch(:url)
 
           perform_enqueued_jobs { RunScrapersJob.perform_later }
 
