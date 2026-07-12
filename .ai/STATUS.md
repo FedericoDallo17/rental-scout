@@ -7,10 +7,10 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; additional real sources are next product expansion
 
 ## Current Task
-Port viable `../home_scraper` sources while MercadoLibre API keys are pending
+Provider-sample data model follow-up while MercadoLibre API keys are pending
 
 ## Status
-Hybrid Workbench polish landed for new saved-search and scraping-run features; Ticket 018 is paused until MercadoLibre API keys or an allowed index payload sample are available. Ticket 020 is adding Remax, Housi, and Imperium Inmobiliaria as inactive seeded sources with isolated adapters.
+Ticket 020 landed: Remax, Housi, and Imperium Inmobiliaria adapters are seeded as inactive sources; raw provider samples are stored under `docs/provider_samples/2026-07-12`; a controlled development scrape imported new real rows. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -21,18 +21,16 @@ Hybrid Workbench polish landed for new saved-search and scraping-run features; T
 - Hourly RunScrapersJob configured via Solid Queue recurring tasks (unvalidated end-to-end)
 - Full audit + decision records + roadmap refresh (07-06)
 - Workflow guardrails: CSS-mirror test, STATUS structure test (replaced frozen bootstrap snapshot), ticket Definition-of-Done, shared `.claude/settings.json`, live-scrape HTTP-layer-stubbing policy lines; `.ai/WORKFLOW.md` runbook (07-11)
-- Ticket 014 landed: branded header/flash styling, InfoCasas pagination max-page guard throttles, coordinate backfill repaired to fetch listing detail pages directly (07-11; concurrent session stamped 07-12 in error)
-- Follow-up 014: removed inline per-listing detail from `fetch_listings`; live probe showed index returns 0/50 coordinates, so fallback would guarantee 1+N detail requests during list scrape. Coordinates now come from backfill only. See `adr-no-inline-detail-fetch`; 014 plan carries amendment.
-- Ticket 015 landed: new-listing notification fan-out, Pushover delivery seam/client, and `NotifyNewListingsJob` enqueued after scrape runs (07-12)
-- Ticket 016 landed: intake enforces normalized adapter contract, mock adapter emits scope metadata and restores demo feed, dead InfoCasas legacy map deleted (07-12)
-- Ticket 017 landed: daily Solid Queue purge hard-deletes listings not seen in 7 days, explicitly deletes notification events, nullifies seen-listing references, logs counts (07-12)
-- Ticket 018 planned: MercadoLibre source ticket, design spec, and implementation plan written. Read-only probes to `api.mercadolibre.com/sites/MLU/search` returned `403`, so adapter normalization must not be written against guessed provider fields.
-- Ticket 011 landed: signed-in scraping run observability page shows recent run status, counts, per-source rows, and error messages (07-12)
-- Ticket 019 landed: signed-in users can create, edit, and delete their own saved searches with zones and filters (07-12)
-- Hybrid Workbench polish landed: saved-search sidebar cards show match counts, search forms include feed context, and scraping runs include feed navigation plus source timelines (07-12)
+- Ticket 014 landed: branded header/flash styling, InfoCasas pagination max-page guard throttles, coordinate backfill repaired fetch listing detail pages directly (07-11; concurrent session stamped 07-12 in error)
+- Follow-up 014: removed inline per-listing detail from `fetch_listings`; live probe showed index returns 0/50 coordinates, so fallback would guarantee 1+N detail requests during list scrape. Coordinates now come from backfill only.
+- Ticket 018 planned: MercadoLibre source ticket, design spec, implementation plan written. Read-only probes to `api.mercadolibre.com/sites/MLU/search` returned `403`, so adapter normalization must not be written against guessed provider fields.
+- Ticket 011 landed: signed-in scraping run observability page shows recent run status, counts, per-source rows, error messages (07-12)
+- Ticket 019 landed: signed-in users can create, edit, delete own saved searches zones filters (07-12)
+- Hybrid Workbench polish landed: saved-search sidebar cards show match counts, search forms include feed context, scraping runs include feed navigation plus source timelines (07-12)
+- Ticket 020 landed: Remax direct RedREMAX API adapter, Housi server-rendered HTML adapter, Imperium API adapter, raw provider samples, scrape-driven parser hardening, clickable listing cards, source activation controls, studio bedroom normalization, UYU-only price filtering, and currency labels on cards (07-12)
 
 ## Doing
-- Ticket 020: port Remax, Housi, and Imperium Inmobiliaria adapters as inactive sources. Viability audit found Remax direct RedREMAX API works, Housi server-rendered Tokko HTML is parseable, Imperium API works, and Sorhuet targeted Pocitos route currently returns no properties.
+- Provider-sample data model follow-up: normalize expenses, parking, and property type from raw provider payloads.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
@@ -42,7 +40,8 @@ Hybrid Workbench polish landed for new saved-search and scraping-run features; T
 - Real Pushover delivery requires runtime `PUSHOVER_API_TOKEN` and real user `pushover_user_key`; tests use injected fake clients.
 
 ## Human Input Needed
+- Approve a migration for provider-derived fields such as `expenses_cents`, `parking_spaces`, and `property_type`.
 - Provide `PUSHOVER_API_TOKEN` and user Pushover keys before manual end-to-end push validation.
 
 ## Next Step
-Finish Ticket 020 verification/commit, then enable selected sources locally or resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.
+After migration approval, add normalized provider fields from the saved samples; otherwise resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.
