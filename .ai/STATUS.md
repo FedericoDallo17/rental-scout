@@ -1,6 +1,7 @@
 # Status
 
-Last updated: 2026-07-06 (full audit — see docs/superpowers/reports/2026-07-06-state-of-the-project.md)
+Last updated: 2026-07-11. New here? Read `.ai/WORKFLOW.md` first — it's the dev loop.
+Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
 Ingest core complete; notification/ranking half not started
@@ -19,6 +20,9 @@ In progress
 - PostGIS zones: listing geometry at intake, zone-based feed filtering (07-05)
 - Hourly RunScrapersJob configured via Solid Queue recurring tasks (unvalidated end-to-end)
 - Full audit + decision records + roadmap refresh (07-06)
+- Workflow guardrails: CSS-mirror test, STATUS structure test (replaced frozen
+  bootstrap snapshot), ticket Definition-of-Done, shared `.claude/settings.json`,
+  live-scrape and HTTP-layer-stubbing policy lines; `.ai/WORKFLOW.md` runbook (07-11)
 
 ## Doing
 - Ticket 014: three uncommitted change sets need fixes and a 3-way commit split

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bin/rails test:*)",
+      "Bash(bin/rails test)",
+      "Bash(bin/rails routes:*)",
+      "Bash(bin/rails db:prepare)",
+      "Bash(bin/rails db:test:prepare)",
+      "Bash(bin/rubocop:*)",
+      "Bash(bin/setup)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)"
+    ],
+    "ask": [
+      "Bash(bin/jobs:*)",
+      "Bash(bin/rails runner:*)"
+    ]
+  }
+}
