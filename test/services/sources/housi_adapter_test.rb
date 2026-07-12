@@ -21,7 +21,7 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
           source_neighborhood: "Pocitos",
           source_city: "Montevideo",
           operation_type: "alquiler",
-          bedrooms: nil,
+          bedrooms: 0,
           square_meters: 36
         },
         listings.first.slice(:external_id, :title, :canonical_url, :price_cents, :currency, :location_text, :source_neighborhood, :source_city, :operation_type, :bedrooms, :square_meters)

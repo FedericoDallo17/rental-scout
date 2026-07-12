@@ -85,6 +85,8 @@ module Sources
     end
 
     def bedrooms(title)
+      return 0 if title.to_s.match?(/monoambiente/i)
+
       match = title.to_s.match(/(\d+)\s*dormitorios?/i)
       return unless match
 
