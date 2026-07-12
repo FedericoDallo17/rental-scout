@@ -18,6 +18,13 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".search-form-shell"
     assert_select ".search-form-panel"
     assert_select ".search-form-aside", text: /Feed preview/
+    assert_select "label", text: "Search name"
+    assert_select "label", text: "Min price"
+    assert_select "label", text: "Max price"
+    assert_select "label", text: "Location note"
+    assert_select "label", text: /cents/, count: 0
+    assert_select "input[name='search_preference[min_price]']"
+    assert_select "input[name='search_preference[max_price]']"
     assert_select ".search-form__zones label", text: /Pocitos/
   end
 
@@ -27,14 +34,14 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     sign_in user
 
     post search_preferences_path, params: {
-      search_preference: {
-        name: "Pocitos under 40",
-        location_query: "Pocitos",
-        min_price_cents: "2000000",
-        max_price_cents: "4000000",
-        min_bedrooms: "1",
-        notifications_enabled: "0",
-        zone_ids: [zone.id]
+          search_preference: {
+            name: "Pocitos under 40",
+            location_query: "Pocitos",
+            min_price: "20000",
+            max_price: "40000",
+            min_bedrooms: "1",
+            notifications_enabled: "0",
+            zone_ids: [zone.id]
       }
     }
 
@@ -73,13 +80,13 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     sign_in user
 
     patch search_preference_path(search), params: {
-      search_preference: {
-        name: "Carrasco",
-        location_query: "Carrasco",
-        max_price_cents: "6500000",
-        min_bedrooms: "2",
-        notifications_enabled: "1",
-        zone_ids: [new_zone.id]
+          search_preference: {
+            name: "Carrasco",
+            location_query: "Carrasco",
+            max_price: "65000",
+            min_bedrooms: "2",
+            notifications_enabled: "1",
+            zone_ids: [new_zone.id]
       }
     }
 

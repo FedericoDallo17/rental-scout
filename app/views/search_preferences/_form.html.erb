@@ -13,23 +13,23 @@
 
     <div class="search-form__grid">
       <div class="search-form__field">
-        <%= form.label :name %>
+        <%= form.label :name, "Search name" %>
         <%= form.text_field :name, autofocus: true %>
       </div>
 
       <div class="search-form__field">
-        <%= form.label :location_query, "Location" %>
+        <%= form.label :location_query, "Location note" %>
         <%= form.text_field :location_query %>
       </div>
 
       <div class="search-form__field">
-        <%= form.label :min_price_cents, "Min price (cents)" %>
-        <%= form.number_field :min_price_cents, min: 0, step: 1000 %>
+        <%= form.label :min_price, "Min price" %>
+        <%= form.number_field :min_price, min: 0, step: 1000 %>
       </div>
 
       <div class="search-form__field">
-        <%= form.label :max_price_cents, "Max price (cents)" %>
-        <%= form.number_field :max_price_cents, min: 0, step: 1000 %>
+        <%= form.label :max_price, "Max price" %>
+        <%= form.number_field :max_price, min: 0, step: 1000 %>
       </div>
 
       <div class="search-form__field">

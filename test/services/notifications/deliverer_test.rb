@@ -45,6 +45,7 @@ class Notifications::DelivererTest < ActiveSupport::TestCase
     assert_equal "u-abc123", delivered.first[:user_key]
     assert_match "Centro rentals", delivered.first[:title]
     assert_match "Apto Centro", delivered.first[:message]
+    assert_match "UYU 25.000", delivered.first[:message]
     assert_equal @listing.canonical_url, delivered.first[:url]
   end
 

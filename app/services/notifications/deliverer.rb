@@ -29,7 +29,7 @@ module Notifications
     def formatted_price(listing)
       return "price unknown" if listing.price_cents.blank?
 
-      "#{listing.currency} #{listing.price_cents / 100}"
+      MoneyFormatter.call(listing.price_cents, listing.currency)
     end
   end
 end

@@ -152,9 +152,9 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
   assert_select "section.listings-grid article.listing-card", count: 2
   assert_select "section.listings-grid article.listing-card h2", text: "Pocitos Bright Loft"
   assert_select "section.listings-grid article.listing-card h2", text: "Pocitos Patio Studio"
-  assert_select "section.listings-grid article.listing-card .listing-card__price", text: "USD 17,500"
-  assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Expenses"
-  assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "UYU 4,500"
+    assert_select "section.listings-grid article.listing-card .listing-card__price", text: "USD 17.500"
+    assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Expenses"
+    assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "UYU 4.500"
   assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Parking"
   assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "1"
   assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Type"

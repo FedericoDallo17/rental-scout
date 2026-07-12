@@ -131,6 +131,10 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     seeded_search = demo_user.search_preferences.find_by!(name: "Pocitos")
     assert_equal "Pocitos", seeded_search.location_query
     assert_equal ["Pocitos"], seeded_search.zones.pluck(:name)
+    assert_includes Zone.order(:name).pluck(:name), "Buceo"
+    assert_includes Zone.order(:name).pluck(:name), "Cordón"
+    assert_includes Zone.order(:name).pluck(:name), "Malvín"
+    assert_operator Zone.count, :>=, 12
     assert_equal ["Carrasco", "Centro", "Costa Este", "Pocitos"], demo_user.search_preferences.order(:name).pluck(:name)
   end
 end
