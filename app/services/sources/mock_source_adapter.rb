@@ -103,10 +103,15 @@ module Sources
       }
     ].freeze
 
-    def fetch_listings
-      LISTINGS.map do |listing|
-        listing.transform_values { |value| value.is_a?(String) ? value.dup : value }
-      end
-    end
+ def fetch_listings
+ LISTINGS.map do |listing|
+ duplicated = listing.transform_values { |value| value.is_a?(String) ? value.dup : value }
+ duplicated.merge(
+ source_neighborhood: duplicated[:location_text].split(",").first.strip,
+ source_city: "Montevideo",
+ operation_type: "alquiler"
+ )
+ end
+ end
   end
 end

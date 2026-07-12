@@ -1,7 +1,12 @@
 module Scraping
-  class ListingIntake
-    def call(listing_source:, attributes:, scraping_run: nil)
-      listing, was_new_record = persist_listing(listing_source:, attributes:, scraping_run:)
+ class ListingIntake
+ class InvalidAttributesError < StandardError; end
+
+ REQUIRED_ATTRIBUTES = %i[title canonical_url source_city operation_type].freeze
+
+ def call(listing_source:, attributes:, scraping_run: nil)
+ validate_attributes!(attributes)
+ listing, was_new_record = persist_listing(listing_source:, attributes:, scraping_run:)
 
       upsert_seen_listing(listing_source:, listing:, attributes:, scraping_run:)
 
@@ -9,9 +14,17 @@ module Scraping
       listing
     end
 
-    private
+ private
 
-    def listing_attributes(attributes)
+ def validate_attributes!(attributes)
+ missing = REQUIRED_ATTRIBUTES.select { |key| attributes[key].blank? }
+ return if missing.empty?
+
+ raise InvalidAttributesError,
+ "missing required attributes: #{missing.join(', ')} (canonical_url=#{attributes[:canonical_url].inspect})"
+ end
+
+ def listing_attributes(attributes)
       attrs = Scraping::ListingGeometryBuilder.new.call(attributes: attributes.dup)
       attrs = Scraping::ListingScopeValidator.new.call(attributes: attrs)
       attrs = attrs.slice(*Listing.attribute_names.map(&:to_sym))

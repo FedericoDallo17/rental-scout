@@ -6,8 +6,20 @@ class Sources::MockSourceAdapterTest < ActiveSupport::TestCase
 
     assert_equal 10, listings.size
 
-    assert_equal %i[bedrooms canonical_url description external_id location_text price_cents square_meters title].sort,
-                 listings.first.keys.sort
+    assert_equal %i[
+      bedrooms
+      canonical_url
+      description
+      external_id
+      location_text
+      operation_type
+      price_cents
+      source_city
+      source_neighborhood
+      square_meters
+      title
+    ].sort,
+      listings.first.keys.sort
 
     assert_includes listings.map { |listing| listing[:location_text] }, "Pocitos, Montevideo"
     assert_includes listings.map { |listing| listing[:location_text] }, "Cordón, Montevideo"
@@ -31,5 +43,22 @@ class Sources::MockSourceAdapterTest < ActiveSupport::TestCase
 
     assert_equal original_title, fresh_listing[:title]
     assert_equal original_description, fresh_listing[:description]
+  end
+
+  test "fetch_listings satisfies intake contract and is zone-matchable" do
+    listings = Sources::MockSourceAdapter.new.fetch_listings
+
+    listings.each do |listing|
+      Scraping::ListingIntake::REQUIRED_ATTRIBUTES.each do |key|
+        assert listing[key].present?, "expected #{listing[:external_id]} to have #{key}"
+      end
+
+      assert_equal "Montevideo", listing[:source_city]
+      assert_equal "alquiler", listing[:operation_type]
+      assert listing[:source_neighborhood].present?
+    end
+
+    pocitos = listings.find { |listing| listing[:external_id] == "mock-pocitos-2d-01" }
+    assert_equal "Pocitos", pocitos[:source_neighborhood]
   end
 end

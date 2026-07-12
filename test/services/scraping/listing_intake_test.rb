@@ -11,6 +11,8 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
         title: "Apto Pocitos",
         canonical_url: "https://example.test/a",
         external_id: "1",
+        source_city: "Montevideo",
+        operation_type: "alquiler",
         latitude: -34.9012,
         longitude: -56.1645,
         source_neighborhood: "Pocitos"
@@ -32,6 +34,8 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
         title: "Apto Pocitos",
         canonical_url: "https://example.test/a",
         external_id: "1",
+        source_city: "Montevideo",
+        operation_type: "alquiler",
         latitude: -34.9012,
         longitude: -56.1645,
         source_neighborhood: "Pocitos"
@@ -44,6 +48,8 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
         title: "Apto Pocitos",
         canonical_url: "https://example.test/a",
         external_id: "1",
+        source_city: "Montevideo",
+        operation_type: "alquiler",
         source_neighborhood: "Pocitos"
       }
     )
@@ -56,7 +62,13 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
 
   test "does not create duplicate listing for same source and external id" do
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
-    attrs = { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "1" }
+    attrs = {
+      title: "Apto Pocitos",
+      canonical_url: "https://example.test/a",
+      external_id: "1",
+      source_city: "Montevideo",
+      operation_type: "alquiler"
+    }
 
     intake = Scraping::ListingIntake.new
     first = intake.call(listing_source: source, attributes: attrs)
@@ -72,12 +84,24 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
 
     first = intake.call(
       listing_source: source,
-      attributes: { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "1" }
+      attributes: {
+        title: "Apto Pocitos",
+        canonical_url: "https://example.test/a",
+        external_id: "1",
+        source_city: "Montevideo",
+        operation_type: "alquiler"
+      }
     )
 
     second = intake.call(
       listing_source: source,
-      attributes: { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "2" }
+      attributes: {
+        title: "Apto Pocitos",
+        canonical_url: "https://example.test/a",
+        external_id: "2",
+        source_city: "Montevideo",
+        operation_type: "alquiler"
+      }
     )
 
     assert_equal first.id, second.id
@@ -95,13 +119,25 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
 
     listing = intake.call(
       listing_source: source,
-      attributes: { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "1" },
+      attributes: {
+        title: "Apto Pocitos",
+        canonical_url: "https://example.test/a",
+        external_id: "1",
+        source_city: "Montevideo",
+        operation_type: "alquiler"
+      },
       scraping_run: first_run
     )
 
     intake.call(
       listing_source: source,
-      attributes: { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "1" },
+      attributes: {
+        title: "Apto Pocitos",
+        canonical_url: "https://example.test/a",
+        external_id: "1",
+        source_city: "Montevideo",
+        operation_type: "alquiler"
+      },
       scraping_run: second_run
     )
 
@@ -113,6 +149,7 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     intake = Scraping::ListingIntake.new
     attributes = { title: "Apto Pocitos", canonical_url: "https://example.test/a", external_id: "1" }
+    intake_attributes = attributes.merge(source_city: "Montevideo", operation_type: "alquiler")
     concurrent_listing = Listing.create!(listing_source: source, **attributes, raw_payload: attributes)
     find_listing_calls = 0
     racing_listing = Listing.new(listing_source: source)
@@ -132,7 +169,7 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
 
     begin
       Listing.define_singleton_method(:new) { |*| racing_listing }
-      listing = intake.call(listing_source: source, attributes: attributes)
+      listing = intake.call(listing_source: source, attributes: intake_attributes)
     ensure
       Listing.define_singleton_method(:new, original_new)
       racing_listing.define_singleton_method(:save!, original_save)
@@ -155,7 +192,13 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
     first_run = ScrapingRun.create!(status: "succeeded", started_at: 2.hours.ago)
     second_run = ScrapingRun.create!(status: "succeeded", started_at: Time.current)
     intake = Scraping::ListingIntake.new
-    attributes = { title: "Apto Pocitos", canonical_url: listing.canonical_url, external_id: listing.external_id }
+    attributes = {
+      title: "Apto Pocitos",
+      canonical_url: listing.canonical_url,
+      external_id: listing.external_id,
+      source_city: "Montevideo",
+      operation_type: "alquiler"
+    }
     prior_last_seen_at = 2.hours.ago.change(usec: 0)
     concurrent_seen_listing = SeenListing.create!(
       listing_source: source,
@@ -202,6 +245,8 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
       title: "Apto Pocitos",
       canonical_url: "https://example.test/a",
       external_id: "1",
+      source_city: "Montevideo",
+      operation_type: "alquiler",
       location_text: "Pocitos",
       price_cents: 3_200_000,
       square_meters: 55
@@ -266,6 +311,8 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
       title: "Apto Pocitos",
       canonical_url: "https://example.test/a",
       external_id: "1",
+      source_city: "Montevideo",
+      operation_type: "alquiler",
       location_text: "Pocitos",
       price_cents: 3_200_000,
       bedrooms: 2,

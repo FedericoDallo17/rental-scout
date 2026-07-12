@@ -8,6 +8,8 @@ module Sources
         title: "Centro Loft",
         canonical_url: "https://example.test/listings/stub-1",
         location_text: "Centro",
+        source_city: "Montevideo",
+        operation_type: "alquiler",
         price_cents: 2100000,
         square_meters: 40
       }]
@@ -99,10 +101,12 @@ class RunScrapersJobTest < ActiveJob::TestCase
         canonical_url: "https://www.infocasas.com.uy/alquiler/apartamento/pocitos/123",
         description: "Apartamento luminoso con terraza",
         price_cents: 3_500_000,
-        currency: "UYU",
-        location_text: "Pocitos, Montevideo",
-        bedrooms: 2,
-        square_meters: 58
+            currency: "UYU",
+            location_text: "Pocitos, Montevideo",
+            source_city: "Montevideo",
+            operation_type: "alquiler",
+            bedrooms: 2,
+            square_meters: 58
       }]
     end
 
