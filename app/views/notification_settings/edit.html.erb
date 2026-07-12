@@ -1,0 +1,41 @@
+<main class="notification-settings">
+  <section class="notification-settings__panel">
+    <p class="notification-settings__eyebrow">Account</p>
+    <h1>Notification settings</h1>
+    <p class="notification-settings__intro">
+      Add your Pushover user key to receive new matches from searches with notifications enabled.
+    </p>
+
+    <div class="notification-settings__status notification-settings__status--<%= current_user.pushover_user_key.present? ? "ready" : "missing" %>">
+      <strong><%= current_user.pushover_user_key.present? ? "Ready" : "Setup needed" %></strong>
+      <span><%= current_user.pushover_user_key.present? ? "A Pushover key is configured." : "No Pushover key is configured." %></span>
+    </div>
+
+    <%= form_with url: notification_settings_path, method: :patch, scope: :user, class: "notification-settings__form" do |form| %>
+      <div class="notification-settings__field">
+        <%= form.label :pushover_user_key, current_user.pushover_user_key.present? ? "Replace Pushover user key" : "Pushover user key" %>
+        <%= form.password_field :pushover_user_key, value: nil, autocomplete: "off", spellcheck: false %>
+        <p>Leave blank to keep the currently configured key.</p>
+      </div>
+
+      <% if current_user.pushover_user_key.present? %>
+        <label class="notification-settings__remove">
+          <%= form.check_box :remove_pushover_key %>
+          <span>Remove my saved Pushover key</span>
+        </label>
+      <% end %>
+
+      <div class="notification-settings__actions">
+        <%= form.submit "Save notification settings", class: "notification-settings__submit" %>
+        <%= link_to "Back to listings", listings_path, class: "notification-settings__cancel" %>
+      </div>
+    <% end %>
+  </section>
+
+  <aside class="notification-settings__aside">
+    <p class="notification-settings__eyebrow">Privacy</p>
+    <h2>Your key stays private</h2>
+    <p>The saved value is never displayed back in the page or included in application logs.</p>
+    <p>Saving this page does not send a test notification.</p>
+  </aside>
+</main>

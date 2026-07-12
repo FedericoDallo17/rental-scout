@@ -41,6 +41,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Scraped Apartments"
+    assert_select "a[href='#{edit_notification_settings_path}']", text: "Notifications"
   end
 
   test "signed in root defaults to the first saved search feed" do

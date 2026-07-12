@@ -1127,6 +1127,118 @@ button {
   padding-left: 1.2rem;
 }
 
+.notification-settings {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.7fr);
+  gap: 1.5rem;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.notification-settings__panel,
+.notification-settings__aside {
+  padding: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: rgba(255, 253, 249, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.notification-settings h1,
+.notification-settings h2,
+.notification-settings__eyebrow {
+  margin-top: 0;
+}
+
+.notification-settings__eyebrow {
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.notification-settings__intro,
+.notification-settings__aside p,
+.notification-settings__field p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.notification-settings__status {
+  display: grid;
+  gap: 0.25rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.notification-settings__status--ready {
+  background: #edf8ef;
+  border-color: #bfdac4;
+}
+
+.notification-settings__status--missing {
+  background: #fff8e8;
+  border-color: #ead7a8;
+}
+
+.notification-settings__form,
+.notification-settings__field {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.notification-settings__field label {
+  font-weight: 800;
+}
+
+.notification-settings__field input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  font: inherit;
+}
+
+.notification-settings__field p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.notification-settings__remove {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.notification-settings__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.notification-settings__submit {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--text);
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--surface);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.notification-settings__cancel {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 @media (max-width: 720px) {
   .app-header {
     padding: 0.75rem 1rem 0;
@@ -1171,6 +1283,16 @@ button {
 
   .search-form-shell {
     grid-template-columns: 1fr;
+  }
+
+  .notification-settings {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .notification-settings__panel,
+  .notification-settings__aside {
+    padding: 1.5rem;
   }
 
   .search-form-aside {
