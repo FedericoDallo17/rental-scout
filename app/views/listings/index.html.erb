@@ -40,7 +40,7 @@
         <%= link_to listing.canonical_url, class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
           <div class="listing-card__image">Photo</div>
           <div class="listing-card__body">
-            <p class="listing-card__price"><%= number_to_currency(listing.price_cents.to_i / 100.0, unit: "$", precision: 0) if listing.price_cents %></p>
+            <p class="listing-card__price"><%= number_to_currency(listing.price_cents.to_i / 100.0, unit: "#{listing.currency.presence || "$"} ", precision: 0) if listing.price_cents %></p>
             <h2><%= listing.title %></h2>
             <p class="listing-card__location"><%= listing.location_text %></p>
             <dl class="listing-card__facts">
