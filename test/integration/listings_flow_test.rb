@@ -24,6 +24,8 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ".auth-submit"
     assert_includes response.body, ".auth-flash"
     assert_includes response.body, ".app-flash"
+    assert_includes response.body, ".app-header"
+    assert_includes response.body, ".app-sign-out__button"
     refute_includes response.body, ".flash {"
   end
 
@@ -55,7 +57,9 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
   test "signed in listings route shows an empty saved-search state when none exist" do
     sign_in create_user!(email: "empty-root@example.com")
 
-    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    source = ListingSource.find_or_create_by!(adapter_key: "mock_source") do |listing_source|
+      listing_source.name = "Mock Source"
+    end
     create_listing!(
       listing_source: source,
       title: "Centro Loft",
@@ -79,7 +83,9 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
 
     pocitos = user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
     user.search_preferences.create!(name: "Centro", location_query: "Centro")
-    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
+    source = ListingSource.find_or_create_by!(adapter_key: "mock_source") do |listing_source|
+      listing_source.name = "Mock Source"
+    end
 
     create_listing!(
       listing_source: source,

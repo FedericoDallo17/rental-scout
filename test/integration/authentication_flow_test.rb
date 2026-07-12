@@ -124,6 +124,11 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "feed-layout"
+    assert_select "header.app-header"
+    assert_select "nav.app-nav"
+    assert_select ".app-user__email", text: user.email
+    assert_select "form.app-sign-out"
+    assert_select ".app-sign-out__button", text: "Sign out"
     refute_includes response.body, "auth-shell"
   end
 
