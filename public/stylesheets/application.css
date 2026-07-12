@@ -577,6 +577,10 @@ button {
   padding: 0 2rem;
 }
 
+.runs-workbench {
+  min-width: 0;
+}
+
 .runs-header,
 .run-card__summary,
 .source-run {

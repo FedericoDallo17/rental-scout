@@ -26,6 +26,10 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ".app-flash"
     assert_includes response.body, ".app-header"
     assert_includes response.body, ".app-sign-out__button"
+    assert_includes response.body, ".search-form-shell"
+    assert_includes response.body, ".search-form-aside"
+    assert_includes response.body, ".search-link__count"
+    assert_includes response.body, ".runs-workbench"
     refute_includes response.body, ".flash {"
   end
 
