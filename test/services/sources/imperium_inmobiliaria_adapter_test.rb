@@ -22,6 +22,10 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
       assert_equal "alquiler", listing[:operation_type]
       assert_equal 2, listing[:bedrooms]
       assert_equal 76, listing[:square_meters]
+      assert_nil listing[:expenses_cents]
+      assert_nil listing[:expenses_currency]
+      assert_equal 1, listing[:parking_spaces]
+      assert_equal "Apartamento", listing[:property_type]
     end
   end
 
@@ -48,7 +52,6 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
   test "fetch_listings uses explicit HTTP timeouts for Imperium request" do
     adapter = Sources::ImperiumInmobiliariaAdapter.new
     seen_request = false
-
     request_assertion = lambda do |host, port, options, request|
       assert_equal "imperium-prod.herokuapp.com", host
       assert_equal 443, port

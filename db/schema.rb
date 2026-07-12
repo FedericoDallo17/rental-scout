@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_05_121000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_12_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -46,6 +46,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_121000) do
     t.boolean "in_scope", default: true, null: false
     t.string "scope_rejection_reason"
     t.geography "coordinates", limit: {:srid=>4326, :type=>"st_point", :geographic=>true}
+    t.integer "expenses_cents"
+    t.string "expenses_currency"
+    t.integer "parking_spaces"
+    t.string "property_type"
     t.index ["coordinates"], name: "index_listings_on_coordinates", using: :gist
     t.index ["in_scope"], name: "index_listings_on_in_scope"
     t.index ["listing_source_id", "canonical_url"], name: "index_listings_on_listing_source_id_and_canonical_url", unique: true

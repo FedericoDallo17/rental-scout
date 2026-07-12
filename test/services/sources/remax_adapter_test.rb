@@ -19,6 +19,10 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
       assert_equal "alquiler", listing[:operation_type]
       assert_equal 1, listing[:bedrooms]
       assert_equal 42, listing[:square_meters]
+      assert_equal 500_000, listing[:expenses_cents]
+      assert_equal "UYU", listing[:expenses_currency]
+      assert_nil listing[:parking_spaces]
+      assert_equal "departamento_estandar", listing[:property_type]
       assert_equal(-34.908573, listing[:latitude])
       assert_equal(-56.1483782, listing[:longitude])
     end
@@ -39,7 +43,6 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
   test "fetch_listings uses explicit HTTP timeouts for RedREMAX request" do
     adapter = Sources::RemaxAdapter.new
     seen_request = false
-
     request_assertion = lambda do |host, port, options, request|
       assert_equal "api-ar.redremax.com", host
       assert_equal 443, port
@@ -76,8 +79,11 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
             title: "ALQUILER Pocitos 1 dormitorio balcón garage",
             slug: "alquiler-pocitos-1-dormitorio-balcon-garage",
             price: 38_000,
+            expensesPrice: 5_000,
+            expensesCurrency: { value: "UYU" },
             currency: { value: "UYU" },
             operation: { value: "rent" },
+            type: { value: "departamento_estandar" },
             bedrooms: 1,
             dimensionCovered: 42,
             geoLabel: geo_label,

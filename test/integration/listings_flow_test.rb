@@ -111,11 +111,15 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
       listing_source: source,
       title: "Pocitos Bright Loft",
       canonical_url: "https://example.test/listings/pocitos-bright-loft",
-      location_text: "Pocitos, Montevideo",
-      price_cents: 2100000,
-      square_meters: 48,
-      bedrooms: 2
-    )
+    location_text: "Pocitos, Montevideo",
+    price_cents: 2100000,
+    square_meters: 48,
+    bedrooms: 2,
+    expenses_cents: 450000,
+    expenses_currency: "UYU",
+    parking_spaces: 1,
+    property_type: "Apartamento"
+  )
     create_listing!(
       listing_source: source,
       title: "Pocitos Patio Studio",
@@ -149,11 +153,17 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
   assert_select "section.listings-grid article.listing-card h2", text: "Pocitos Bright Loft"
   assert_select "section.listings-grid article.listing-card h2", text: "Pocitos Patio Studio"
   assert_select "section.listings-grid article.listing-card .listing-card__price", text: "USD 17,500"
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Expenses"
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "UYU 4,500"
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Parking"
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "1"
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Type"
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "Apartamento"
   assert_select "section.listings-grid article.listing-card a.listing-card__link[href='https://example.test/listings/pocitos-bright-loft'][target='_blank'][rel='noopener noreferrer']", count: 1
   assert_select "section.listings-grid article.listing-card .listing-card__location", text: "Pocitos, Montevideo"
     assert_select "section.listings-grid article.listing-card .listing-card__location", text: "POCITOS"
     assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "2", count: 1
-    assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "1", count: 1
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "1", count: 2
     assert_select "section.listings-grid article.listing-card .listing-card__url", text: "https://example.test/listings/pocitos-bright-loft"
     assert_select "section.listings-grid article.listing-card .listing-card__url", text: "https://example.test/listings/pocitos-patio-studio"
     assert_no_match "Centro Loft", response.body

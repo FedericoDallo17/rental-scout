@@ -57,7 +57,11 @@ module Sources
         source_city: "Montevideo",
         operation_type: "alquiler",
         bedrooms: bedrooms(title),
-        square_meters: square_meters(card)
+        square_meters: square_meters(card),
+        expenses_cents: nil,
+        expenses_currency: nil,
+        parking_spaces: nil,
+        property_type: text_at(card, ".prop-card-red-text")
       }
     end
 

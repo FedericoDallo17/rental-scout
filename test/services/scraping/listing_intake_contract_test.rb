@@ -2,7 +2,9 @@ require "test_helper"
 
 class Scraping::ListingIntakeContractTest < ActiveSupport::TestCase
   setup do
-    @source = ListingSource.create!(name: "InfoCasas API", adapter_key: "info_casas_api")
+    @source = ListingSource.find_or_create_by!(adapter_key: "info_casas_api") do |source|
+      source.name = "InfoCasas API"
+    end
     @valid_attributes = {
       external_id: "1",
       title: "Apto Centro",
@@ -17,6 +19,23 @@ class Scraping::ListingIntakeContractTest < ActiveSupport::TestCase
 
     assert listing.persisted?
     assert listing.in_scope?
+  end
+
+  test "persists optional provider detail attributes when present" do
+    listing = Scraping::ListingIntake.new.call(
+      listing_source: @source,
+      attributes: @valid_attributes.merge(
+        expenses_cents: 450_000,
+        expenses_currency: "UYU",
+        parking_spaces: 1,
+        property_type: "apartamento"
+      )
+    )
+
+    assert_equal 450_000, listing.expenses_cents
+    assert_equal "UYU", listing.expenses_currency
+    assert_equal 1, listing.parking_spaces
+    assert_equal "apartamento", listing.property_type
   end
 
   test "raises naming missing required attributes" do

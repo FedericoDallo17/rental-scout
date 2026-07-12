@@ -61,6 +61,10 @@ module Sources
         operation_type: operation_type(entry.dig("operation", "value")),
         bedrooms: integer_or_nil(entry["bedrooms"]),
         square_meters: integer_or_nil(entry["dimensionCovered"]),
+        expenses_cents: normalize_price(entry["expensesPrice"]),
+        expenses_currency: entry.dig("expensesCurrency", "value"),
+        parking_spaces: nil,
+        property_type: entry.dig("type", "value"),
         latitude: latitude,
         longitude: longitude
       }

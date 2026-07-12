@@ -53,6 +53,18 @@
                 <dd><%= listing.square_meters || "-" %></dd>
               </div>
               <div>
+                <dt>Expenses</dt>
+                <dd><%= listing.expenses_cents ? number_to_currency(listing.expenses_cents / 100.0, unit: "#{listing.expenses_currency.presence || listing.currency.presence || "$"} ", precision: 0) : "-" %></dd>
+              </div>
+              <div>
+                <dt>Parking</dt>
+                <dd><%= listing.parking_spaces.nil? ? "-" : listing.parking_spaces %></dd>
+              </div>
+              <div>
+                <dt>Type</dt>
+                <dd><%= listing.property_type.presence || "-" %></dd>
+              </div>
+              <div>
                 <dt>Source</dt>
                 <dd><%= listing.listing_source.name %></dd>
               </div>

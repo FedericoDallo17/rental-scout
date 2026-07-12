@@ -87,7 +87,11 @@ module Sources
         source_city: "Montevideo",
         operation_type: "alquiler",
         bedrooms: integer_or_nil(property["bedrooms"]),
-        square_meters: integer_or_nil(property["area"])
+        square_meters: integer_or_nil(property["area"]),
+        expenses_cents: nil,
+        expenses_currency: nil,
+        parking_spaces: integer_or_nil(property["parking"]),
+        property_type: property["typeProperty"]
       }
     end
 

@@ -9,7 +9,6 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
       listings = adapter.fetch_listings
 
       assert_equal 2, listings.size
-
       assert_equal(
         {
           external_id: "8148664",
@@ -22,9 +21,29 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
           source_city: "Montevideo",
           operation_type: "alquiler",
           bedrooms: 0,
-          square_meters: 36
+          square_meters: 36,
+          property_type: "Apartamento",
+          expenses_cents: nil,
+          expenses_currency: nil,
+          parking_spaces: nil
         },
-        listings.first.slice(:external_id, :title, :canonical_url, :price_cents, :currency, :location_text, :source_neighborhood, :source_city, :operation_type, :bedrooms, :square_meters)
+        listings.first.slice(
+          :external_id,
+          :title,
+          :canonical_url,
+          :price_cents,
+          :currency,
+          :location_text,
+          :source_neighborhood,
+          :source_city,
+          :operation_type,
+          :bedrooms,
+          :square_meters,
+          :property_type,
+          :expenses_cents,
+          :expenses_currency,
+          :parking_spaces
+        )
       )
 
       assert_equal "USD", listings.second[:currency]
@@ -47,7 +66,6 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
   test "fetch_listings uses explicit HTTP timeouts for Housi request" do
     adapter = Sources::HousiAdapter.new
     seen_request = false
-
     request_assertion = lambda do |host, port, options, request|
       assert_equal "www.housi.com.uy", host
       assert_equal 443, port

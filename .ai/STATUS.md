@@ -7,10 +7,10 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; additional real sources are next product expansion
 
 ## Current Task
-Provider-sample data model follow-up while MercadoLibre API keys are pending
+Provider-sample data model follow-up complete; MercadoLibre API keys pending
 
 ## Status
-Ticket 020 landed: Remax, Housi, and Imperium Inmobiliaria adapters are seeded as inactive sources; raw provider samples are stored under `docs/provider_samples/2026-07-12`; a controlled development scrape imported new real rows. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
+Provider-sample data model follow-up landed: listings now persist expenses, expenses currency, parking spaces, and property type where providers expose them; listing cards show those details. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -28,9 +28,10 @@ Ticket 020 landed: Remax, Housi, and Imperium Inmobiliaria adapters are seeded a
 - Ticket 019 landed: signed-in users can create, edit, delete own saved searches zones filters (07-12)
 - Hybrid Workbench polish landed: saved-search sidebar cards show match counts, search forms include feed context, scraping runs include feed navigation plus source timelines (07-12)
 - Ticket 020 landed: Remax direct RedREMAX API adapter, Housi server-rendered HTML adapter, Imperium API adapter, raw provider samples, scrape-driven parser hardening, clickable listing cards, source activation controls, studio bedroom normalization, UYU-only price filtering, and currency labels on cards (07-12)
+- Provider-sample data model follow-up landed: `expenses_cents`, `expenses_currency`, `parking_spaces`, and `property_type` columns; adapters populate available fields; cards render provider detail rows (07-12)
 
 ## Doing
-- Provider-sample data model follow-up: normalize expenses, parking, and property type from raw provider payloads.
+- Waiting for MercadoLibre API keys or next product gap selection.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
@@ -40,8 +41,7 @@ Ticket 020 landed: Remax, Housi, and Imperium Inmobiliaria adapters are seeded a
 - Real Pushover delivery requires runtime `PUSHOVER_API_TOKEN` and real user `pushover_user_key`; tests use injected fake clients.
 
 ## Human Input Needed
-- Approve a migration for provider-derived fields such as `expenses_cents`, `parking_spaces`, and `property_type`.
 - Provide `PUSHOVER_API_TOKEN` and user Pushover keys before manual end-to-end push validation.
 
 ## Next Step
-After migration approval, add normalized provider fields from the saved samples; otherwise resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.
+Resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available; otherwise choose the next small unblocked product gap.
