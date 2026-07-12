@@ -10,7 +10,7 @@ Freshness-first MVP lifecycle complete; second real source is next product expan
 Second real source - MercadoLibre
 
 ## Status
-Ticket 018 spec and implementation plan written; implementation is gated on capturing an allowed MercadoLibre index payload because public probes returned 403 from this environment.
+Ticket 018 spec and implementation plan written; implementation is paused until MercadoLibre API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -32,7 +32,7 @@ Ticket 018 spec and implementation plan written; implementation is gated on capt
 - Implement Ticket 018 from `docs/superpowers/plans/2026-07-12-mercado-libre-source.md`, starting with a MercadoLibre index payload capture gate.
 
 ## Blockers
-- None
+- MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
 
 ## Risks
 - Second source introduces currency handling and cross-source dedup risks called out in adapter-contract ADR.
@@ -42,4 +42,4 @@ Ticket 018 spec and implementation plan written; implementation is gated on capt
 - Provide `PUSHOVER_API_TOKEN` and user Pushover keys before manual end-to-end push validation.
 
 ## Next Step
-Begin Ticket 018 implementation by obtaining an allowed MercadoLibre index payload sample, or pause for user-provided sample/API access if MercadoLibre continues returning 403.
+While MercadoLibre credentials are pending, pick one unblocked app/product ticket; resume Ticket 018 when API keys or an allowed index payload sample are available.
