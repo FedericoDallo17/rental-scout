@@ -54,6 +54,22 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__name", text: "Centro"
   end
 
+  test "signed in sidebar renders hybrid search workbench cards with counts" do
+    user = create_user!(email: "sidebar-workbench@example.com")
+    sign_in user
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source_sidebar_workbench")
+    search = user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "Pocitos One", canonical_url: "https://example.test/pocitos-one", location_text: "Pocitos", in_scope: true)
+    Listing.create!(listing_source: source, title: "Pocitos Two", canonical_url: "https://example.test/pocitos-two", location_text: "Pocitos", in_scope: true)
+
+    get listings_path(search_id: search.id)
+
+    assert_response :success
+    assert_select ".search-workbench"
+    assert_select ".search-sidebar__item .search-link__count", text: "2 listings"
+    assert_select ".search-sidebar__item .search-sidebar__edit", text: "Edit"
+  end
+
   test "signed in listings route shows an empty saved-search state when none exist" do
     sign_in create_user!(email: "empty-root@example.com")
 

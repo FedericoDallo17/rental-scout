@@ -7,6 +7,20 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_user_session_path
   end
 
+  test "signed in user sees hybrid workbench search form" do
+    user = create_user!(email: "search-form-workbench@example.com")
+    create_zone("Pocitos", "pocitos")
+    sign_in user
+
+    get new_search_preference_path
+
+    assert_response :success
+    assert_select ".search-form-shell"
+    assert_select ".search-form-panel"
+    assert_select ".search-form-aside", text: /Feed preview/
+    assert_select ".search-form__zones label", text: /Pocitos/
+  end
+
   test "signed in user creates saved search with zones" do
     user = create_user!(email: "create-search@example.com")
     zone = create_zone("Pocitos", "pocitos")

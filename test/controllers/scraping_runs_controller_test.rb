@@ -40,6 +40,9 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "top-level warning"
     assert_includes response.body, "InfoCasas API"
     assert_includes response.body, "provider timeout"
+    assert_select ".runs-workbench"
+    assert_select "a[href='#{listings_path}']", text: "Feed"
+    assert_select ".source-run__timeline", text: /Started/
   end
 
   test "signed in app header links to scraping runs" do

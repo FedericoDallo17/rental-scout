@@ -1,10 +1,13 @@
-<main class="runs-page">
+<main class="runs-page runs-workbench">
   <header class="runs-header">
     <div>
       <p class="runs-header__eyebrow">Scraper observability</p>
       <h1>Scraping Runs</h1>
     </div>
-    <p class="runs-header__count"><%= pluralize(@scraping_runs.size, "run") %></p>
+    <div class="runs-header__tools">
+      <%= link_to "Feed", listings_path, class: "runs-header__link" %>
+      <p class="runs-header__count"><%= pluralize(@scraping_runs.size, "run") %></p>
+    </div>
   </header>
 
   <% if @scraping_runs.any? %>
@@ -43,11 +46,17 @@
               <div class="source-run">
                 <div>
                   <p class="source-run__name"><%= source_run.listing_source.name %></p>
-                  <p class="source-run__meta">
-                    <%= source_run.listings_seen_count %> seen ·
-                    <%= source_run.listings_created_count %> new
-                  </p>
-                </div>
+                <p class="source-run__meta">
+                  <%= source_run.listings_seen_count %> seen ·
+                  <%= source_run.listings_created_count %> new
+                </p>
+                <p class="source-run__timeline">
+                  Started <%= l(source_run.started_at, format: :short) %>
+                  <% if source_run.finished_at %>
+                    · Finished <%= l(source_run.finished_at, format: :short) %>
+                  <% end %>
+                </p>
+              </div>
                 <span class="status-pill status-pill--<%= source_run.status.to_s.dasherize %>"><%= source_run.status %></span>
                 <% if source_run.error_message.present? %>
                   <p class="source-run__error"><%= source_run.error_message %></p>

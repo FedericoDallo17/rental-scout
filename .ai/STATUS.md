@@ -10,7 +10,7 @@ Freshness-first MVP lifecycle complete; second real source is next product expan
 Saved search management while MercadoLibre API keys are pending
 
 ## Status
-Ticket 019 landed; Ticket 018 is paused until MercadoLibre API keys or an allowed index payload sample are available.
+Hybrid Workbench polish landed for new saved-search and scraping-run features; Ticket 018 is paused until MercadoLibre API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -29,6 +29,7 @@ Ticket 019 landed; Ticket 018 is paused until MercadoLibre API keys or an allowe
 - Ticket 018 planned: MercadoLibre source ticket, design spec, and implementation plan written. Read-only probes to `api.mercadolibre.com/sites/MLU/search` returned `403`, so adapter normalization must not be written against guessed provider fields.
 - Ticket 011 landed: signed-in scraping run observability page shows recent run status, counts, per-source rows, and error messages (07-12)
 - Ticket 019 landed: signed-in users can create, edit, and delete their own saved searches with zones and filters (07-12)
+- Hybrid Workbench polish landed: saved-search sidebar cards show match counts, search forms include feed context, and scraping runs include feed navigation plus source timelines (07-12)
 
 ## Doing
 - MercadoLibre source integration paused pending API keys.

@@ -1,4 +1,4 @@
-<div class="feed-layout">
+<div class="feed-layout search-workbench">
   <aside class="search-sidebar">
     <p class="search-sidebar__eyebrow">Rental Scout Lite</p>
     <h2>Saved searches</h2>
@@ -10,8 +10,9 @@
         <div class="search-sidebar__item">
           <%= link_to listings_path(search_id: search.id), class: ["search-link", ("search-link--active" if search == @active_search)] do %>
             <span class="search-link__name"><%= search.name %></span>
-            <span class="search-link__meta"><%= search.location_query %></span>
-          <% end %>
+          <span class="search-link__meta"><%= search.location_query %></span>
+          <span class="search-link__count"><%= pluralize(@search_counts.fetch(search, 0), "listing") %></span>
+        <% end %>
           <%= link_to "Edit", edit_search_preference_path(search), class: "search-sidebar__edit" %>
         </div>
       <% end %>
