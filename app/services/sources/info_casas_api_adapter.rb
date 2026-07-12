@@ -1,7 +1,6 @@
 require "json"
 require "net/http"
 require "uri"
-require_relative "info_casas_legacy_map"
 
 module Sources
   class InfoCasasApiAdapter
