@@ -36,29 +36,31 @@
     <% if @active_search %>
       <section class="listings-grid" aria-label="Listings">
         <% @listings.each do |listing| %>
-          <article class="listing-card">
-            <div class="listing-card__image">Photo</div>
-            <div class="listing-card__body">
-              <p class="listing-card__price"><%= number_to_currency(listing.price_cents.to_i / 100.0, unit: "$", precision: 0) if listing.price_cents %></p>
-              <h2><%= listing.title %></h2>
-              <p class="listing-card__location"><%= listing.location_text %></p>
-              <dl class="listing-card__facts">
-                <div>
-                  <dt>Bedrooms</dt>
-                  <dd><%= listing.bedrooms || "-" %></dd>
-                </div>
-                <div>
-                  <dt>m²</dt>
-                  <dd><%= listing.square_meters || "-" %></dd>
-                </div>
-                <div>
-                  <dt>Source</dt>
-                  <dd><%= listing.listing_source.name %></dd>
-                </div>
-              </dl>
-              <p class="listing-card__url"><%= listing.canonical_url %></p>
-            </div>
-          </article>
+      <article class="listing-card">
+        <%= link_to listing.canonical_url, class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
+          <div class="listing-card__image">Photo</div>
+          <div class="listing-card__body">
+            <p class="listing-card__price"><%= number_to_currency(listing.price_cents.to_i / 100.0, unit: "$", precision: 0) if listing.price_cents %></p>
+            <h2><%= listing.title %></h2>
+            <p class="listing-card__location"><%= listing.location_text %></p>
+            <dl class="listing-card__facts">
+              <div>
+                <dt>Bedrooms</dt>
+                <dd><%= listing.bedrooms || "-" %></dd>
+              </div>
+              <div>
+                <dt>m²</dt>
+                <dd><%= listing.square_meters || "-" %></dd>
+              </div>
+              <div>
+                <dt>Source</dt>
+                <dd><%= listing.listing_source.name %></dd>
+              </div>
+            </dl>
+            <p class="listing-card__url"><%= listing.canonical_url %></p>
+          </div>
+        <% end %>
+      </article>
         <% end %>
       </section>
     <% else %>
