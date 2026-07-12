@@ -16,13 +16,16 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Ticket 017: purge stale listings one week - daily hard-delete job for listings not seen in 7 days
 - Ticket 011: scraping runs observability - signed-in page for recent run status, source outcomes, and errors
 - Ticket 019: saved search management - signed-in users create, edit, and delete their own search filters
+- Ticket 006: saved-search-specific listing scoring - transient 0–100 scores rank
+  matches by price fit, bedroom fit, and detail completeness with recency ties
 
 ## Now
-- Additional real sources from `../home_scraper` while MercadoLibre is paused: Remax, Housi, and Imperium Inmobiliaria as inactive source adapters; Sorhuet deferred after targeted route returned no properties.
-- MercadoLibre remains paused pending API keys or allowed index payload; must address currency handling cross-source dedup.
+- Choose the next small unblocked product gap.
+- MercadoLibre remains paused pending API keys or allowed index payload.
 
 ## Next
-- Listing scoring/ranking (Ticket 006) - deferred per adr-notifications-over-ranking
+- Choose the next small product gap after scoring; resume MercadoLibre when API
+  keys or an allowed index payload are available.
 
 ## Dropped now
 - Map UI, match explanations (deferred in 06-27 frontend spec)

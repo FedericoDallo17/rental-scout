@@ -29,6 +29,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ".search-form-shell"
     assert_includes response.body, ".search-form-aside"
     assert_includes response.body, ".search-link__count"
+    assert_includes response.body, ".listing-card__score"
     assert_includes response.body, ".runs-workbench"
     refute_includes response.body, ".flash {"
   end
@@ -182,6 +183,49 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "nav.search-sidebar__nav a.search-link .search-link__name", text: "Pocitos"
     assert_select "nav.search-sidebar__nav a.search-link .search-link__name", text: "Centro", count: 0
+  end
+
+  test "signed in feed ranks matches by score and explains the score" do
+    user = create_user!(email: "ranked-feed@example.com")
+    sign_in user
+    search = user.search_preferences.create!(
+      name: "Ranked Pocitos",
+      location_query: "Pocitos",
+      max_price_cents: 4_000_000,
+      min_bedrooms: 1
+    )
+    source = ListingSource.create!(name: "Ranking Source", adapter_key: "ranking_source")
+    create_listing!(
+      listing_source: source,
+      title: "Good Match",
+      canonical_url: "https://example.test/good-match",
+      location_text: "Pocitos",
+      currency: "UYU",
+      price_cents: 3_000_000,
+      bedrooms: 2,
+      square_meters: 55,
+      expenses_cents: 0,
+      parking_spaces: 0,
+      property_type: "Apartamento"
+    )
+    create_listing!(
+      listing_source: source,
+      title: "Okay Match",
+      canonical_url: "https://example.test/okay-match",
+      location_text: "Pocitos",
+      currency: "UYU",
+      price_cents: 3_900_000,
+      bedrooms: 1
+    )
+
+    get listings_path(search_id: search.id)
+
+    assert_response :success
+    assert_equal ["Good Match", "Okay Match"], css_select(".listing-card h2").map { |node| node.text.strip }
+    assert_select ".listing-card", count: 2 do |cards|
+      assert_select cards.first, ".listing-card__score", text: /100\/100 match/
+      assert_select cards.first, ".listing-card__explanation", text: "25% under budget · 2 bedrooms · Complete details"
+    end
   end
 
   test "signed in listings route stays on the listings layout" do

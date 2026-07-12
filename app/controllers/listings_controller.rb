@@ -8,5 +8,7 @@ class ListingsController < ApplicationController
     else
       Listing.none
     end
+    @listing_scores = @listings.index_with { |listing| ListingMatchScore.new(listing, @active_search).result }
+    @listings = @listings.sort_by { |listing| [-@listing_scores.fetch(listing).score, -listing.created_at.to_f] }
   end
 end

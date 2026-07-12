@@ -40,7 +40,12 @@
         <%= link_to listing.canonical_url, class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
           <div class="listing-card__image">Photo</div>
           <div class="listing-card__body">
+            <% match_score = @listing_scores.fetch(listing) %>
+            <div class="listing-card__summary">
               <p class="listing-card__price"><%= format_money(listing.price_cents, listing.currency) %></p>
+              <p class="listing-card__score"><strong><%= match_score.score %></strong>/100 match</p>
+            </div>
+            <p class="listing-card__explanation"><%= match_score.explanations.join(" · ") %></p>
             <h2><%= listing.title %></h2>
             <p class="listing-card__location"><%= listing.location_text %></p>
             <dl class="listing-card__facts">

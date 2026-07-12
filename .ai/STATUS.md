@@ -4,13 +4,13 @@ Last updated: 2026-07-12. New here? Read `.ai/WORKFLOW.md` first - it's the dev 
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
-Freshness-first MVP lifecycle complete; additional real sources are next product expansion
+Freshness-first MVP lifecycle complete; multi-source feed refinement underway
 
 ## Current Task
-Provider-sample data model follow-up complete; MercadoLibre API keys pending
+Ticket 006 listing scoring complete; MercadoLibre API keys pending
 
 ## Status
-Provider-sample data model follow-up landed: listings now persist expenses, expenses currency, parking spaces, and property type where providers expose them; listing cards show those details. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
+Ticket 006 landed: matching listings now receive a transient, saved-search-specific 0–100 score based on price fit, bedroom fit, and detail completeness. Feeds rank by score with recency as the tie-breaker and cards explain the score. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -29,6 +29,7 @@ Provider-sample data model follow-up landed: listings now persist expenses, expe
 - Hybrid Workbench polish landed: saved-search sidebar cards show match counts, search forms include feed context, scraping runs include feed navigation plus source timelines (07-12)
 - Ticket 020 landed: Remax direct RedREMAX API adapter, Housi server-rendered HTML adapter, Imperium API adapter, raw provider samples, scrape-driven parser hardening, clickable listing cards, source activation controls, studio bedroom normalization, UYU-only price filtering, and currency labels on cards (07-12)
 - Provider-sample data model follow-up landed: `expenses_cents`, `expenses_currency`, `parking_spaces`, and `property_type` columns; adapters populate available fields; cards render provider detail rows (07-12)
+- Ticket 006 landed: transient saved-search scoring ranks the feed and displays concise match explanations without a migration (07-12)
 
 ## Doing
 - Waiting for MercadoLibre API keys or next product gap selection.
