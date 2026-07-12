@@ -1,0 +1,67 @@
+<main class="runs-page">
+  <header class="runs-header">
+    <div>
+      <p class="runs-header__eyebrow">Scraper observability</p>
+      <h1>Scraping Runs</h1>
+    </div>
+    <p class="runs-header__count"><%= pluralize(@scraping_runs.size, "run") %></p>
+  </header>
+
+  <% if @scraping_runs.any? %>
+    <section class="runs-list" aria-label="Scraping runs">
+      <% @scraping_runs.each do |run| %>
+        <article class="run-card">
+          <div class="run-card__summary">
+            <div>
+              <p class="run-card__started"><%= l(run.started_at, format: :short) %></p>
+              <h2>Run #<%= run.id %></h2>
+            </div>
+            <span class="status-pill status-pill--<%= run.status.to_s.dasherize %>"><%= run.status %></span>
+          </div>
+
+          <dl class="run-card__facts">
+            <div>
+              <dt>Seen</dt>
+              <dd><%= run.listings_seen_count %> seen</dd>
+            </div>
+            <div>
+              <dt>New</dt>
+              <dd><%= run.listings_created_count %> new</dd>
+            </div>
+            <div>
+              <dt>Finished</dt>
+              <dd><%= run.finished_at ? l(run.finished_at, format: :short) : "Still running" %></dd>
+            </div>
+          </dl>
+
+          <% if run.error_message.present? %>
+            <p class="run-card__error"><%= run.error_message %></p>
+          <% end %>
+
+          <div class="source-runs">
+            <% run.scraping_source_runs.each do |source_run| %>
+              <div class="source-run">
+                <div>
+                  <p class="source-run__name"><%= source_run.listing_source.name %></p>
+                  <p class="source-run__meta">
+                    <%= source_run.listings_seen_count %> seen ·
+                    <%= source_run.listings_created_count %> new
+                  </p>
+                </div>
+                <span class="status-pill status-pill--<%= source_run.status.to_s.dasherize %>"><%= source_run.status %></span>
+                <% if source_run.error_message.present? %>
+                  <p class="source-run__error"><%= source_run.error_message %></p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </section>
+  <% else %>
+    <section class="empty-state">
+      <h2>No scraping runs yet.</h2>
+      <p>Runs will appear here after the scraper job executes.</p>
+    </section>
+  <% end %>
+</main>

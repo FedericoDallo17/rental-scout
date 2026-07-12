@@ -14,15 +14,16 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Ticket 015: notification pipeline MVP - fan-out, Pushover delivery seam, post-scrape notification job
 - Ticket 016: adapter contract + mock adapter fix - intake validation, scope metadata in mock adapter, demo feed restored
 - Ticket 017: purge stale listings one week - daily hard-delete job for listings not seen in 7 days
+- Ticket 011: scraping runs observability - signed-in page for recent run status, source outcomes, and errors
 
 ## Now
-- Second real source (MercadoLibre) - gated on Ticket 016; must address currency handling cross-source dedup
+- Second real source (MercadoLibre) - paused pending API keys or allowed index payload; must address currency handling cross-source dedup
 
 ## Next
 - Listing scoring/ranking (Ticket 006) - deferred per adr-notifications-over-ranking
 
 ## Later
-- Run observability surfacing (Ticket 011)
+- Saved search creation/editing flow
 
 ## Dropped now
 - Map UI, match explanations (deferred in 06-27 frontend spec)

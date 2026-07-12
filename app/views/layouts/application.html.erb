@@ -20,8 +20,9 @@
             <span>Rental Scout Lite</span>
           <% end %>
 
-          <div class="app-user">
-            <span class="app-user__email"><%= current_user.email %></span>
+        <div class="app-user">
+          <%= link_to "Runs", scraping_runs_path, class: "app-nav__link" %>
+          <span class="app-user__email"><%= current_user.email %></span>
             <%= button_to "Sign out", destroy_user_session_path, method: :delete, form_class: "app-sign-out", class: "app-sign-out__button" %>
           </div>
         </nav>

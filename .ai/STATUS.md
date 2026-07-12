@@ -7,10 +7,10 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; second real source is next product expansion
 
 ## Current Task
-Second real source - MercadoLibre
+Scraping runs observability while MercadoLibre API keys are pending
 
 ## Status
-Ticket 018 spec and implementation plan written; implementation is paused until MercadoLibre API keys or an allowed index payload sample are available.
+Ticket 011 landed; Ticket 018 is paused until MercadoLibre API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -27,9 +27,10 @@ Ticket 018 spec and implementation plan written; implementation is paused until 
 - Ticket 016 landed: intake enforces normalized adapter contract, mock adapter emits scope metadata and restores demo feed, dead InfoCasas legacy map deleted (07-12)
 - Ticket 017 landed: daily Solid Queue purge hard-deletes listings not seen in 7 days, explicitly deletes notification events, nullifies seen-listing references, logs counts (07-12)
 - Ticket 018 planned: MercadoLibre source ticket, design spec, and implementation plan written. Read-only probes to `api.mercadolibre.com/sites/MLU/search` returned `403`, so adapter normalization must not be written against guessed provider fields.
+- Ticket 011 landed: signed-in scraping run observability page shows recent run status, counts, per-source rows, and error messages (07-12)
 
 ## Doing
-- Implement Ticket 018 from `docs/superpowers/plans/2026-07-12-mercado-libre-source.md`, starting with a MercadoLibre index payload capture gate.
+- MercadoLibre source integration paused pending API keys; saved search creation/editing flow is the next unblocked product gap.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
@@ -42,4 +43,4 @@ Ticket 018 spec and implementation plan written; implementation is paused until 
 - Provide `PUSHOVER_API_TOKEN` and user Pushover keys before manual end-to-end push validation.
 
 ## Next Step
-While MercadoLibre credentials are pending, pick one unblocked app/product ticket; resume Ticket 018 when API keys or an allowed index payload sample are available.
+Resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available; otherwise plan the saved search creation/editing flow.
