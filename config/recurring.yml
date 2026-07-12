@@ -3,15 +3,27 @@ development:
     class: RunScrapersJob
     queue: default
     schedule: every hour
+  purge_stale_listings:
+    class: PurgeStaleListingsJob
+    queue: default
+    schedule: every day
 
 test:
   run_scrapers:
     class: RunScrapersJob
     queue: default
     schedule: every hour
+  purge_stale_listings:
+    class: PurgeStaleListingsJob
+    queue: default
+    schedule: every day
 
 production:
   run_scrapers:
     class: RunScrapersJob
     queue: default
     schedule: every hour
+  purge_stale_listings:
+    class: PurgeStaleListingsJob
+    queue: default
+    schedule: every day

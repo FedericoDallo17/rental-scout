@@ -78,6 +78,7 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     %w[development test production].each do |environment|
       assert_includes recurring_config, "#{environment}:"
       assert_includes recurring_config, "  run_scrapers:"
+      assert_includes recurring_config, "  purge_stale_listings:"
     end
   end
 
