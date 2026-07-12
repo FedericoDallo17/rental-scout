@@ -46,7 +46,8 @@ module Sources
 
     def normalized_listing(entry)
       longitude, latitude = entry.dig("location", "coordinates")
-      neighborhood = entry["geoLabel"].presence || "Pocitos"
+      label = entry["geoLabel"].presence || "Pocitos"
+      neighborhood = label.split(",").first.strip
 
       {
         external_id: entry.fetch("id").to_s,
@@ -54,7 +55,7 @@ module Sources
         canonical_url: canonical_url(entry),
         price_cents: normalize_price(entry["price"]),
         currency: entry.dig("currency", "value"),
-        location_text: [neighborhood, "Montevideo"].compact_blank.join(", "),
+        location_text: location_text(label),
         source_neighborhood: neighborhood,
         source_city: "Montevideo",
         operation_type: operation_type(entry.dig("operation", "value")),
@@ -68,6 +69,12 @@ module Sources
     def canonical_url(entry)
       slug = entry["slug"].presence || entry["id"].to_s
       "#{FRONTEND_BASE_URL}/listings/#{slug}/#{entry.fetch("id")}"
+    end
+
+    def location_text(label)
+      return label if label.to_s.downcase.include?("montevideo")
+
+      [label, "Montevideo"].compact_blank.join(", ")
     end
 
     def operation_type(value)

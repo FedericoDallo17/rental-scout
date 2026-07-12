@@ -31,8 +31,12 @@ module Sources
     }.freeze
 
     def fetch_listings
-      properties.filter_map { |property| normalized_listing(property) }
-    rescue JSON::ParserError, KeyError, TypeError
+      properties.filter_map do |property|
+        normalized_listing(property)
+      rescue KeyError, TypeError
+        nil
+      end
+    rescue JSON::ParserError
       []
     end
 

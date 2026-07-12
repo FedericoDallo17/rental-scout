@@ -24,6 +24,18 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings does not duplicate Montevideo when RedREMAX geo label already includes city" do
+    adapter = Sources::RemaxAdapter.new
+
+    stub_net_http_start(response_body: remax_response_body(geo_label: "Pocitos, Montevideo")) do
+      listing = adapter.fetch_listings.first
+
+      assert_equal "Pocitos, Montevideo", listing[:location_text]
+      assert_equal "Pocitos", listing[:source_neighborhood]
+      assert_equal "Montevideo", listing[:source_city]
+    end
+  end
+
   test "fetch_listings uses explicit HTTP timeouts for RedREMAX request" do
     adapter = Sources::RemaxAdapter.new
     seen_request = false
@@ -55,7 +67,7 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
 
   private
 
-  def remax_response_body
+  def remax_response_body(geo_label: "Pocitos")
     JSON.generate(
       data: {
         data: [
@@ -68,7 +80,7 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
             operation: { value: "rent" },
             bedrooms: 1,
             dimensionCovered: 42,
-            geoLabel: "Pocitos",
+            geoLabel: geo_label,
             location: {
               type: "Point",
               coordinates: [-56.1483782, -34.908573]

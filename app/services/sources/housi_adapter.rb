@@ -49,7 +49,7 @@ module Sources
       {
         external_id: card["prop-id"].to_s,
         title: title,
-        canonical_url: URI.join(FRONTEND_BASE_URL, href).to_s,
+        canonical_url: URI.join(FRONTEND_BASE_URL, escaped_href(href)).to_s,
         price_cents: price_cents(price),
         currency: currency(price),
         location_text: [address, "Pocitos", "Montevideo"].compact_blank.join(", "),
@@ -63,6 +63,10 @@ module Sources
 
     def text_at(node, selector)
       node.at_css(selector)&.text&.strip
+    end
+
+    def escaped_href(href)
+      URI::DEFAULT_PARSER.escape(href)
     end
 
     def normalized_text(text)

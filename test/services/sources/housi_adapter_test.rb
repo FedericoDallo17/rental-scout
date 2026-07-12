@@ -33,6 +33,17 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings escapes non ascii Housi URLs" do
+    adapter = Sources::HousiAdapter.new
+
+    stub_net_http_start(response_body: housi_html_with_non_ascii_url) do
+      listing = adapter.fetch_listings.first
+
+      assert_equal "8055496", listing[:external_id]
+      assert_equal "https://www.housi.com.uy/p/8055496-Apartamento-en-Alquiler-en-Pocitos-Roque-Graseras-y-Bulevar-Espa%C3%B1a", listing[:canonical_url]
+    end
+  end
+
   test "fetch_listings uses explicit HTTP timeouts for Housi request" do
     adapter = Sources::HousiAdapter.new
     seen_request = false
@@ -96,6 +107,25 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
                   <p class="card-address">C. Luis C. Bollo al 2900</p>
                   <ul><li>Alquiler</li><li>Área total construida: 76 m²</li></ul>
                 </div>
+              </a>
+            </div>
+          </div>
+        </body>
+      </html>
+    HTML
+  end
+
+  def housi_html_with_non_ascii_url
+    <<~HTML
+      <html>
+        <body>
+          <div id="propiedades">
+            <div prop-id="8055496">
+              <a class="item" href="/p/8055496-Apartamento-en-Alquiler-en-Pocitos-Roque-Graseras-y-Bulevar-España">
+                <span class="fp_price"><p>$45.000</p></span>
+                <h4>Alquiler Apartamento 2 dormitorios al frente con balcón y garaje en Pocitos</h4>
+                <p class="card-address">Roque Graseras y Bulevar España</p>
+                <ul><li>Alquiler</li><li>Área total construida: 72 m²</li></ul>
               </a>
             </div>
           </div>

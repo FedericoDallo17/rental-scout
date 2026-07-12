@@ -35,6 +35,16 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings skips malformed Imperium rows without dropping valid listings" do
+    adapter = Sources::ImperiumInmobiliariaAdapter.new
+
+    stub_net_http_start(response_body: imperium_response_body(include_malformed: true)) do
+      external_ids = adapter.fetch_listings.map { |listing| listing[:external_id] }
+
+      assert_equal ["MLU695091687"], external_ids
+    end
+  end
+
   test "fetch_listings uses explicit HTTP timeouts for Imperium request" do
     adapter = Sources::ImperiumInmobiliariaAdapter.new
     seen_request = false
@@ -59,40 +69,44 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
 
   private
 
-  def imperium_response_body
+  def imperium_response_body(include_malformed: false)
+    rows = [
+      {
+        property: {
+          id: "MLU695091687",
+          title: "ALQUILER | Apartamento 2 Dormitorios en Pocitos",
+          description: "<p>Excelente apartamento de diseño en alquiler en Pocitos</p>",
+          price: "53500",
+          currency: "UYU",
+          city: "Pocitos",
+          area: "76",
+          bedrooms: "2",
+          parking: "1",
+          typeProperty: "Apartamento",
+          street: "Coronel Alegre 1195, 11300 Montevideo, Uruguay"
+        }
+      },
+      {
+        property: {
+          id: "MLU974573946",
+          title: "ALQUILER | Local en Montevideo con 63 m² de Espacio",
+          price: "55000",
+          currency: "UYU",
+          city: "Pocitos",
+          area: "63",
+          bedrooms: nil,
+          typeProperty: "Local",
+          street: "Avenida General Rivera 2735, Montevideo, Uruguay"
+        }
+      }
+    ]
+
+    rows << { property: { title: "Malformed apartment", bedrooms: "1", typeProperty: "Apartamento" } } if include_malformed
+
     JSON.generate(
       success: true,
       response: {
-        result: [
-          {
-            property: {
-              id: "MLU695091687",
-              title: "ALQUILER | Apartamento 2 Dormitorios en Pocitos",
-              description: "<p>Excelente apartamento de diseño en alquiler en Pocitos</p>",
-              price: "53500",
-              currency: "UYU",
-              city: "Pocitos",
-              area: "76",
-              bedrooms: "2",
-              parking: "1",
-              typeProperty: "Apartamento",
-              street: "Coronel Alegre 1195, 11300 Montevideo, Uruguay"
-            }
-          },
-          {
-            property: {
-              id: "MLU974573946",
-              title: "ALQUILER | Local en Montevideo con 63 m² de Espacio",
-              price: "55000",
-              currency: "UYU",
-              city: "Pocitos",
-              area: "63",
-              bedrooms: nil,
-              typeProperty: "Local",
-              street: "Avenida General Rivera 2735, Montevideo, Uruguay"
-            }
-          }
-        ]
+        result: rows
       }
     )
   end
