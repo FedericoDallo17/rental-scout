@@ -22,6 +22,19 @@ class RunScrapersJobTest < ActiveJob::TestCase
     end
   end
 
+  test "enqueues notification fan-out after run" do
+    original_adapter = ActiveJob::Base.queue_adapter
+    ActiveJob::Base.queue_adapter = :test
+
+    begin
+      assert_enqueued_with(job: NotifyNewListingsJob) do
+        RunScrapersJob.perform_now
+      end
+    ensure
+      ActiveJob::Base.queue_adapter = original_adapter
+    end
+  end
+
   test "links the run to the records it processes" do
     ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
 
