@@ -4,13 +4,13 @@ Last updated: 2026-07-12. New here? Read `.ai/WORKFLOW.md` first - it's the dev 
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
-Freshness-first MVP lifecycle complete; second real source is next product expansion
+Freshness-first MVP lifecycle complete; additional real sources are next product expansion
 
 ## Current Task
-Saved search management while MercadoLibre API keys are pending
+Port viable `../home_scraper` sources while MercadoLibre API keys are pending
 
 ## Status
-Hybrid Workbench polish landed for new saved-search and scraping-run features; Ticket 018 is paused until MercadoLibre API keys or an allowed index payload sample are available.
+Hybrid Workbench polish landed for new saved-search and scraping-run features; Ticket 018 is paused until MercadoLibre API keys or an allowed index payload sample are available. Ticket 020 is adding Remax, Housi, and Imperium Inmobiliaria as inactive seeded sources with isolated adapters.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -32,7 +32,7 @@ Hybrid Workbench polish landed for new saved-search and scraping-run features; T
 - Hybrid Workbench polish landed: saved-search sidebar cards show match counts, search forms include feed context, and scraping runs include feed navigation plus source timelines (07-12)
 
 ## Doing
-- MercadoLibre source integration paused pending API keys.
+- Ticket 020: port Remax, Housi, and Imperium Inmobiliaria adapters as inactive sources. Viability audit found Remax direct RedREMAX API works, Housi server-rendered Tokko HTML is parseable, Imperium API works, and Sorhuet targeted Pocitos route currently returns no properties.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
@@ -45,4 +45,4 @@ Hybrid Workbench polish landed for new saved-search and scraping-run features; T
 - Provide `PUSHOVER_API_TOKEN` and user Pushover keys before manual end-to-end push validation.
 
 ## Next Step
-Resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available; otherwise choose the next small unblocked product gap.
+Finish Ticket 020 verification/commit, then enable selected sources locally or resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.

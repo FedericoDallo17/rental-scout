@@ -92,11 +92,21 @@ class BootstrapConfigTest < ActiveSupport::TestCase
   test "seeds bootstrap listing sources outside production" do
     ListingSource.delete_all
 
-    assert_difference("ListingSource.count", 2) do
+    assert_difference("ListingSource.count", 5) do
       load Rails.root.join("db/seeds.rb")
     end
 
-    assert_equal ["info_casas_api", "mock_source"], ListingSource.order(:adapter_key).pluck(:adapter_key)
+    assert_equal ["housi", "imperium_inmobiliaria", "info_casas_api", "mock_source", "remax"], ListingSource.order(:adapter_key).pluck(:adapter_key)
+    assert_equal(
+      {
+        "housi" => false,
+        "imperium_inmobiliaria" => false,
+        "info_casas_api" => true,
+        "mock_source" => true,
+        "remax" => false
+      },
+      ListingSource.order(:adapter_key).pluck(:adapter_key, :active).to_h
+    )
   end
 
   test "seeds avoid registering the mock source in production" do

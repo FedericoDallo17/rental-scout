@@ -10,6 +10,17 @@ unless Rails.env.production?
     source.name = "InfoCasas API"
   end
 
+  [
+    ["remax", "Remax"],
+    ["housi", "Housi"],
+    ["imperium_inmobiliaria", "Imperium Inmobiliaria"]
+  ].each do |adapter_key, name|
+    ListingSource.find_or_create_by!(adapter_key:) do |source|
+      source.name = name
+      source.active = false
+    end
+  end
+
   demo_user = User.find_or_create_by!(email: "demo@example.com") do |user|
     user.first_name = "Demo"
     user.last_name = "User"

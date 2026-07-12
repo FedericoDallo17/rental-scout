@@ -18,7 +18,8 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Ticket 019: saved search management - signed-in users create, edit, and delete their own search filters
 
 ## Now
-- Second real source (MercadoLibre) - paused pending API keys or allowed index payload; must address currency handling cross-source dedup
+- Additional real sources from `../home_scraper` while MercadoLibre is paused: Remax, Housi, and Imperium Inmobiliaria as inactive source adapters; Sorhuet deferred after targeted route returned no properties.
+- MercadoLibre remains paused pending API keys or allowed index payload; must address currency handling cross-source dedup.
 
 ## Next
 - Listing scoring/ranking (Ticket 006) - deferred per adr-notifications-over-ranking
