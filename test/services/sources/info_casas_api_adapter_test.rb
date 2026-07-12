@@ -158,6 +158,24 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings never fetches detail pages inline" do
+    adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
+    detail_fetch_attempted = false
+    adapter.define_singleton_method(:detail_response) do |*|
+      detail_fetch_attempted = true
+      raise "inline detail fetch attempted"
+    end
+
+    entry = info_casas_entry(id: 1, latitude: nil, longitude: nil)
+    stub_http_response(adapter, stubbed_info_casas_response_for([entry])) do
+      listing = adapter.fetch_listings.first
+
+      assert_not detail_fetch_attempted, "fetch_listings must not fetch detail pages (adr-no-inline-detail-fetch)"
+      assert_nil listing[:latitude]
+      assert_nil listing[:longitude]
+    end
+  end
+
   test "fetch_listings raises UnexpectedResponseError when payload malformed" do
     adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
 

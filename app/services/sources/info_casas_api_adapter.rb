@@ -81,13 +81,6 @@ module Sources
 
     def normalized_listing(entry)
       location_name = location_text(entry)
-      latitude = entry[:lat] || entry.dig(:location, :lat)
-      longitude = entry[:lng] || entry.dig(:location, :lng)
-      detail_coordinates = if latitude && longitude
-        {}
-      else
-        detail_coordinates_for(entry)
-      end
 
       {
         external_id: entry[:id].to_s,
@@ -102,8 +95,8 @@ module Sources
         operation_type: operation_type_from_id(entry[:operation_type_id]) || operation_type(entry[:link]),
         bedrooms: integer_or_nil(entry[:bedrooms]),
         square_meters: integer_or_nil(entry[:area] || entry[:m2]),
-        latitude: latitude || detail_coordinates[:latitude],
-        longitude: longitude || detail_coordinates[:longitude]
+        latitude: entry[:lat] || entry.dig(:location, :lat),
+        longitude: entry[:lng] || entry.dig(:location, :lng)
       }
     end
 
@@ -126,10 +119,6 @@ module Sources
         request.body = request_body(page:)
         http.request(request)
       end
-    end
-
-    def detail_coordinates_for(entry)
-      detail_coordinates_for_url(URI.join(FRONTEND_BASE_URL, entry[:link]).to_s)
     end
 
     def detail_response(canonical_url)
