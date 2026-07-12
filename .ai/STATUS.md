@@ -4,13 +4,13 @@ Last updated: 2026-07-12. New here? Read `.ai/WORKFLOW.md` first - it's the dev 
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
-Ingest, notification MVP, and adapter contract hardening complete; stale-listing purge next
+Freshness-first MVP lifecycle complete; second real source is next product expansion
 
 ## Current Task
-Ticket 017 - purge stale listings after one week
+Second real source - MercadoLibre
 
 ## Status
-Ready to implement Ticket 017
+Needs implementation plan before coding
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -25,19 +25,20 @@ Ready to implement Ticket 017
 - Follow-up 014: removed inline per-listing detail from `fetch_listings`; live probe showed index returns 0/50 coordinates, so fallback would guarantee 1+N detail requests during list scrape. Coordinates now come from backfill only. See `adr-no-inline-detail-fetch`; 014 plan carries amendment.
 - Ticket 015 landed: new-listing notification fan-out, Pushover delivery seam/client, and `NotifyNewListingsJob` enqueued after scrape runs (07-12)
 - Ticket 016 landed: intake enforces normalized adapter contract, mock adapter emits scope metadata and restores demo feed, dead InfoCasas legacy map deleted (07-12)
+- Ticket 017 landed: daily Solid Queue purge hard-deletes listings not seen in 7 days, explicitly deletes notification events, nullifies seen-listing references, logs counts (07-12)
 
 ## Doing
-- Ticket 017 is next: purge stale listings after one week per freshness-first ADR.
+- Plan the second real source (MercadoLibre) with explicit currency handling and cross-source dedup acceptance criteria.
 
 ## Blockers
 - None
 
 ## Risks
-- Stale listings are not purged yet; inventory will keep growing until Ticket 017 lands.
+- Second source introduces currency handling and cross-source dedup risks called out in adapter-contract ADR.
 - Real Pushover delivery requires runtime `PUSHOVER_API_TOKEN` and real user `pushover_user_key`; tests use injected fake clients.
 
 ## Human Input Needed
 - Provide `PUSHOVER_API_TOKEN` and user Pushover keys before manual end-to-end push validation.
 
 ## Next Step
-Execute Ticket 017 stale-listing purge plan.
+Write an implementation plan for MercadoLibre source integration before coding.

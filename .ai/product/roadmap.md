@@ -13,15 +13,15 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Ticket 014: landed in-flight InfoCasas work - header restyle, adapter enrichment, coordinate backfill detail pages
 - Ticket 015: notification pipeline MVP - fan-out, Pushover delivery seam, post-scrape notification job
 - Ticket 016: adapter contract + mock adapter fix - intake validation, scope metadata in mock adapter, demo feed restored
+- Ticket 017: purge stale listings one week - daily hard-delete job for listings not seen in 7 days
 
 ## Now
-- Ticket 017: purge stale listings one week (decided in adr-freshness-first-inventory; ready plan)
-
-## Next
 - Second real source (MercadoLibre) - gated on Ticket 016; must address currency handling cross-source dedup
 
-## Later
+## Next
 - Listing scoring/ranking (Ticket 006) - deferred per adr-notifications-over-ranking
+
+## Later
 - Run observability surfacing (Ticket 011)
 
 ## Dropped now
