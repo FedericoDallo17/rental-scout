@@ -15,15 +15,13 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Ticket 016: adapter contract + mock adapter fix - intake validation, scope metadata in mock adapter, demo feed restored
 - Ticket 017: purge stale listings one week - daily hard-delete job for listings not seen in 7 days
 - Ticket 011: scraping runs observability - signed-in page for recent run status, source outcomes, and errors
+- Ticket 019: saved search management - signed-in users create, edit, and delete their own search filters
 
 ## Now
 - Second real source (MercadoLibre) - paused pending API keys or allowed index payload; must address currency handling cross-source dedup
 
 ## Next
 - Listing scoring/ranking (Ticket 006) - deferred per adr-notifications-over-ranking
-
-## Later
-- Saved search creation/editing flow
 
 ## Dropped now
 - Map UI, match explanations (deferred in 06-27 frontend spec)

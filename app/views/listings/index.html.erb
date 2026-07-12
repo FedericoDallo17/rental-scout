@@ -3,13 +3,17 @@
     <p class="search-sidebar__eyebrow">Rental Scout Lite</p>
     <h2>Saved searches</h2>
     <p class="search-sidebar__copy">Jump back into the neighborhoods you check most often.</p>
+    <%= link_to "New search", new_search_preference_path, class: "search-sidebar__action" %>
 
     <nav class="search-sidebar__nav" aria-label="Saved searches">
       <% @searches.each do |search| %>
-        <%= link_to listings_path(search_id: search.id), class: ["search-link", ("search-link--active" if search == @active_search)] do %>
-          <span class="search-link__name"><%= search.name %></span>
-          <span class="search-link__meta"><%= search.location_query %></span>
-        <% end %>
+        <div class="search-sidebar__item">
+          <%= link_to listings_path(search_id: search.id), class: ["search-link", ("search-link--active" if search == @active_search)] do %>
+            <span class="search-link__name"><%= search.name %></span>
+            <span class="search-link__meta"><%= search.location_query %></span>
+          <% end %>
+          <%= link_to "Edit", edit_search_preference_path(search), class: "search-sidebar__edit" %>
+        </div>
       <% end %>
     </nav>
   </aside>

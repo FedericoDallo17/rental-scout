@@ -1,0 +1,12 @@
+<main class="search-form-page">
+  <header class="search-form-header">
+    <p class="search-form-header__eyebrow">Saved search</p>
+    <h1>Edit search</h1>
+  </header>
+
+  <%= render "form", search_preference: @search_preference, zones: @zones %>
+
+  <div class="search-form-danger">
+    <%= button_to "Delete search", search_preference_path(@search_preference), method: :delete, class: "search-form-danger__button" %>
+  </div>
+</main>

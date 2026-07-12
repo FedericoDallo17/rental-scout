@@ -1,0 +1,60 @@
+<%= form_with model: search_preference, class: "search-form" do |form| %>
+  <% if search_preference.errors.any? %>
+    <div class="form-errors">
+      <h2>Search could not be saved</h2>
+      <ul>
+        <% search_preference.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="search-form__grid">
+    <div class="search-form__field">
+      <%= form.label :name %>
+      <%= form.text_field :name, autofocus: true %>
+    </div>
+
+    <div class="search-form__field">
+      <%= form.label :location_query, "Location" %>
+      <%= form.text_field :location_query %>
+    </div>
+
+    <div class="search-form__field">
+      <%= form.label :min_price_cents, "Min price (cents)" %>
+      <%= form.number_field :min_price_cents, min: 0, step: 1000 %>
+    </div>
+
+    <div class="search-form__field">
+      <%= form.label :max_price_cents, "Max price (cents)" %>
+      <%= form.number_field :max_price_cents, min: 0, step: 1000 %>
+    </div>
+
+    <div class="search-form__field">
+      <%= form.label :min_bedrooms, "Min bedrooms" %>
+      <%= form.number_field :min_bedrooms, min: 0, step: 1 %>
+    </div>
+  </div>
+
+  <fieldset class="search-form__zones">
+    <legend>Neighborhoods</legend>
+    <% zones.each do |zone| %>
+      <label>
+        <%= check_box_tag "search_preference[zone_ids][]", zone.id, search_preference.zone_ids.include?(zone.id) %>
+        <span><%= zone.name %></span>
+      </label>
+    <% end %>
+    <%= hidden_field_tag "search_preference[zone_ids][]", "" %>
+  </fieldset>
+
+  <label class="search-form__toggle">
+    <%= form.check_box :notifications_enabled %>
+    <span>Notify me about new matches</span>
+  </label>
+
+  <div class="search-form__actions">
+    <%= form.submit search_preference.persisted? ? "Save search" : "Create search", class: "search-form__submit" %>
+    <%= link_to "Cancel", listings_path(search_id: search_preference.id), class: "search-form__cancel" %>
+  </div>
+<% end %>
