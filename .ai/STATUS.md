@@ -7,10 +7,10 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; multi-source feed refinement underway
 
 ## Current Task
-Ticket 023 grouped run notifications complete; MercadoLibre API keys pending
+Ticket 024 conservative cross-source deduplication complete; MercadoLibre API keys pending
 
 ## Status
-Ticket 023 landed: each user receives at most one Pushover summary per scraping run, linked to an authenticated page of their persisted matches and matching search names. Match events remain the idempotency and audit records. Pushover's application token now prefers encrypted Rails credentials with an environment fallback. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
+Ticket 024 landed: provider-local identity remains primary, while complete exact title/price/currency/bedroom signatures conservatively reuse shared inventory across sources and retain each provider occurrence. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -33,6 +33,7 @@ Ticket 023 landed: each user receives at most one Pushover summary per scraping 
 - Ticket 021 landed: scheduled scrape-to-notification lifecycle validated without live provider or notification calls, including repeat-run idempotency (07-12)
 - Ticket 022 landed: secure authenticated Pushover user-key settings close the notification configuration UI gap (07-12)
 - Ticket 023 landed: grouped per-user run summaries link to persisted, user-isolated match results; live Pushover credentials and delivery validated (07-12)
+- Ticket 024 landed: conservative cross-source identity suppresses confirmed syndicated duplicates without fuzzy merging (07-12)
 
 ## Doing
 - Waiting for MercadoLibre API keys or next product gap selection.

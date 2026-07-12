@@ -78,6 +78,36 @@ class Scraping::ListingIntakeTest < ActiveSupport::TestCase
     assert_equal 1, Listing.count
   end
 
+  test "reuses a cross-source listing with the same conservative identity signature" do
+    original_source = ListingSource.create!(name: "InfoCasas", adapter_key: "info_casas_dedup")
+    second_source = ListingSource.create!(name: "Remax", adapter_key: "remax_dedup")
+    intake = Scraping::ListingIntake.new
+    common = { source_city: "Montevideo", operation_type: "alquiler", price_cents: 3_300_000, currency: "UYU", bedrooms: 1 }
+
+    original = intake.call(listing_source: original_source, attributes: common.merge(title: "Pocitos apartamento con terraza", canonical_url: "https://infocasas.test/1", external_id: "ic-1"))
+    duplicate = intake.call(listing_source: second_source, attributes: common.merge(title: "  POCITOS apartamento con terraza  ", canonical_url: "https://remax.test/2", external_id: "re-2"))
+
+    assert_equal original.id, duplicate.id
+    assert_equal 1, Listing.count
+    assert_equal original_source.id, original.reload.listing_source_id
+    assert_equal "https://infocasas.test/1", original.canonical_url
+    assert_equal 2, SeenListing.count
+    assert_equal original.id, second_source.seen_listings.find_by!(external_id: "re-2").listing_id
+    assert_equal false, duplicate.instance_variable_get(:@created_by_intake)
+  end
+
+  test "does not cross-source merge when an identity signature field differs" do
+    first_source = ListingSource.create!(name: "InfoCasas", adapter_key: "info_casas_distinct")
+    second_source = ListingSource.create!(name: "Remax", adapter_key: "remax_distinct")
+    intake = Scraping::ListingIntake.new
+    base = { title: "Apartamento 1 dormitorio", source_city: "Montevideo", operation_type: "alquiler", currency: "UYU", bedrooms: 1 }
+
+    intake.call(listing_source: first_source, attributes: base.merge(canonical_url: "https://infocasas.test/1", external_id: "ic-1", price_cents: 3_300_000))
+    intake.call(listing_source: second_source, attributes: base.merge(canonical_url: "https://remax.test/2", external_id: "re-2", price_cents: 3_400_000))
+
+    assert_equal 2, Listing.count
+  end
+
   test "reuses the existing listing when canonical url stays stable and external id changes" do
     source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     intake = Scraping::ListingIntake.new

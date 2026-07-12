@@ -24,6 +24,8 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
   their Pushover key without the saved credential being rendered or logged
 - Ticket 023: grouped run notifications - one summary push per user and run links
   to authenticated, persisted match results
+- Ticket 024: conservative cross-source deduplication - exact complete signatures
+  share inventory while retaining each provider occurrence
 
 ## Now
 - Choose the next small unblocked product gap.

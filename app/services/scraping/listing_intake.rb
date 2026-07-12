@@ -40,7 +40,11 @@ module Scraping
     end
 
     def persist_listing(listing_source:, attributes:, scraping_run:)
-      listing = find_listing(listing_source:, attributes:) || Listing.new(listing_source:)
+      listing = find_listing(listing_source:, attributes:)
+      cross_source_listing = find_cross_source_listing(listing_source:, attributes:) unless listing
+      return [ cross_source_listing, false ] if cross_source_listing
+
+      listing ||= Listing.new(listing_source:)
       was_new_record = listing.new_record?
       listing.assign_attributes(listing_attributes(attributes))
       listing.scraping_run = scraping_run if scraping_run && was_new_record
@@ -51,6 +55,17 @@ module Scraping
       raise error unless listing
 
       [ listing, false ]
+    end
+
+    def find_cross_source_listing(listing_source:, attributes:)
+      signature = %i[title price_cents currency bedrooms].index_with { |key| attributes[key] }
+      return if signature.values.any?(&:blank?)
+
+      normalized_title = signature[:title].to_s.squish.downcase
+      Listing
+        .where.not(listing_source:)
+        .where(price_cents: signature[:price_cents], currency: signature[:currency], bedrooms: signature[:bedrooms])
+        .find { |listing| listing.title.to_s.squish.downcase == normalized_title }
     end
 
     def upsert_seen_listing(listing_source:, listing:, attributes:, scraping_run:)
