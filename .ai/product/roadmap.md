@@ -12,15 +12,15 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Hourly job configured (Solid Queue recurring) - not yet validated end-to-end
 - Ticket 014: landed in-flight InfoCasas work - header restyle, adapter enrichment, coordinate backfill detail pages
 - Ticket 015: notification pipeline MVP - fan-out, Pushover delivery seam, post-scrape notification job
+- Ticket 016: adapter contract + mock adapter fix - intake validation, scope metadata in mock adapter, demo feed restored
 
 ## Now
-- Ticket 016: adapter contract + mock adapter fix - plan: docs/superpowers/plans/2026-07-06-ticket-016-adapter-contract-and-mock-fix.md
-
-## Next
 - Ticket 017: purge stale listings one week (decided in adr-freshness-first-inventory; ready plan)
 
-## Later
+## Next
 - Second real source (MercadoLibre) - gated on Ticket 016; must address currency handling cross-source dedup
+
+## Later
 - Listing scoring/ranking (Ticket 006) - deferred per adr-notifications-over-ranking
 - Run observability surfacing (Ticket 011)
 
