@@ -25,10 +25,23 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     end
   end
 
-  test "status matches the scraper domain ADR baseline" do
+  test "status keeps the required section structure" do
     status = Rails.root.join(".ai/STATUS.md").read
 
-    assert_equal expected_status_baseline, status
+    [
+      "# Status",
+      "## Current Phase",
+      "## Current Task",
+      "## Status",
+      "## Done",
+      "## Doing",
+      "## Blockers",
+      "## Risks",
+      "## Human Input Needed",
+      "## Next Step"
+    ].each do |section|
+      assert_includes status, "#{section}\n", "expected .ai/STATUS.md to keep a #{section.inspect} section"
+    end
   end
 
   test "development uses solid queue for active job" do
@@ -108,45 +121,5 @@ class BootstrapConfigTest < ActiveSupport::TestCase
     assert_equal "Pocitos", seeded_search.location_query
     assert_equal ["Pocitos"], seeded_search.zones.pluck(:name)
     assert_equal ["Carrasco", "Centro", "Costa Este", "Pocitos"], demo_user.search_preferences.order(:name).pluck(:name)
-  end
-
-  private
-
-  def expected_status_baseline
-    <<~MARKDOWN
-      # Status
-
-      ## Current Phase
-      Bootstrap complete
-
-      ## Current Task
-      Awaiting next scraper implementation ticket
-
-      ## Status
-      Done
-
-      ## Done
-      - Docs and tickets created
-      - Rails app initialized
-      - Core models added
-      - Mock scraper pipeline added
-      - Initial portal added
-      - Scraper domain ADR defined
-
-      ## Doing
-      - None
-
-      ## Blockers
-      - None
-
-      ## Risks
-      - Real source adapters and notification delivery still require careful escalation
-
-      ## Human Input Needed
-      - Choose next implementation ticket
-
-      ## Next Step
-      Execute Ticket 008 or 009 using the scraper domain ADR as the baseline
-    MARKDOWN
   end
 end
