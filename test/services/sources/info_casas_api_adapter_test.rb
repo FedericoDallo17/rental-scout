@@ -3,7 +3,7 @@ require "net/http"
 
 class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
   test "fetch_listings normalizes the legacy info casas payload into listing intake attributes" do
-    adapter = Sources::InfoCasasApiAdapter.new
+    adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
     stub_http_response(adapter, sample_response_body) do
       listings = adapter.fetch_listings
 
@@ -46,13 +46,45 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
   end
 
   test "fetch_listings requests broad montevideo inventory without legacy map filters" do
-    adapter = Sources::InfoCasasApiAdapter.new
+    adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
 
     params = adapter.send(:legacy_search_params)
 
     assert_equal [], params[:map_polygon]
     assert_equal [], params[:map_bounds]
-    assert_equal [10], params[:estate_id]
+    assert_equal 10, params[:estate_id]
+    assert_equal [1, 2], params[:property_type_id]
+    assert_equal 1, params[:publicationDate]
+  end
+
+  test "fetch_listings requests every recent page until results are exhausted" do
+    adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
+    test_case = self
+    requested_pages = []
+
+    http = Object.new
+    http.define_singleton_method(:request) do |request|
+      page = JSON.parse(request.body).first.fetch("variables").fetch("page")
+      requested_pages << page
+      entries = if page == 1
+        Array.new(50) { |index| test_case.send(:info_casas_entry, id: index + 1) }
+      else
+        [
+          test_case.send(:info_casas_entry, id: 51, title: "Casa reciente 51"),
+          test_case.send(:info_casas_entry, id: 52, title: "Casa reciente 52")
+        ]
+      end
+
+      Struct.new(:body).new(test_case.send(:stubbed_info_casas_response_for, entries))
+    end
+
+    stub_net_http_start(->(*, **, &block) { block.call(http) }) do
+      listings = adapter.fetch_listings
+
+      assert_equal [1, 2], requested_pages
+      assert_equal 52, listings.size
+      assert_equal %w[1 52], [listings.first[:external_id], listings.last[:external_id]]
+    end
   end
 
   test "fetch_listings returns coordinates and source metadata" do
@@ -96,14 +128,82 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     end
   end
 
-  test "fetch_listings raises when the payload is malformed" do
+  test "fetch_listings normalizes live provider metadata for internal filtering" do
     adapter = Sources::InfoCasasApiAdapter.new
+    entry = info_casas_entry(
+      id: 789,
+      title: "Apartamento reciente en Prado",
+      link: "/apartamento-reciente-en-prado/789",
+      location_name: nil,
+      latitude: nil,
+      longitude: nil,
+      area: nil,
+      operation_type_id: 2,
+      property_type_id: 2,
+      neighborhood: "Prado",
+      estate: "Montevideo",
+      m2: 40
+    )
+
+    stub_http_response(adapter, stubbed_info_casas_response_for([entry])) do
+      listing = adapter.fetch_listings.first
+
+      assert_equal "Prado, Montevideo", listing[:location_text]
+      assert_equal "Prado", listing[:source_neighborhood]
+      assert_equal "Montevideo", listing[:source_city]
+      assert_equal "alquiler", listing[:operation_type]
+      assert_equal 40, listing[:square_meters]
+      assert_nil listing[:latitude]
+      assert_nil listing[:longitude]
+    end
+  end
+
+  test "fetch_listings raises UnexpectedResponseError when payload malformed" do
+    adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
 
     stub_http_response(adapter, JSON.generate([{ data: {} }])) do
-      assert_raises(NoMethodError) do
+      assert_raises(Sources::InfoCasasApiAdapter::UnexpectedResponseError) do
         adapter.fetch_listings
       end
     end
+  end
+
+  test "fetch_listings stops at max page guard when every page is full" do
+    adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
+    test_case = self
+    requested_pages = []
+
+    http = Object.new
+    http.define_singleton_method(:request) do |request|
+      page = JSON.parse(request.body).first.fetch("variables").fetch("page")
+      requested_pages << page
+      entries = Array.new(50) { |index| test_case.send(:info_casas_entry, id: (page * 1000) + index) }
+
+      Struct.new(:body).new(test_case.send(:stubbed_info_casas_response_for, entries))
+    end
+
+    stub_net_http_start(->(*, **, &block) { block.call(http) }) do
+      listings = adapter.fetch_listings
+
+      assert_equal Sources::InfoCasasApiAdapter::MAX_PAGES, requested_pages.size
+      assert_equal 50 * Sources::InfoCasasApiAdapter::MAX_PAGES, listings.size
+    end
+  end
+
+  test "detail_coordinates_for_url returns empty hash and logs when detail fetch fails" do
+    adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
+    adapter.define_singleton_method(:detail_response) { |*| raise Net::ReadTimeout }
+    logged = []
+
+    original_warn = Rails.logger.method(:warn)
+    Rails.logger.define_singleton_method(:warn) { |message| logged << message }
+    begin
+      assert_equal({}, adapter.detail_coordinates_for_url("https://www.infocasas.com.uy/x/1"))
+    ensure
+      Rails.logger.define_singleton_method(:warn, original_warn)
+    end
+
+    assert_match(/detail coordinate fetch failed/, logged.join)
   end
 
   test "fetch_listings uses explicit HTTP timeouts for the InfoCasas request" do
@@ -192,36 +292,76 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
   end
 
   def stubbed_info_casas_response(id:, title:, location_name:, latitude:, longitude:, description: "Apartamento luminoso con terraza", link: "/alquiler/apartamento/pocitos/123", price: 35000, bedrooms: 2, area: 58)
+    stubbed_info_casas_response_for([
+      info_casas_entry(
+        id: id,
+        title: title,
+        description: description,
+        link: link,
+        price: price,
+        location_name: location_name,
+        bedrooms: bedrooms,
+        area: area,
+        latitude: latitude,
+        longitude: longitude
+      )
+    ])
+  end
+
+  def stubbed_info_casas_response_for(entries)
     JSON.generate([
       {
         data: {
           searchFast: {
-            data: [
-              {
-                id: id,
-                title: title,
-                description: description,
-                link: link,
-                price: price,
-                commonExpenses: 4500,
-                facilities: ["9"],
-                location: { name: location_name, lat: latitude, lng: longitude },
-                lat: latitude,
-                lng: longitude,
-                bedrooms: bedrooms,
-                area: area
-              }
-            ]
+            data: entries
           }
         }
       }
     ])
   end
 
+  def info_casas_entry(
+    id:,
+    title: "Apartamento en Pocitos",
+    description: "Apartamento luminoso con terraza",
+    link: "/alquiler/apartamento/pocitos/123",
+    price: 35000,
+    location_name: "Pocitos, Montevideo",
+    bedrooms: 2,
+    area: 58,
+    m2: nil,
+    latitude: -34.885,
+    longitude: -56.082,
+    operation_type_id: nil,
+    property_type_id: nil,
+    neighborhood: nil,
+    estate: nil
+  )
+    {
+      id: id,
+      title: title,
+      description: description,
+      link: link,
+      price: price,
+      operation_type_id: operation_type_id,
+      property_type_id: property_type_id,
+      commonExpenses: 4500,
+      facilities: ["9"],
+      location: location_name ? { name: location_name, lat: latitude, lng: longitude } : nil,
+      neighborhood: neighborhood,
+      estate: estate,
+      lat: latitude,
+      lng: longitude,
+      bedrooms: bedrooms,
+      area: area,
+      m2: m2
+    }
+  end
+
   def stub_http_response(adapter, body)
     response = Struct.new(:body).new(body)
 
-    adapter.define_singleton_method(:http_response) do
+    adapter.define_singleton_method(:http_response) do |*|
       response
     end
 
@@ -273,14 +413,14 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
       "page" => 1,
       "order" => 2,
       "operation_type_id" => 2,
-      "property_type_id" => [2],
+      "property_type_id" => [1, 2],
       "currencyID" => 2,
       "m2Currency" => 2,
       "mapView" => false,
-      "estate_id" => [10],
+      "estate_id" => 10,
       "neighborhood_id" => [],
       "bedrooms" => nil,
-      "publicationDate" => nil,
+      "publicationDate" => 1,
       "minPrice" => nil,
       "maxPrice" => nil,
       "m2Min" => nil,
