@@ -10,16 +10,16 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Devise auth + user-owned searches (unplanned; see adr-devise-auth-shared-inventory)
 - PostGIS zones + shared Montevideo inventory (see adr-postgis-app-as-search-engine)
 - Hourly job configured (Solid Queue recurring) - not yet validated end-to-end
-- Ticket 014: landed in-flight InfoCasas work - header restyle, adapter enrichment, coordinate backfill from detail pages
+- Ticket 014: landed in-flight InfoCasas work - header restyle, adapter enrichment, coordinate backfill detail pages
+- Ticket 015: notification pipeline MVP - fan-out, Pushover delivery seam, post-scrape notification job
 
 ## Now
-- Ticket 015: notification pipeline MVP - plan: docs/superpowers/plans/2026-07-06-ticket-015-notification-pipeline-mvp.md
-
-## Next
 - Ticket 016: adapter contract + mock adapter fix - plan: docs/superpowers/plans/2026-07-06-ticket-016-adapter-contract-and-mock-fix.md
 
-## Later
+## Next
 - Ticket 017: purge stale listings one week (decided in adr-freshness-first-inventory; ready plan)
+
+## Later
 - Second real source (MercadoLibre) - gated on Ticket 016; must address currency handling cross-source dedup
 - Listing scoring/ranking (Ticket 006) - deferred per adr-notifications-over-ranking
 - Run observability surfacing (Ticket 011)
