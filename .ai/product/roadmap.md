@@ -18,6 +18,8 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Ticket 019: saved search management - signed-in users create, edit, and delete their own search filters
 - Ticket 006: saved-search-specific listing scoring - transient 0–100 scores rank
   matches by price fit, bedroom fit, and detail completeness with recency ties
+- Ticket 021: scheduled scrape lifecycle validation - stubbed Remax HTTP response
+  proves queued intake, match, delivery, and repeat-run notification idempotency
 
 ## Now
 - Choose the next small unblocked product gap.

@@ -7,10 +7,10 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; multi-source feed refinement underway
 
 ## Current Task
-Ticket 006 listing scoring complete; MercadoLibre API keys pending
+Ticket 021 scheduled lifecycle validation complete; MercadoLibre API keys pending
 
 ## Status
-Ticket 006 landed: matching listings now receive a transient, saved-search-specific 0–100 score based on price fit, bedroom fit, and detail completeness. Feeds rank by score with recency as the tie-breaker and cards explain the score. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
+Ticket 021 landed: a job-level integration test now proves a stubbed Remax response flows through queued scraping, intake, saved-search matching, notification event creation, and fake Pushover delivery. Repeating the same scrape produces no duplicate event or delivery. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -30,6 +30,7 @@ Ticket 006 landed: matching listings now receive a transient, saved-search-speci
 - Ticket 020 landed: Remax direct RedREMAX API adapter, Housi server-rendered HTML adapter, Imperium API adapter, raw provider samples, scrape-driven parser hardening, clickable listing cards, source activation controls, studio bedroom normalization, UYU-only price filtering, and currency labels on cards (07-12)
 - Provider-sample data model follow-up landed: `expenses_cents`, `expenses_currency`, `parking_spaces`, and `property_type` columns; adapters populate available fields; cards render provider detail rows (07-12)
 - Ticket 006 landed: transient saved-search scoring ranks the feed and displays concise match explanations without a migration (07-12)
+- Ticket 021 landed: scheduled scrape-to-notification lifecycle validated without live provider or notification calls, including repeat-run idempotency (07-12)
 
 ## Doing
 - Waiting for MercadoLibre API keys or next product gap selection.

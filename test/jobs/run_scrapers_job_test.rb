@@ -1,4 +1,5 @@
 require "test_helper"
+require "net/http"
 
 module Sources
   class StubSourceAdapter
@@ -160,5 +161,92 @@ class RunScrapersJobTest < ActiveJob::TestCase
     run = RunScrapersJob.perform_now
 
     assert_equal "succeeded", run.status
+  end
+
+  test "carries a stubbed provider listing through queued delivery without duplicates" do
+    ListingSource.create!(name: "Remax", adapter_key: "remax")
+    user = User.create!(
+      first_name: "Lifecycle",
+      last_name: "Owner",
+      email: "lifecycle@example.com",
+      password: "password123",
+      password_confirmation: "password123",
+      pushover_user_key: "user-key"
+    )
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos", notifications_enabled: true)
+    deliveries = []
+
+    with_remax_http_response do
+      with_pushover_client(deliveries) do
+        with_test_queue do
+          perform_enqueued_jobs { RunScrapersJob.perform_later }
+
+          assert_equal 1, Listing.count
+          assert_equal 1, SeenListing.count
+          assert_equal 1, NotificationEvent.where(status: "sent").count
+          assert_equal 1, deliveries.size
+          assert_equal "https://www.remax.com.uy/listings/pocitos-lifecycle/91001", deliveries.first.fetch(:url)
+
+          perform_enqueued_jobs { RunScrapersJob.perform_later }
+
+          assert_equal 2, ScrapingRun.count
+          assert_equal 1, Listing.count
+          assert_equal 1, NotificationEvent.count
+          assert_equal 1, deliveries.size
+        end
+      end
+    end
+  end
+
+  private
+
+  def with_remax_http_response
+    original_start = Net::HTTP.method(:start)
+    body = JSON.generate(
+      data: {
+        data: [{
+          id: 91_001,
+          title: "Pocitos lifecycle apartment",
+          slug: "pocitos-lifecycle",
+          price: 35_000,
+          currency: { value: "UYU" },
+          operation: { value: "rent" },
+          type: { value: "departamento_estandar" },
+          bedrooms: 1,
+          dimensionCovered: 42,
+          geoLabel: "Pocitos",
+          location: { type: "Point", coordinates: [-56.148, -34.908] }
+        }]
+      }
+    )
+    response = Struct.new(:body).new(body)
+    http = Object.new
+    http.define_singleton_method(:request) { |_request| response }
+    Net::HTTP.define_singleton_method(:start) { |_host, _port, **_options, &block| block.call(http) }
+
+    yield
+  ensure
+    Net::HTTP.define_singleton_method(:start) do |*args, **kwargs, &block|
+      original_start.call(*args, **kwargs, &block)
+    end
+  end
+
+  def with_pushover_client(deliveries)
+    original_new = Notifications::PushoverClient.method(:new)
+    client = Object.new
+    client.define_singleton_method(:deliver) { |**attributes| deliveries << attributes }
+    Notifications::PushoverClient.define_singleton_method(:new) { client }
+
+    yield
+  ensure
+    Notifications::PushoverClient.define_singleton_method(:new, original_new)
+  end
+
+  def with_test_queue
+    original_adapter = ActiveJob::Base.queue_adapter
+    ActiveJob::Base.queue_adapter = :test
+    yield
+  ensure
+    ActiveJob::Base.queue_adapter = original_adapter
   end
 end
