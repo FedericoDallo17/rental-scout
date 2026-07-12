@@ -10,6 +10,10 @@ so the seeded demo feed shows listings again (see adr-adapter-contract).
   out-of-scope listings.
 - `MockSourceAdapter` emits `source_city` and `operation_type`; a fresh `bin/setup`
   plus a scrape yields a non-empty demo feed.
+- The contract records `latitude`/`longitude` as optional index-time keys: adapters
+  emit them when the source's index payload provides geolocation, and must never
+  fetch per-listing detail pages inside `fetch_listings` to obtain them — detail
+  enrichment is out-of-band only (see adr-no-inline-detail-fetch).
 - `info_casas_legacy_map.rb` (dead code) is deleted.
 
 ## Human Approval Required?

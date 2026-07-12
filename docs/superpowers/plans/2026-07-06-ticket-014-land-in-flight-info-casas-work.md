@@ -17,6 +17,99 @@
 
 ---
 
+## PLAN UPDATE (2026-07-11): no inline detail fetches in `fetch_listings`
+
+> **Timing note:** Ticket 014 was executed from the original plan (commits
+> `59d8307`/`2943302`/`4cc9c7c`, 07-12) concurrently with this update being
+> written, so the inline detail fetch landed. The amendments below were therefore
+> applied as an immediate follow-up commit rather than during Task 2. They are kept
+> here as the authoritative spec for that follow-up (see
+> `.ai/decisions/adr-no-inline-detail-fetch.md`).
+
+**Evidence (measured live, single request):** the `searchFast` index payload contains
+**no coordinate fields at all** — a 50-entry probe returned 0 entries with `lat`/`lng`
+or `location.{lat,lng}`; those keys simply don't exist in the payload. So the inline
+branch in `normalized_listing` (fetch the detail page when index coords are missing)
+fires for **100% of listings**: every scrape run = pages + one blocking detail GET per
+listing (~2000 worst case, each with up to a 15s read timeout). This is a guaranteed
+1+N, and it duplicates what the Task 3 backfill does out of band.
+
+**Decision (see `.ai/decisions/adr-no-inline-detail-fetch.md`):** `fetch_listings`
+must never perform per-listing detail requests. It maps index coordinates when the
+source provides them (kept: a future source may) and otherwise leaves
+`latitude`/`longitude` nil. Coordinate enrichment is the backfill job's sole job.
+
+**Amendments to Task 2** (everything else in the plan stands):
+
+1. **Step 1 (failing tests) — add one more test** to
+   `test/services/sources/info_casas_api_adapter_test.rb`:
+
+   ```ruby
+   test "fetch_listings never fetches detail pages inline" do
+     adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
+     detail_fetch_attempted = false
+     adapter.define_singleton_method(:detail_response) do |*|
+       detail_fetch_attempted = true
+       raise "inline detail fetch attempted"
+     end
+
+     entry = info_casas_entry(id: 1, latitude: nil, longitude: nil)
+     stub_http_response(adapter, stubbed_info_casas_response_for([entry])) do
+       listing = adapter.fetch_listings.first
+
+       assert_not detail_fetch_attempted, "fetch_listings must not fetch detail pages (adr-no-inline-detail-fetch)"
+       assert_nil listing[:latitude]
+       assert_nil listing[:longitude]
+     end
+   end
+   ```
+
+   (A flag is required rather than a bare `raise`: `detail_coordinates_for_url`
+   rescues StandardError by design, so a raise alone would be swallowed and the
+   test would pass even with the inline fetch present.)
+
+2. **Step 3(e) is replaced.** Instead of keeping `detail_coordinates_for(entry)` as a
+   delegation: **delete that private method entirely**, and in `normalized_listing`
+   remove the detail-fetch branch so the coordinate mapping is index-only:
+
+   ```ruby
+   latitude: entry[:lat] || entry.dig(:location, :lat),
+   longitude: entry[:lng] || entry.dig(:location, :lng)
+   ```
+
+   (Delete the `location_name`-adjacent `detail_coordinates = ...` conditional at the
+   top of `normalized_listing`; `detail_coordinates_for_url` stays public — it is the
+   backfill's interface, per Task 2's Interfaces block.)
+
+3. **`test/services/sources/info_casas_detail_geo_test.rb` is rewritten, not
+   committed as-is.** Its current single test pins the inline behavior
+   (`fetch_listings` extracting coords from detail HTML) — the exact behavior this
+   update removes. Replace that test with a unit test of the public method, reusing
+   the same `detail_html` fixture:
+
+   ```ruby
+   test "detail_coordinates_for_url extracts geo from JSON-LD in detail html" do
+     adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
+     adapter.define_singleton_method(:detail_response) do |_canonical_url|
+       Struct.new(:body).new(detail_html)
+     end
+
+     coordinates = adapter.detail_coordinates_for_url("https://www.infocasas.com.uy/apartamento-en-cordon-con-mapa/790")
+
+     assert_equal(-34.9057216, coordinates[:latitude])
+     assert_equal(-56.1822016, coordinates[:longitude])
+   end
+   ```
+
+   Drop the now-unused `stub_search_response` helper if nothing else uses it.
+
+4. **Step 5 expectation changes:** intake tests that relied on inline-enriched
+   coordinates (if any) will see nil lat/lng from the index path; that is correct —
+   such listings resolve via neighborhood fallback at intake and get coordinates from
+   the backfill (Task 3).
+
+---
+
 ### Task 1: Land the header/style change set
 
 **Files:**
@@ -55,6 +148,10 @@ git commit -m "style: brand app header and flash styling"
 ---
 
 ### Task 2: Harden the enriched InfoCasas adapter
+
+> **AMENDED after execution — see "PLAN UPDATE (2026-07-11)" above.** This task was
+> executed as originally written; the inline detail fetch it preserved was removed
+> in a follow-up commit per the plan update.
 
 **Files:**
 - Modify: `app/services/sources/info_casas_api_adapter.rb`
