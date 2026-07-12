@@ -10,7 +10,7 @@ Freshness-first MVP lifecycle complete; second real source is next product expan
 Second real source - MercadoLibre
 
 ## Status
-Needs implementation plan before coding
+Ticket 018 spec and implementation plan written; implementation is gated on capturing an allowed MercadoLibre index payload because public probes returned 403 from this environment.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -26,9 +26,10 @@ Needs implementation plan before coding
 - Ticket 015 landed: new-listing notification fan-out, Pushover delivery seam/client, and `NotifyNewListingsJob` enqueued after scrape runs (07-12)
 - Ticket 016 landed: intake enforces normalized adapter contract, mock adapter emits scope metadata and restores demo feed, dead InfoCasas legacy map deleted (07-12)
 - Ticket 017 landed: daily Solid Queue purge hard-deletes listings not seen in 7 days, explicitly deletes notification events, nullifies seen-listing references, logs counts (07-12)
+- Ticket 018 planned: MercadoLibre source ticket, design spec, and implementation plan written. Read-only probes to `api.mercadolibre.com/sites/MLU/search` returned `403`, so adapter normalization must not be written against guessed provider fields.
 
 ## Doing
-- Plan the second real source (MercadoLibre) with explicit currency handling and cross-source dedup acceptance criteria.
+- Implement Ticket 018 from `docs/superpowers/plans/2026-07-12-mercado-libre-source.md`, starting with a MercadoLibre index payload capture gate.
 
 ## Blockers
 - None
@@ -41,4 +42,4 @@ Needs implementation plan before coding
 - Provide `PUSHOVER_API_TOKEN` and user Pushover keys before manual end-to-end push validation.
 
 ## Next Step
-Write an implementation plan for MercadoLibre source integration before coding.
+Begin Ticket 018 implementation by obtaining an allowed MercadoLibre index payload sample, or pause for user-provided sample/API access if MercadoLibre continues returning 403.
