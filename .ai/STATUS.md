@@ -58,4 +58,4 @@ Ticket 026 live probes confirm city-wide neighborhood diversity and valid canoni
   users can now enter their own Pushover keys in the app.
 
 ## Next Step
-Resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available; otherwise evaluate cached address geocoding for Housi and Imperium or choose another small unblocked product gap.
+Shape Ticket 028's feed usability and source-efficiency decisions; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.

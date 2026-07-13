@@ -38,6 +38,12 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Choose the next small unblocked product gap.
 - MercadoLibre remains paused pending API keys or allowed index payload.
 
+## Product gaps to shape
+
+- Ticket 028: card alignment, user-facing source names, card fact density,
+  incremental provider fetching, score semantics/contrast, and feed sorting,
+  filtering, deselection, and all-search aggregation.
+
 ## Next
 - Choose the next small product gap after scoring; resume MercadoLibre when API
   keys or an allowed index payload are available.
