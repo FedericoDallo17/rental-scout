@@ -65,4 +65,22 @@ class SearchPreferenceTest < ActiveSupport::TestCase
 
     assert search_preference.valid?
   end
+
+  test "defaults price currency to UYU and accepts USD" do
+    user = User.create!(first_name: "Search", last_name: "Owner", email: "currency-search@example.com", password: "password123", password_confirmation: "password123")
+    search_preference = user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+
+    assert_equal "UYU", search_preference.price_currency
+
+    search_preference.price_currency = "USD"
+    assert search_preference.valid?
+  end
+
+  test "rejects unsupported price currencies" do
+    user = User.create!(first_name: "Search", last_name: "Owner", email: "invalid-currency-search@example.com", password: "password123", password_confirmation: "password123")
+    search_preference = user.search_preferences.build(name: "Pocitos", location_query: "Pocitos", price_currency: "EUR")
+
+    assert_not search_preference.valid?
+    assert_includes search_preference.errors[:price_currency], "is not included in the list"
+  end
 end

@@ -37,6 +37,8 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   labels without exposing internal adapter keys
 - Ticket 029: preserved InfoCasas rent currency independently from peso-denominated
   common expenses and removed the acquisition-time peso-only filter
+- Ticket 030: added a bilingual UYU/USD saved-search price currency and made
+  bounded feed filtering and scoring currency-safe
 
 ## Now
 - Resolve the remaining Ticket 028 product and provider-fetch decisions.

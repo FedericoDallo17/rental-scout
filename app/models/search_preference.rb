@@ -1,4 +1,6 @@
 class SearchPreference < ApplicationRecord
+  PRICE_CURRENCIES = %w[UYU USD].freeze
+
   belongs_to :user
 
   has_many :notification_events, dependent: :nullify
@@ -6,6 +8,7 @@ class SearchPreference < ApplicationRecord
   has_many :zones, through: :search_zones
 
   validates :name, :location_query, presence: true
+  validates :price_currency, inclusion: { in: PRICE_CURRENCIES }
 
   scope :ordered_for_sidebar, -> { order(:created_at, :id) }
 

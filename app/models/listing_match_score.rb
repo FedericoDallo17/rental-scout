@@ -24,6 +24,7 @@ class ListingMatchScore
   def price_points
     return 30 unless search_preference.max_price_cents.present?
     return 0 unless listing.price_cents.present?
+    return 0 if price_currency_mismatch?
 
     ratio = listing.price_cents.fdiv(search_preference.max_price_cents)
     return PRICE_WEIGHT if ratio <= 0.75
@@ -45,6 +46,7 @@ class ListingMatchScore
   def price_explanation
     return I18n.t("scoring.no_maximum_budget") unless search_preference.max_price_cents.present?
     return I18n.t("scoring.price_unavailable") unless listing.price_cents.present?
+    return I18n.t("scoring.price_currency_mismatch") if price_currency_mismatch?
 
     percent = (((search_preference.max_price_cents - listing.price_cents).fdiv(search_preference.max_price_cents)) * 100).round
     percent.negative? ? I18n.t("scoring.over_budget", percent: percent.abs) : I18n.t("scoring.under_budget", percent: percent)
@@ -63,5 +65,9 @@ class ListingMatchScore
     return I18n.t("scoring.good_detail_coverage") if known_fields >= 3
 
     I18n.t("scoring.basic_details")
+  end
+
+  def price_currency_mismatch?
+    listing.currency.present? && search_preference.price_currency.present? && listing.currency != search_preference.price_currency
   end
 end

@@ -23,6 +23,11 @@
       </div>
 
       <div class="search-form__field">
+        <%= form.label :price_currency, t("searches.price_currency") %>
+        <%= form.select :price_currency, SearchPreference::PRICE_CURRENCIES.map { |currency| [currency, currency] } %>
+      </div>
+
+      <div class="search-form__field">
         <%= form.label :min_price, t("searches.min_price") %>
         <%= form.number_field :min_price, min: 0, step: 1000 %>
       </div>

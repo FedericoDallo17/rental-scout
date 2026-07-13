@@ -1094,6 +1094,7 @@ button {
   font-weight: 800;
 }
 
+.search-form__field select,
 .search-form__field input {
   width: 100%;
   padding: 0.8rem 0.9rem;
@@ -1101,6 +1102,7 @@ button {
   border-radius: 14px;
   background: var(--surface);
   color: var(--text);
+  font: inherit;
 }
 
 .search-form__zones {

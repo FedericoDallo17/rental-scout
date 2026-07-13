@@ -77,12 +77,33 @@ test "for_search_feed applies scalar filters" do
     search = user.search_preferences.create!(
       name: "Pocitos two bedrooms",
       location_query: "pocitos",
+      price_currency: "UYU",
       min_price_cents: 1800000,
       max_price_cents: 2400000,
       min_bedrooms: 2
     )
 
     assert_equal [matching], Listing.for_search_feed(search).to_a
+  end
+
+  test "for_search_feed applies price bounds in the selected USD currency" do
+    user = create_user!("listing-owner-usd@example.com")
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source_usd_filters")
+    usd_match = Listing.create!(listing_source: source, title: "USD Match", canonical_url: "https://example.test/usd-match", location_text: "Pocitos", price_cents: 90_000, currency: "USD", in_scope: true)
+    Listing.create!(listing_source: source, title: "UYU Same Number", canonical_url: "https://example.test/uyu-same", location_text: "Pocitos", price_cents: 90_000, currency: "UYU", in_scope: true)
+    search = user.search_preferences.create!(name: "USD Pocitos", location_query: "Pocitos", price_currency: "USD", max_price_cents: 100_000)
+
+    assert_equal [usd_match], Listing.for_search_feed(search).to_a
+  end
+
+  test "for_search_feed includes both currencies when no price bounds exist" do
+    user = create_user!("listing-owner-mixed-currency@example.com")
+    source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source_mixed_currency")
+    uyu = Listing.create!(listing_source: source, title: "UYU Match", canonical_url: "https://example.test/uyu-unbounded", location_text: "Pocitos", currency: "UYU", in_scope: true)
+    usd = Listing.create!(listing_source: source, title: "USD Match", canonical_url: "https://example.test/usd-unbounded", location_text: "Pocitos", currency: "USD", in_scope: true)
+    search = user.search_preferences.create!(name: "Any price", location_query: "Pocitos", price_currency: "USD")
+
+    assert_equal [usd, uyu].sort_by(&:id), Listing.for_search_feed(search).to_a.sort_by(&:id)
   end
 
   test "for_search_feed matches any attached zone spatially" do

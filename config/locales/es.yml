@@ -54,6 +54,7 @@ es:
   scoring:
     no_maximum_budget: "Sin presupuesto máximo"
     price_unavailable: "Precio no informado"
+    price_currency_mismatch: "El precio está en otra moneda"
     over_budget: "%{percent}% sobre el presupuesto"
     under_budget: "%{percent}% bajo el presupuesto"
     any_bedroom_count: "Cualquier cantidad de dormitorios"
@@ -71,6 +72,7 @@ es:
     save_error: "No se pudo guardar la búsqueda"
     name: "Nombre de la búsqueda"
     location: "Nota de ubicación"
+    price_currency: "Moneda del precio"
     min_price: "Precio mínimo"
     max_price: "Precio máximo"
     min_bedrooms: "Dormitorios mínimos"

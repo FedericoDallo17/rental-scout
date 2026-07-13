@@ -25,6 +25,8 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_select "label", text: /cents/, count: 0
     assert_select "input[name='search_preference[min_price]']"
     assert_select "input[name='search_preference[max_price]']"
+    assert_select "select[name='search_preference[price_currency]'] option[value='UYU'][selected]", text: "UYU"
+    assert_select "select[name='search_preference[price_currency]'] option[value='USD']", text: "USD"
     assert_select ".search-form__zones label", text: /Pocitos/
   end
 
@@ -39,6 +41,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
             location_query: "Pocitos",
             min_price: "20000",
             max_price: "40000",
+            price_currency: "USD",
             min_bedrooms: "1",
             notifications_enabled: "0",
             zone_ids: [zone.id]
@@ -49,6 +52,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_equal ["pocitos"], search.zones.pluck(:slug)
     assert_equal 2_000_000, search.min_price_cents
     assert_equal 4_000_000, search.max_price_cents
+    assert_equal "USD", search.price_currency
     assert_equal 1, search.min_bedrooms
     assert_not search.notifications_enabled
     assert_redirected_to listings_path(search_id: search.id)

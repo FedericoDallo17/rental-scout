@@ -49,4 +49,14 @@ class ListingMatchScoreTest < ActiveSupport::TestCase
 
     assert_equal ["Sin presupuesto máximo", "Cualquier cantidad de dormitorios", "Información básica"], result.explanations
   end
+
+  test "does not compare prices in a different currency" do
+    search = SearchPreference.new(max_price_cents: 4_000_000, price_currency: "UYU")
+    listing = Listing.new(price_cents: 900_000, currency: "USD")
+
+    result = ListingMatchScore.new(listing, search).result
+
+    assert_equal 15, result.score
+    assert_includes result.explanations, "Price is in another currency"
+  end
 end
