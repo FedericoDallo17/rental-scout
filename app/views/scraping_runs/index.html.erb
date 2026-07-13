@@ -52,8 +52,7 @@
       <% @listing_sources.each do |source| %>
         <article class="source-control-card">
           <div>
-            <h3><%= source.name %></h3>
-            <p><%= source.adapter_key %></p>
+            <h3><%= source.display_name %></h3>
           </div>
           <div class="source-control-card__actions">
             <span class="source-control-card__status source-control-card__status--<%= source.active? ? "active" : "inactive" %>">
@@ -107,7 +106,7 @@
             <% run.scraping_source_runs.each do |source_run| %>
               <div class="source-run">
                 <div>
-                  <p class="source-run__name"><%= source_run.listing_source.name %></p>
+                  <p class="source-run__name"><%= source_run.listing_source.display_name %></p>
                 <p class="source-run__meta">
                   <%= t("runs.seen_count", count: source_run.listings_seen_count) %> ·
                   <%= t("runs.new_count", count: source_run.listings_created_count) %>

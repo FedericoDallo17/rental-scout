@@ -1,6 +1,6 @@
 # Roadmap
 
-Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-project.md).
+Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-project.md).
 
 ## Done
 - Discovery, look feel, MVP scope (stub docs only)
@@ -33,9 +33,11 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
   bounded provider probes, and a daily 20-listing InfoCasas coordinate backfill
 - Ticket 027: bilingual user interface - persisted English/Spanish preference and
   translated signed-in product surfaces
+- Ticket 028A: aligned listing-card text tracks and product-facing `InfoCasas`
+  labels without exposing internal adapter keys
 
 ## Now
-- Choose the next small unblocked product gap.
+- Resolve the remaining Ticket 028 product and provider-fetch decisions.
 - MercadoLibre remains paused pending API keys or allowed index payload.
 
 ## Product gaps to shape

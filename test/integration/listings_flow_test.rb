@@ -187,6 +187,24 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_select "nav.search-sidebar__nav a.search-link .search-link__name", text: "Centro", count: 0
   end
 
+  test "feed presents the InfoCasas source without internal API terminology" do
+    user = create_user!(email: "source-label@example.com")
+    sign_in user
+    search = user.search_preferences.create!(name: "Centro", location_query: "Centro")
+    source = ListingSource.create!(name: "InfoCasas API", adapter_key: "info_casas_api")
+    create_listing!(
+      listing_source: source,
+      title: "Centro rental",
+      canonical_url: "https://example.test/centro-rental",
+      location_text: "Centro"
+    )
+
+    get listings_path(search_id: search.id)
+
+    assert_select ".listing-card__facts dd", text: "InfoCasas"
+    assert_not_includes response.body, "InfoCasas API"
+  end
+
   test "signed in feed ranks matches by score and explains the score" do
     user = create_user!(email: "ranked-feed@example.com")
     sign_in user

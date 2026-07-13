@@ -39,7 +39,8 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "12 seen"
     assert_includes response.body, "3 new"
     assert_includes response.body, "top-level warning"
-    assert_includes response.body, "InfoCasas API"
+    assert_includes response.body, "InfoCasas"
+    assert_not_includes response.body, "InfoCasas API"
     assert_includes response.body, "provider timeout"
     assert_select ".runs-workbench"
     assert_select "a[href='#{listings_path}']", text: "Feed"
@@ -60,6 +61,8 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".source-control-card", count: 2
     assert_select ".source-control-card", text: /Remax/
     assert_select ".source-control-card", text: /Inactive/
+    assert_select ".source-control-card", text: /InfoCasas/
+    assert_not_includes response.body, "info_casas_api"
     assert_select "form[action='#{listing_source_path(remax)}'] input[name='_method'][value='patch']", count: 1
     assert_select "form[action='#{listing_source_path(info_casas)}'] button", text: "Deactivate"
   end

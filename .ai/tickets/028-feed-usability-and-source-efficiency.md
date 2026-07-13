@@ -6,8 +6,8 @@ Shape the next feed refinement pass before implementation.
 
 ## Open TODOs
 
-- [ ] Align listing cards in each dashboard row despite different title and URL lengths.
-- [ ] Rename the user-facing `InfoCasas API` source label to `InfoCasas` without changing its adapter key.
+- [x] Align listing cards in each dashboard row despite different title and URL lengths.
+- [x] Rename the user-facing `InfoCasas API` source label to `InfoCasas` without changing its adapter key.
 - [ ] Decide whether the `Type` fact earns its permanent card space when providers omit it.
 - [ ] Define incremental-fetch strategies per provider based on publication-date and ordering support.
 - [ ] Revisit the meaning, explanation, and contrast of the 0–100 coincidence score.
@@ -48,6 +48,12 @@ Shape the next feed refinement pass before implementation.
 ## Human Approval Required?
 
 Yes. Product semantics and provider request behavior require user decisions before implementation.
+
+## Delivered Slice
+
+Ticket 028A was completed on 2026-07-13. Cards now use bounded title,
+explanation, location, and URL tracks; `InfoCasas` is the product-facing label while
+`info_casas_api` remains the adapter key. The remaining items stay approval-gated.
 
 ## Definition of Done
 

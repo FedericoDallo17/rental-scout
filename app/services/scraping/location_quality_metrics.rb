@@ -31,7 +31,7 @@ module Scraping
         total = statuses.values.sum
         SourceResult.new(
           source_id: source.id,
-          source_name: source.name,
+          source_name: source.display_name,
           total_count: total,
           spatial_count: statuses.fetch("spatial", 0),
           fallback_count: statuses.fetch("fallback", 0),
