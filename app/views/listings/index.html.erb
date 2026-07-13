@@ -38,7 +38,6 @@
         <% @listings.each do |listing| %>
       <article class="listing-card">
         <%= link_to listing.canonical_url, class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
-          <div class="listing-card__image"><%= t("feed.photo") %></div>
           <div class="listing-card__body">
             <% match_score = @listing_scores.fetch(listing) %>
             <div class="listing-card__summary">

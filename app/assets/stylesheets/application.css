@@ -353,20 +353,8 @@ button {
   outline-offset: -3px;
 }
 
-.listing-card__image {
-  height: 190px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #d7d0c4 0%, #f7f4ef 100%);
-  color: #7d7468;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .listing-card__body {
-  padding: 1rem;
+  padding: 1.25rem;
 }
 
 .listing-card__summary {

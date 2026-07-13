@@ -152,6 +152,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_select ".feed-header__context", text: /Browsing Pocitos/
     assert_select ".feed-header__count", text: "2 listings"
   assert_select "section.listings-grid article.listing-card", count: 2
+  assert_select "section.listings-grid .listing-card__image", count: 0
   assert_select "section.listings-grid article.listing-card h2", text: "Pocitos Bright Loft"
   assert_select "section.listings-grid article.listing-card h2", text: "Pocitos Patio Studio"
     assert_select "section.listings-grid article.listing-card .listing-card__price", text: "USD 17.500"
