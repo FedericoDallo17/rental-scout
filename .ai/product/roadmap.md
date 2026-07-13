@@ -41,6 +41,8 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   bounded feed filtering and scoring currency-safe
 - Ticket 031: removed the permanent Type fact from listing cards while preserving
   provider type data for future conditional use
+- Ticket 032: replaced mixed-purpose coincidence points with preference-only fit,
+  separate completeness, and readable bilingual presentation
 
 ## Now
 - Resolve the remaining Ticket 028 product and provider-fetch decisions.
@@ -53,8 +55,8 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   filtering, deselection, and all-search aggregation.
 
 ## Next
-- Choose the next small product gap after scoring; resume MercadoLibre when API
-  keys or an allowed index payload are available.
+- Shape aggregate saved-search feed controls and sorting/filtering; resume
+  MercadoLibre when API keys or an allowed index payload are available.
 
 ## Dropped now
 - Map UI, match explanations (deferred in 06-27 frontend spec)

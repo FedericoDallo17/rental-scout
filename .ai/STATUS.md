@@ -7,7 +7,7 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; bilingual signed-in experience complete
 
 ## Current Task
-Ticket 031 permanent Type fact removal complete
+Ticket 032 preference-fit score redesign complete
 
 ## Status
 Ticket 026 live probes confirm city-wide neighborhood diversity and valid canonical URLs. Remax supplies coordinates for every sampled result; InfoCasas, Housi, and Imperium index responses do not. InfoCasas detail JSON-LD supplies coordinates, so its existing backfill is now capped and scheduled daily. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
@@ -46,6 +46,7 @@ Ticket 026 live probes confirm city-wide neighborhood diversity and valid canoni
 - Ticket 029 landed: InfoCasas acquisition no longer filters to peso listings; rent symbols normalize to USD/UYU while common expenses remain UYU (07-13)
 - Ticket 030 landed: saved searches persist a UYU/USD price currency; bounded feeds and scores never compare unlike currencies, while unbounded feeds remain mixed-currency (07-13)
 - Ticket 031 landed: listing cards no longer reserve a fact cell for Type; Source spans the final row while provider type data remains available internally (07-13)
+- Ticket 032 landed: the numeric score measures only active saved-search preferences at 70/30 price/bedrooms, disappears for broad searches, and separates listing completeness with higher-contrast styling (07-13)
 
 ## Doing
 - Discussing the remaining Ticket 028 product and provider-fetch decisions.
@@ -62,4 +63,4 @@ Ticket 026 live probes confirm city-wide neighborhood diversity and valid canoni
   users can now enter their own Pushover keys in the app.
 
 ## Next Step
-Resolve Ticket 028's score, aggregate-feed/control, and incremental-fetch decisions; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.
+Resolve Ticket 028's aggregate-feed/control and incremental-fetch decisions; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.

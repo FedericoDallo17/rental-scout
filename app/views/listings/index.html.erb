@@ -42,9 +42,14 @@
             <% match_score = @listing_scores.fetch(listing) %>
             <div class="listing-card__summary">
               <p class="listing-card__price"><%= format_money(listing.price_cents, listing.currency) %></p>
-              <p class="listing-card__score"><strong><%= match_score.score %></strong>/100 <%= t("feed.match") %></p>
+              <% if match_score.score %>
+                <p class="listing-card__score"><strong><%= match_score.score %></strong>/100 <%= t("feed.fit") %></p>
+              <% end %>
             </div>
-            <p class="listing-card__explanation"><%= match_score.explanations.join(" · ") %></p>
+            <% if match_score.explanations.any? %>
+              <p class="listing-card__explanation"><%= match_score.explanations.join(" · ") %></p>
+            <% end %>
+            <p class="listing-card__completeness"><%= match_score.completeness %></p>
             <h2><%= listing.title %></h2>
             <p class="listing-card__location"><%= listing.display_location %></p>
             <dl class="listing-card__facts">

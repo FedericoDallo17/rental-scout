@@ -9,6 +9,6 @@ class ListingsController < ApplicationController
       Listing.none
     end
     @listing_scores = @listings.index_with { |listing| ListingMatchScore.new(listing, @active_search).result }
-    @listings = @listings.sort_by { |listing| [-@listing_scores.fetch(listing).score, -listing.created_at.to_f] }
+    @listings = @listings.sort_by { |listing| [-(@listing_scores.fetch(listing).score || 0), -listing.created_at.to_f] }
   end
 end

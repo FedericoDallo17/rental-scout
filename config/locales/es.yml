@@ -44,6 +44,7 @@ es:
     saved_searches_label: "Búsquedas guardadas"
     setup_label: "Configuración de búsqueda guardada"
     match: "coincidencia"
+    fit: "afinidad"
     bedrooms: "Dormitorios"
     expenses: "Gastos comunes"
     parking: "Garaje"

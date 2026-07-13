@@ -15,7 +15,8 @@ class ListingMatchScoreTest < ActiveSupport::TestCase
     result = ListingMatchScore.new(listing, search).result
 
     assert_equal 100, result.score
-    assert_equal ["25% under budget", "2 bedrooms", "Complete details"], result.explanations
+    assert_equal ["25% under budget", "2 bedrooms"], result.explanations
+    assert_equal "Complete details", result.completeness
   end
 
   test "price points taper to zero at the maximum" do
@@ -24,22 +25,23 @@ class ListingMatchScoreTest < ActiveSupport::TestCase
 
     result = ListingMatchScore.new(listing, search).result
 
-    assert_equal 45, result.score
+    assert_equal 50, result.score
     assert_includes result.explanations, "13% under budget"
   end
 
-  test "uses neutral preference points when optional filters are absent" do
+  test "omits a numeric score when no measured preferences exist" do
     result = ListingMatchScore.new(Listing.new, SearchPreference.new).result
 
-    assert_equal 42, result.score
-    assert_equal ["No maximum budget", "Any bedroom count", "Basic details"], result.explanations
+    assert_nil result.score
+    assert_empty result.explanations
+    assert_equal "Basic details", result.completeness
   end
 
   test "clamps non-matching inputs to the score bounds" do
     search = SearchPreference.new(max_price_cents: 4_000_000, min_bedrooms: 2)
     listing = Listing.new(price_cents: 5_000_000, bedrooms: -100)
 
-    assert_equal 3, ListingMatchScore.new(listing, search).result.score
+    assert_equal 0, ListingMatchScore.new(listing, search).result.score
   end
 
   test "localizes score explanations" do
@@ -47,7 +49,8 @@ class ListingMatchScoreTest < ActiveSupport::TestCase
       ListingMatchScore.new(Listing.new, SearchPreference.new).result
     end
 
-    assert_equal ["Sin presupuesto máximo", "Cualquier cantidad de dormitorios", "Información básica"], result.explanations
+    assert_empty result.explanations
+    assert_equal "Información básica", result.completeness
   end
 
   test "does not compare prices in a different currency" do
@@ -56,7 +59,23 @@ class ListingMatchScoreTest < ActiveSupport::TestCase
 
     result = ListingMatchScore.new(listing, search).result
 
-    assert_equal 15, result.score
+    assert_equal 0, result.score
     assert_includes result.explanations, "Price is in another currency"
+  end
+
+  test "weights price seventy and bedrooms thirty when both are active" do
+    search = SearchPreference.new(max_price_cents: 4_000_000, min_bedrooms: 2)
+    listing = Listing.new(price_cents: 3_500_000, currency: "UYU", bedrooms: 2)
+
+    result = ListingMatchScore.new(listing, search).result
+
+    assert_equal 59, result.score
+  end
+
+  test "normalizes a bedroom-only preference to the full scale" do
+    search = SearchPreference.new(min_bedrooms: 2)
+    listing = Listing.new(bedrooms: 3)
+
+    assert_equal 100, ListingMatchScore.new(listing, search).result.score
   end
 end

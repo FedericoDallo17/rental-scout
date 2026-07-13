@@ -36,6 +36,7 @@ en:
     saved_searches_label: "Saved searches"
     setup_label: "Saved search setup"
     match: "match"
+    fit: "fit"
     bedrooms: "Bedrooms"
     expenses: "Expenses"
     parking: "Parking"

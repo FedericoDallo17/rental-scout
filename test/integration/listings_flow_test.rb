@@ -244,9 +244,24 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal ["Good Match", "Okay Match"], css_select(".listing-card h2").map { |node| node.text.strip }
     assert_select ".listing-card", count: 2 do |cards|
-      assert_select cards.first, ".listing-card__score", text: /100\/100 match/
-      assert_select cards.first, ".listing-card__explanation", text: "25% under budget · 2 bedrooms · Complete details"
+      assert_select cards.first, ".listing-card__score", text: /100\/100 fit/
+      assert_select cards.first, ".listing-card__explanation", text: "25% under budget · 2 bedrooms"
+      assert_select cards.first, ".listing-card__completeness", text: "Complete details"
     end
+  end
+
+  test "broad saved search shows completeness without a misleading numeric fit" do
+    user = create_user!(email: "broad-fit@example.com")
+    sign_in user
+    search = user.search_preferences.create!(name: "Broad Centro", location_query: "Centro")
+    source = ListingSource.create!(name: "Broad Source", adapter_key: "broad_score_source")
+    create_listing!(listing_source: source, title: "Broad match", canonical_url: "https://example.test/broad-match", location_text: "Centro")
+
+    get listings_path(search_id: search.id)
+
+    assert_select ".listing-card__score", count: 0
+    assert_select ".listing-card__explanation", count: 0
+    assert_select ".listing-card__completeness", text: "Basic details"
   end
 
   test "signed in listings route stays on the listings layout" do
