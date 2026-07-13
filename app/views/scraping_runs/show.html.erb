@@ -1,17 +1,17 @@
 <main class="runs-page runs-workbench">
   <header class="runs-header">
     <div>
-      <p class="runs-header__eyebrow">Notification results</p>
-      <h1>Matches from run #<%= @scraping_run.id %></h1>
+      <p class="runs-header__eyebrow"><%= t("runs.matches_eyebrow") %></p>
+      <h1><%= t("runs.matches_title", id: @scraping_run.id) %></h1>
     </div>
     <div class="runs-header__tools">
-      <%= link_to "Feed", listings_path, class: "runs-header__link" %>
-      <%= link_to "All runs", scraping_runs_path, class: "runs-header__link" %>
+      <%= link_to t("runs.feed"), listings_path, class: "runs-header__link" %>
+      <%= link_to t("runs.all_runs"), scraping_runs_path, class: "runs-header__link" %>
     </div>
   </header>
 
   <% if @matches.any? %>
-    <section class="runs-list" aria-label="Matches from this run">
+    <section class="runs-list" aria-label="<%= t("runs.matches_label") %>">
       <% @matches.each do |listing, events| %>
         <article class="run-card">
           <div class="run-card__summary">
@@ -21,14 +21,14 @@
             </div>
           </div>
           <p><%= MoneyFormatter.call(listing.price_cents, listing.currency) if listing.price_cents.present? %></p>
-          <p>Matched <%= events.map { |event| event.search_preference.name }.uniq.to_sentence %></p>
+          <p><%= t("runs.matched", searches: events.map { |event| event.search_preference.name }.uniq.to_sentence) %></p>
         </article>
       <% end %>
     </section>
   <% else %>
     <section class="empty-state">
-      <h2>No matches from this run.</h2>
-      <p>This run did not create any notification matches for your saved searches.</p>
+      <h2><%= t("runs.no_matches") %></h2>
+      <p><%= t("runs.no_matches_copy") %></p>
     </section>
   <% end %>
 </main>

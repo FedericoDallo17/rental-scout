@@ -43,25 +43,25 @@ class ListingMatchScore
   end
 
   def price_explanation
-    return "No maximum budget" unless search_preference.max_price_cents.present?
-    return "Price unavailable" unless listing.price_cents.present?
+    return I18n.t("scoring.no_maximum_budget") unless search_preference.max_price_cents.present?
+    return I18n.t("scoring.price_unavailable") unless listing.price_cents.present?
 
     percent = (((search_preference.max_price_cents - listing.price_cents).fdiv(search_preference.max_price_cents)) * 100).round
-    percent.negative? ? "#{percent.abs}% over budget" : "#{percent}% under budget"
+    percent.negative? ? I18n.t("scoring.over_budget", percent: percent.abs) : I18n.t("scoring.under_budget", percent: percent)
   end
 
   def bedroom_explanation
-    return "Any bedroom count" unless search_preference.min_bedrooms.present?
-    return "Bedrooms unavailable" unless listing.bedrooms.present?
+    return I18n.t("scoring.any_bedroom_count") unless search_preference.min_bedrooms.present?
+    return I18n.t("scoring.bedrooms_unavailable") unless listing.bedrooms.present?
 
-    "#{listing.bedrooms} #{'bedroom'.pluralize(listing.bedrooms)}"
+    I18n.t("scoring.bedroom", count: listing.bedrooms)
   end
 
   def detail_explanation
     known_fields = detail_points / 3
-    return "Complete details" if known_fields == DETAIL_FIELDS.length
-    return "Good detail coverage" if known_fields >= 3
+    return I18n.t("scoring.complete_details") if known_fields == DETAIL_FIELDS.length
+    return I18n.t("scoring.good_detail_coverage") if known_fields >= 3
 
-    "Basic details"
+    I18n.t("scoring.basic_details")
   end
 end

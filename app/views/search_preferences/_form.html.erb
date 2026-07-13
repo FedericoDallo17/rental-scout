@@ -2,7 +2,7 @@
   <%= form_with model: search_preference, class: "search-form search-form-panel" do |form| %>
     <% if search_preference.errors.any? %>
       <div class="form-errors">
-        <h2>Search could not be saved</h2>
+        <h2><%= t("searches.save_error") %></h2>
         <ul>
           <% search_preference.errors.full_messages.each do |message| %>
             <li><%= message %></li>
@@ -13,33 +13,33 @@
 
     <div class="search-form__grid">
       <div class="search-form__field">
-        <%= form.label :name, "Search name" %>
+        <%= form.label :name, t("searches.name") %>
         <%= form.text_field :name, autofocus: true %>
       </div>
 
       <div class="search-form__field">
-        <%= form.label :location_query, "Location note" %>
+        <%= form.label :location_query, t("searches.location") %>
         <%= form.text_field :location_query %>
       </div>
 
       <div class="search-form__field">
-        <%= form.label :min_price, "Min price" %>
+        <%= form.label :min_price, t("searches.min_price") %>
         <%= form.number_field :min_price, min: 0, step: 1000 %>
       </div>
 
       <div class="search-form__field">
-        <%= form.label :max_price, "Max price" %>
+        <%= form.label :max_price, t("searches.max_price") %>
         <%= form.number_field :max_price, min: 0, step: 1000 %>
       </div>
 
       <div class="search-form__field">
-        <%= form.label :min_bedrooms, "Min bedrooms" %>
+        <%= form.label :min_bedrooms, t("searches.min_bedrooms") %>
         <%= form.number_field :min_bedrooms, min: 0, step: 1 %>
       </div>
     </div>
 
     <fieldset class="search-form__zones">
-      <legend>Neighborhoods</legend>
+      <legend><%= t("searches.neighborhoods") %></legend>
       <% zones.each do |zone| %>
         <label>
           <%= check_box_tag "search_preference[zone_ids][]", zone.id, search_preference.zone_ids.include?(zone.id) %>
@@ -51,22 +51,22 @@
 
     <label class="search-form__toggle">
       <%= form.check_box :notifications_enabled %>
-      <span>Notify me about new matches</span>
+      <span><%= t("searches.notify") %></span>
     </label>
 
     <div class="search-form__actions">
-      <%= form.submit search_preference.persisted? ? "Save search" : "Create search", class: "search-form__submit" %>
-      <%= link_to "Cancel", listings_path(search_id: search_preference.id), class: "search-form__cancel" %>
+      <%= form.submit search_preference.persisted? ? t("searches.save") : t("searches.create"), class: "search-form__submit" %>
+      <%= link_to t("searches.cancel"), listings_path(search_id: search_preference.id), class: "search-form__cancel" %>
     </div>
   <% end %>
 
-  <aside class="search-form-aside" aria-label="Search setup context">
-    <p class="search-form-aside__eyebrow">Feed preview</p>
-    <h2><%= search_preference.name.presence || "New search" %></h2>
-    <p>Saved searches become sidebar workbench cards and filter the shared fresh listing inventory.</p>
+  <aside class="search-form-aside" aria-label="<%= t("searches.context") %>">
+    <p class="search-form-aside__eyebrow"><%= t("searches.preview") %></p>
+    <h2><%= search_preference.name.presence || t("searches.new_title") %></h2>
+    <p><%= t("searches.preview_copy") %></p>
     <div class="search-form-aside__facts">
-      <span><%= pluralize(search_preference.zones.size, "zone") %></span>
-      <span><%= search_preference.notifications_enabled? ? "Notifications on" : "Notifications off" %></span>
+      <span><%= t("count.zone", count: search_preference.zones.size) %></span>
+      <span><%= search_preference.notifications_enabled? ? t("searches.notifications_on") : t("searches.notifications_off") %></span>
     </div>
   </aside>
 </div>

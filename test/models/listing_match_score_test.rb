@@ -41,4 +41,12 @@ class ListingMatchScoreTest < ActiveSupport::TestCase
 
     assert_equal 3, ListingMatchScore.new(listing, search).result.score
   end
+
+  test "localizes score explanations" do
+    result = I18n.with_locale(:es) do
+      ListingMatchScore.new(Listing.new, SearchPreference.new).result
+    end
+
+    assert_equal ["Sin presupuesto máximo", "Cualquier cantidad de dormitorios", "Información básica"], result.explanations
+  end
 end

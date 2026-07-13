@@ -1,31 +1,147 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  nav:
+    account: "Account"
+    runs: "Runs"
+    notifications: "Notifications"
+    language: "Language"
+    sign_out: "Sign out"
+  flash:
+    language_updated: "Language updated."
+    search_created: "Saved search created."
+    search_updated: "Saved search updated."
+    search_deleted: "Saved search deleted."
+    notification_removed: "Notification key removed."
+    notification_saved: "Notification settings saved."
+    notification_unchanged: "Notification settings unchanged."
+  count:
+    listing:
+      one: "%{count} listing"
+      other: "%{count} listings"
+    run:
+      one: "%{count} run"
+      other: "%{count} runs"
+    zone:
+      one: "%{count} zone"
+      other: "%{count} zones"
+  feed:
+    saved_searches: "Saved searches"
+    saved_searches_copy: "Jump back into the neighborhoods you check most often."
+    new_search: "New search"
+    edit: "Edit"
+    marketplace: "Marketplace feed"
+    title: "Scraped Apartments"
+    browsing_html: "Browsing <strong>%{name}</strong>"
+    refresh: "Updated automatically as new matches land."
+    listings_label: "Listings"
+    saved_searches_label: "Saved searches"
+    setup_label: "Saved search setup"
+    photo: "Photo"
+    match: "match"
+    bedrooms: "Bedrooms"
+    expenses: "Expenses"
+    parking: "Parking"
+    type: "Type"
+    source: "Source"
+    empty_title: "Save your first search to start a feed tailored to you."
+    empty_copy: "Pick a neighborhood and budget once, then come back to a browsing view built around that search."
+  scoring:
+    no_maximum_budget: "No maximum budget"
+    price_unavailable: "Price unavailable"
+    over_budget: "%{percent}% over budget"
+    under_budget: "%{percent}% under budget"
+    any_bedroom_count: "Any bedroom count"
+    bedrooms_unavailable: "Bedrooms unavailable"
+    bedroom:
+      one: "%{count} bedroom"
+      other: "%{count} bedrooms"
+    complete_details: "Complete details"
+    good_detail_coverage: "Good detail coverage"
+    basic_details: "Basic details"
+  searches:
+    eyebrow: "Saved search"
+    new_title: "New search"
+    edit_title: "Edit search"
+    save_error: "Search could not be saved"
+    name: "Search name"
+    location: "Location note"
+    min_price: "Min price"
+    max_price: "Max price"
+    min_bedrooms: "Min bedrooms"
+    neighborhoods: "Neighborhoods"
+    notify: "Notify me about new matches"
+    save: "Save search"
+    create: "Create search"
+    cancel: "Cancel"
+    delete: "Delete search"
+    preview: "Feed preview"
+    preview_copy: "Saved searches become sidebar workbench cards and filter the shared fresh listing inventory."
+    notifications_on: "Notifications on"
+    notifications_off: "Notifications off"
+    context: "Search setup context"
+  runs:
+    eyebrow: "Scraper observability"
+    title: "Scraping Runs"
+    feed: "Feed"
+    inventory_diagnostics: "Inventory diagnostics"
+    location_quality: "Location quality"
+    spatial: "Spatial"
+    resolved: "%{count} resolved"
+    fallback: "Fallback"
+    provider_labels: "%{count} provider labels"
+    unresolved: "Unresolved"
+    unresolved_count: "%{count} unresolved"
+    mismatches: "Mismatches"
+    provider_conflicts: "%{count} provider conflicts"
+    source: "Source"
+    total: "Total"
+    coverage: "Coverage"
+    source_controls: "Source controls"
+    listing_sources: "Listing Sources"
+    active: "Active"
+    inactive: "Inactive"
+    activate: "Activate"
+    deactivate: "Deactivate"
+    run: "Run #%{id}"
+    seen: "Seen"
+    seen_count: "%{count} seen"
+    new: "New"
+    new_count: "%{count} new"
+    finished: "Finished"
+    still_running: "Still running"
+    started_at: "Started %{time}"
+    finished_at: "Finished %{time}"
+    empty_title: "No scraping runs yet."
+    empty_copy: "Runs will appear here after the scraper job executes."
+    matches_eyebrow: "Notification results"
+    matches_title: "Matches from run #%{id}"
+    all_runs: "All runs"
+    matched: "Matched %{searches}"
+    no_matches: "No matches from this run."
+    no_matches_copy: "This run did not create any notification matches for your saved searches."
+    matches_label: "Matches from this run"
+    sources_label: "Listing sources"
+    runs_label: "Scraping runs"
+    statuses:
+      succeeded: "Succeeded"
+      failed: "Failed"
+      running: "Running"
+      queued: "Queued"
+      completed_with_failures: "Completed with failures"
+  notifications:
+    account: "Account"
+    title: "Notification settings"
+    intro: "Add your Pushover user key to receive new matches from searches with notifications enabled."
+    ready: "Ready"
+    setup_needed: "Setup needed"
+    configured: "A Pushover key is configured."
+    not_configured: "No Pushover key is configured."
+    replace_key: "Replace Pushover user key"
+    key: "Pushover user key"
+    blank_hint: "Leave blank to keep the currently configured key."
+    remove: "Remove my saved Pushover key"
+    save: "Save notification settings"
+    back: "Back to listings"
+    privacy: "Privacy"
+    private_title: "Your key stays private"
+    private_copy: "The saved value is never displayed back in the page or included in application logs."
+    no_test: "Saving this page does not send a test notification."

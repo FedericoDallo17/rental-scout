@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  SUPPORTED_LOCALES = %w[en es].freeze
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
@@ -6,4 +7,5 @@ class User < ApplicationRecord
 
   validates :first_name, presence: true
   validates :last_name, presence: true
+  validates :locale, inclusion: { in: SUPPORTED_LOCALES }
 end

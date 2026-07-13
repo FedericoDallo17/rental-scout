@@ -109,6 +109,35 @@ button {
   white-space: nowrap;
 }
 
+.app-language {
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.app-language form {
+  margin: 0;
+}
+
+.app-language__button {
+  padding: 0.3rem 0.45rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.app-language__button--active {
+  background: var(--text);
+  color: var(--surface);
+}
+
 .app-sign-out {
   margin: 0;
 }

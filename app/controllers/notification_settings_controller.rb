@@ -5,12 +5,12 @@ class NotificationSettingsController < ApplicationController
   def update
     if remove_key?
       current_user.update!(pushover_user_key: nil)
-      redirect_to edit_notification_settings_path, notice: "Notification key removed."
+      redirect_to edit_notification_settings_path, notice: t("flash.notification_removed")
     elsif submitted_key.present?
       current_user.update!(pushover_user_key: submitted_key)
-      redirect_to edit_notification_settings_path, notice: "Notification settings saved."
+      redirect_to edit_notification_settings_path, notice: t("flash.notification_saved")
     else
-      redirect_to edit_notification_settings_path, notice: "Notification settings unchanged."
+      redirect_to edit_notification_settings_path, notice: t("flash.notification_unchanged")
     end
   end
 

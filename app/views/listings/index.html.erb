@@ -1,19 +1,19 @@
 <div class="feed-layout search-workbench">
   <aside class="search-sidebar">
     <p class="search-sidebar__eyebrow">Rental Scout Lite</p>
-    <h2>Saved searches</h2>
-    <p class="search-sidebar__copy">Jump back into the neighborhoods you check most often.</p>
-    <%= link_to "New search", new_search_preference_path, class: "search-sidebar__action" %>
+    <h2><%= t("feed.saved_searches") %></h2>
+    <p class="search-sidebar__copy"><%= t("feed.saved_searches_copy") %></p>
+    <%= link_to t("feed.new_search"), new_search_preference_path, class: "search-sidebar__action" %>
 
-    <nav class="search-sidebar__nav" aria-label="Saved searches">
+    <nav class="search-sidebar__nav" aria-label="<%= t("feed.saved_searches_label") %>">
       <% @searches.each do |search| %>
         <div class="search-sidebar__item">
           <%= link_to listings_path(search_id: search.id), class: ["search-link", ("search-link--active" if search == @active_search)] do %>
             <span class="search-link__name"><%= search.name %></span>
           <span class="search-link__meta"><%= search.location_query %></span>
-          <span class="search-link__count"><%= pluralize(@search_counts.fetch(search, 0), "listing") %></span>
+          <span class="search-link__count"><%= t("count.listing", count: @search_counts.fetch(search, 0)) %></span>
         <% end %>
-          <%= link_to "Edit", edit_search_preference_path(search), class: "search-sidebar__edit" %>
+          <%= link_to t("feed.edit"), edit_search_preference_path(search), class: "search-sidebar__edit" %>
         </div>
       <% end %>
     </nav>
@@ -22,35 +22,35 @@
   <main class="feed-main">
     <header class="feed-header">
       <div>
-        <p class="feed-header__eyebrow">Marketplace feed</p>
-        <h1>Scraped Apartments</h1>
+        <p class="feed-header__eyebrow"><%= t("feed.marketplace") %></p>
+        <h1><%= t("feed.title") %></h1>
         <% if @active_search %>
-          <p class="feed-header__context">Browsing <strong><%= @active_search.name %></strong></p>
-          <p class="feed-header__refresh-cue">Updated automatically as new matches land.</p>
+          <p class="feed-header__context"><%= t("feed.browsing_html", name: @active_search.name) %></p>
+          <p class="feed-header__refresh-cue"><%= t("feed.refresh") %></p>
         <% end %>
       </div>
 
-      <p class="feed-header__count"><%= pluralize(@listings.size, "listing") %></p>
+      <p class="feed-header__count"><%= t("count.listing", count: @listings.size) %></p>
     </header>
 
     <% if @active_search %>
-      <section class="listings-grid" aria-label="Listings">
+      <section class="listings-grid" aria-label="<%= t("feed.listings_label") %>">
         <% @listings.each do |listing| %>
       <article class="listing-card">
         <%= link_to listing.canonical_url, class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
-          <div class="listing-card__image">Photo</div>
+          <div class="listing-card__image"><%= t("feed.photo") %></div>
           <div class="listing-card__body">
             <% match_score = @listing_scores.fetch(listing) %>
             <div class="listing-card__summary">
               <p class="listing-card__price"><%= format_money(listing.price_cents, listing.currency) %></p>
-              <p class="listing-card__score"><strong><%= match_score.score %></strong>/100 match</p>
+              <p class="listing-card__score"><strong><%= match_score.score %></strong>/100 <%= t("feed.match") %></p>
             </div>
             <p class="listing-card__explanation"><%= match_score.explanations.join(" · ") %></p>
             <h2><%= listing.title %></h2>
             <p class="listing-card__location"><%= listing.display_location %></p>
             <dl class="listing-card__facts">
               <div>
-                <dt>Bedrooms</dt>
+                <dt><%= t("feed.bedrooms") %></dt>
                 <dd><%= listing.bedrooms || "-" %></dd>
               </div>
               <div>
@@ -58,19 +58,19 @@
                 <dd><%= listing.square_meters || "-" %></dd>
               </div>
               <div>
-                <dt>Expenses</dt>
+                <dt><%= t("feed.expenses") %></dt>
                 <dd><%= format_money(listing.expenses_cents, listing.expenses_currency.presence || listing.currency) || "-" %></dd>
               </div>
               <div>
-                <dt>Parking</dt>
+                <dt><%= t("feed.parking") %></dt>
                 <dd><%= listing.parking_spaces.nil? ? "-" : listing.parking_spaces %></dd>
               </div>
               <div>
-                <dt>Type</dt>
+                <dt><%= t("feed.type") %></dt>
                 <dd><%= listing.property_type.presence || "-" %></dd>
               </div>
               <div>
-                <dt>Source</dt>
+                <dt><%= t("feed.source") %></dt>
                 <dd><%= listing.listing_source.name %></dd>
               </div>
             </dl>
@@ -81,9 +81,9 @@
         <% end %>
       </section>
     <% else %>
-      <section class="feed-empty-state" aria-label="Saved search setup">
-        <h2>Save your first search to start a feed tailored to you.</h2>
-        <p>Pick a neighborhood and budget once, then come back to a browsing view built around that search.</p>
+      <section class="feed-empty-state" aria-label="<%= t("feed.setup_label") %>">
+        <h2><%= t("feed.empty_title") %></h2>
+        <p><%= t("feed.empty_copy") %></p>
       </section>
     <% end %>
   </main>

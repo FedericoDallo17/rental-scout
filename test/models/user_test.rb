@@ -1,6 +1,15 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
+  test "locale defaults to English and only supports English or Spanish" do
+    user = User.new
+    assert_equal "en", user.locale
+
+    user.locale = "fr"
+    refute user.valid?
+    assert_includes user.errors[:locale], "is not included in the list"
+  end
+
   test "requires unique email and required names" do
     User.create!(
       first_name: "Jane",

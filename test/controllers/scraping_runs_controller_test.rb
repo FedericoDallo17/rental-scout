@@ -35,7 +35,7 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Scraping Runs"
-    assert_includes response.body, "completed_with_failures"
+    assert_includes response.body, "Completed with failures"
     assert_includes response.body, "12 seen"
     assert_includes response.body, "3 new"
     assert_includes response.body, "top-level warning"

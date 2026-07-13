@@ -31,6 +31,8 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
   location-quality diagnostics
 - Ticket 026: coordinate coverage and live validation - per-source coverage metrics,
   bounded provider probes, and a daily 20-listing InfoCasas coordinate backfill
+- Ticket 027: bilingual user interface - persisted English/Spanish preference and
+  translated signed-in product surfaces
 
 ## Now
 - Choose the next small unblocked product gap.
