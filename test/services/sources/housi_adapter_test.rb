@@ -73,6 +73,8 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
       assert options.key?(:open_timeout)
       assert options.key?(:read_timeout)
       assert_instance_of Net::HTTP::Get, request
+      assert_includes request.path, "locations=51720"
+      refute_includes request.path, "locations=51731"
       seen_request = true
     end
 
@@ -91,6 +93,18 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings leaves neighborhood unresolved when card metadata does not identify one" do
+    adapter = Sources::HousiAdapter.new
+    html = housi_html.sub(/<img alt="[^"]+">/, "")
+
+    stub_net_http_start(response_body: html) do
+      listing = adapter.fetch_listings.first
+
+      assert_nil listing[:source_neighborhood]
+      assert_equal "Rambla Gandhi al 500, Montevideo", listing[:location_text]
+    end
+  end
+
   private
 
   def housi_html
@@ -100,6 +114,7 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
           <div id="propiedades">
             <div class="col-md-6 col-lg-6" prop-id="8148664">
               <a class="item" href="/p/8148664-Apartamento-en-Alquiler-en-Pocitos-Rambla-Gandhi--al-500">
+                <img alt="Foto Apartamento en Alquiler en Pocitos, Montevideo Rambla Gandhi al 500">
                 <span class="fp_price"><p>$32.000</p></span>
                 <div class="details">
                   <div class="type_and_code">
@@ -118,6 +133,7 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
             </div>
             <div class="col-md-6 col-lg-6" prop-id="8058423">
               <a class="item" href="/p/8058423-Apartamento-en-Alquiler-en-Pocitos-C.-Luis-C.-Bollo--al-2900">
+                <img alt="Foto Apartamento en Alquiler en Pocitos, Montevideo C. Luis C. Bollo al 2900">
                 <span class="fp_price"><p>USD1.600</p></span>
                 <div class="details">
                   <p class="prop-card-red-text">Apartamento</p>
@@ -140,6 +156,7 @@ class Sources::HousiAdapterTest < ActiveSupport::TestCase
           <div id="propiedades">
             <div prop-id="8055496">
               <a class="item" href="/p/8055496-Apartamento-en-Alquiler-en-Pocitos-Roque-Graseras-y-Bulevar-España">
+                <img alt="Foto Apartamento en Alquiler en Pocitos, Montevideo Roque Graseras y Bulevar España">
                 <span class="fp_price"><p>$45.000</p></span>
                 <h4>Alquiler Apartamento 2 dormitorios al frente con balcón y garaje en Pocitos</h4>
                 <p class="card-address">Roque Graseras y Bulevar España</p>

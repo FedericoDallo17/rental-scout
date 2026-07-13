@@ -49,6 +49,20 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings does not invent Pocitos when Imperium omits the neighborhood" do
+    adapter = Sources::ImperiumInmobiliariaAdapter.new
+    body = JSON.parse(imperium_response_body)
+    property = body.dig("response", "result", 0, "property")
+    property.delete("city")
+
+    stub_net_http_start(response_body: JSON.generate(body)) do
+      listing = adapter.fetch_listings.first
+
+      assert_nil listing[:source_neighborhood]
+      assert_equal "Coronel Alegre 1195, 11300 Montevideo, Uruguay", listing[:location_text]
+    end
+  end
+
   test "fetch_listings uses explicit HTTP timeouts for Imperium request" do
     adapter = Sources::ImperiumInmobiliariaAdapter.new
     seen_request = false
@@ -60,6 +74,8 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
       assert options.key?(:read_timeout)
       assert_instance_of Net::HTTP::Get, request
       assert_match(/operation=Alquiler/, request.path)
+      assert_match(/region=Todos/, request.path)
+      refute_match(/region=Pocitos/, request.path)
       seen_request = true
     end
 

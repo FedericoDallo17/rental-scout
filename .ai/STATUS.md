@@ -4,10 +4,10 @@ Last updated: 2026-07-12. New here? Read `.ai/WORKFLOW.md` first - it's the dev 
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
-Freshness-first MVP lifecycle complete; multi-source feed refinement underway
+Freshness-first MVP lifecycle complete; location-quality refinement complete
 
 ## Current Task
-Ticket 024 conservative cross-source deduplication complete; MercadoLibre API keys pending
+Ticket 025 city-wide authoritative neighborhoods complete; MercadoLibre API keys pending
 
 ## Status
 Ticket 024 landed: provider-local identity remains primary, while complete exact title/price/currency/bedroom signatures conservatively reuse shared inventory across sources and retain each provider occurrence. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
@@ -34,6 +34,11 @@ Ticket 024 landed: provider-local identity remains primary, while complete exact
 - Ticket 022 landed: secure authenticated Pushover user-key settings close the notification configuration UI gap (07-12)
 - Ticket 023 landed: grouped per-user run summaries link to persisted, user-isolated match results; live Pushover credentials and delivery validated (07-12)
 - Ticket 024 landed: conservative cross-source identity suppresses confirmed syndicated duplicates without fuzzy merging (07-12)
+- InfoCasas location follow-up: explicit Villa del Cerro and misspelled Buce0 titles normalize to Cerro/Buceo and override incorrect Centro provider fallbacks (07-12)
+- Remax URL follow-up: canonical detail URLs now use the provider's `/listings/:slug` route without an invented trailing ID (07-12)
+- Source coverage follow-up: Remax, Housi, and Imperium queries are Montevideo-wide instead of Pocitos-only; missing neighborhoods are no longer mislabeled as Pocitos (07-12)
+- Authoritative neighborhoods: IDE Uruguay's 62-feature Montevideo GeoJSON has a reproducible import task and coordinate-based labels override provider metadata (07-12)
+- Ticket 025 landed: the runs workbench reports spatial, provider-fallback, unresolved, and provider-versus-polygon mismatch counts (07-12)
 
 ## Doing
 - Waiting for MercadoLibre API keys or next product gap selection.

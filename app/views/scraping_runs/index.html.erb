@@ -10,6 +10,21 @@
     </div>
   </header>
 
+  <section class="run-card" aria-labelledby="location-quality-heading">
+    <div class="run-card__summary">
+      <div>
+        <p class="runs-header__eyebrow">Inventory diagnostics</p>
+        <h2 id="location-quality-heading">Location quality</h2>
+      </div>
+    </div>
+    <dl class="run-card__facts">
+      <div><dt>Spatial</dt><dd><%= @location_quality.spatial_count %> resolved</dd></div>
+      <div><dt>Fallback</dt><dd><%= @location_quality.fallback_count %> provider labels</dd></div>
+      <div><dt>Unresolved</dt><dd><%= @location_quality.unresolved_count %> unresolved</dd></div>
+      <div><dt>Mismatches</dt><dd><%= @location_quality.provider_mismatch_count %> provider conflicts</dd></div>
+    </dl>
+  </section>
+
   <section class="source-controls" aria-label="Listing sources">
     <div class="source-controls__header">
       <p class="source-controls__eyebrow">Source controls</p>

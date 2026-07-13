@@ -1,6 +1,17 @@
 require "test_helper"
 
 class ListingTest < ActiveSupport::TestCase
+  test "display location prefers the resolved neighborhood while preserving raw address" do
+    listing = Listing.new(
+      source_neighborhood: "Buceo",
+      location_text: "Rivera 3200",
+      raw_payload: { source_city: "Montevideo" }
+    )
+
+    assert_equal "Buceo, Montevideo", listing.display_location
+    assert_equal "Rivera 3200", listing.location_text
+  end
+
   test "spatially_resolvable scope returns listings with coordinates" do
  source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     Listing.create!(listing_source: source, title: "Spatial", canonical_url: "https://example.test/spatial", location_resolution_status: "spatial", latitude: -34.90, longitude: -56.16, coordinates: Zone::FACTORY.point(-56.16, -34.90))

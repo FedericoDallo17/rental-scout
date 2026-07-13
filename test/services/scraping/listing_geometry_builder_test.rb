@@ -1,6 +1,33 @@
 require "test_helper"
 
 class Scraping::ListingGeometryBuilderTest < ActiveSupport::TestCase
+  test "coordinates use an authoritative imported neighborhood for labels" do
+    Zone.create!(
+      name: "Buceo",
+      slug: "buceo",
+      aliases: ["buceo"],
+      source_key: Zones::ImportMontevideoNeighborhoods::SOURCE_KEY,
+      source_feature_id: "1",
+      source_url: Zones::ImportMontevideoNeighborhoods::SOURCE_URL,
+      geom: Zone.polygon_from_coordinates([
+        [-56.15, -34.92], [-56.11, -34.92], [-56.11, -34.88],
+        [-56.15, -34.88], [-56.15, -34.92]
+      ])
+    )
+
+    result = Scraping::ListingGeometryBuilder.new.call(attributes: {
+      latitude: -34.90,
+      longitude: -56.13,
+      source_city: "Montevideo",
+      source_neighborhood: "Centro",
+      location_text: "Centro, Montevideo"
+    })
+
+    assert_equal "Buceo", result[:source_neighborhood]
+    assert_equal "Centro, Montevideo", result[:location_text]
+    assert_equal "spatial", result[:location_resolution_status]
+  end
+
   test "builds coordinates and marks listing spatially resolvable" do
     result = Scraping::ListingGeometryBuilder.new.call(attributes: {
       latitude: -34.9012,

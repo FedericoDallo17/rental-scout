@@ -4,7 +4,7 @@ require "uri"
 
 module Sources
   class RemaxAdapter
-    ENDPOINT_URI = URI("https://api-ar.redremax.com/remaxweb-uy/api/listings/findAllWithEntrepreneurships?page=0&pageSize=50&sort=-createdAt&in=operationId:2&in=typeId:1,2,3,4,5,6,7,8&pricein=3:0:65000&gte=dimensionCovered:30&locations=in:::1441@%3Cb%3EPocitos%3C%2Fb%3E::::&landingPath=")
+    ENDPOINT_URI = URI("https://api-ar.redremax.com/remaxweb-uy/api/listings/findAllWithEntrepreneurships?page=0&pageSize=50&sort=-createdAt&in=operationId:2&in=typeId:1,2,3,4,5,6,7,8&pricein=3:0:65000&gte=dimensionCovered:30&landingPath=")
     FRONTEND_BASE_URL = "https://www.remax.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
     READ_TIMEOUT_SECONDS = 15
@@ -15,7 +15,7 @@ module Sources
     }.freeze
 
     def fetch_listings
-      entries.map { |entry| normalized_listing(entry) }
+      entries.filter_map { |entry| normalized_listing(entry) }
     rescue JSON::ParserError, KeyError, TypeError
       []
     end
@@ -46,8 +46,14 @@ module Sources
 
     def normalized_listing(entry)
       longitude, latitude = entry.dig("location", "coordinates")
-      label = entry["geoLabel"].presence || "Pocitos"
-      neighborhood = label.split(",").first.strip
+      label = entry["geoLabel"].presence
+      return unless label
+
+      location_parts = label.split(",").map(&:strip).reject(&:blank?)
+      return if location_parts.size < 2
+
+      neighborhood = location_parts.first
+      city = location_parts.last
 
       {
         external_id: entry.fetch("id").to_s,
@@ -55,9 +61,9 @@ module Sources
         canonical_url: canonical_url(entry),
         price_cents: normalize_price(entry["price"]),
         currency: entry.dig("currency", "value"),
-        location_text: location_text(label),
+        location_text: [neighborhood, city].uniq.join(", "),
         source_neighborhood: neighborhood,
-        source_city: "Montevideo",
+        source_city: city,
         operation_type: operation_type(entry.dig("operation", "value")),
         bedrooms: integer_or_nil(entry["bedrooms"]),
         square_meters: integer_or_nil(entry["dimensionCovered"]),
@@ -72,7 +78,7 @@ module Sources
 
     def canonical_url(entry)
       slug = entry["slug"].presence || entry["id"].to_s
-      "#{FRONTEND_BASE_URL}/listings/#{slug}/#{entry.fetch("id")}"
+      "#{FRONTEND_BASE_URL}/listings/#{slug}"
     end
 
     def location_text(label)

@@ -64,6 +64,22 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action='#{listing_source_path(info_casas)}'] button", text: "Deactivate"
   end
 
+  test "signed in user sees inventory location quality metrics" do
+    user = create_user!(email: "location-quality@example.com")
+    source = ListingSource.create!(name: "Location Metrics", adapter_key: "location_metrics")
+    Listing.create!(listing_source: source, title: "Fallback", canonical_url: "https://example.test/location-fallback", location_resolution_status: "fallback")
+    Listing.create!(listing_source: source, title: "Unresolved", canonical_url: "https://example.test/location-unresolved", location_resolution_status: "unresolved")
+    sign_in user
+
+    get scraping_runs_path
+
+    assert_response :success
+    assert_select "#location-quality-heading", text: "Location quality"
+    assert_select ".run-card__facts", text: /1 provider labels/
+    assert_select ".run-card__facts", text: /1 unresolved/
+    assert_select ".run-card__facts", text: /provider conflicts/
+  end
+
   test "signed in user sees only their persisted matches for a run" do
     user = create_user!(email: "matches@example.com")
     other_user = create_user!(email: "other-matches@example.com")

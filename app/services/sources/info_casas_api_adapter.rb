@@ -13,6 +13,10 @@ module Sources
     MAX_PAGES = 40
     DEFAULT_PAGE_THROTTLE_SECONDS = 1.0
     DEFAULT_DETAIL_THROTTLE_SECONDS = 0.5
+    EXPLICIT_TITLE_NEIGHBORHOODS = {
+      "buce0" => "Buceo",
+      "villa del cerro" => "Cerro"
+    }.freeze
 
     class UnexpectedResponseError < StandardError; end
     LEGACY_HEADERS = {
@@ -80,6 +84,9 @@ module Sources
 
     def normalized_listing(entry)
       location_name = location_text(entry)
+      title_neighborhood = explicit_title_neighborhood(entry[:title])
+      neighborhood = title_neighborhood || entry[:neighborhood].presence || location_name
+      location_name = [neighborhood, entry[:estate]].compact_blank.join(", ") if title_neighborhood
 
       {
         external_id: entry[:id].to_s,
@@ -89,7 +96,7 @@ module Sources
         price_cents: normalize_price(entry[:price]),
         currency: "UYU",
         location_text: location_name,
-        source_neighborhood: entry[:neighborhood].presence || location_name,
+        source_neighborhood: neighborhood,
         source_city: entry[:estate].presence || source_city(location_name),
         operation_type: operation_type_from_id(entry[:operation_type_id]) || operation_type(entry[:link]),
         bedrooms: integer_or_nil(entry[:bedrooms]),
@@ -221,6 +228,14 @@ module Sources
       return if location_name.blank? || !location_name.include?(",")
 
       location_name.split(",").last.strip.presence
+    end
+
+    def explicit_title_neighborhood(title)
+      normalized_title = ActiveSupport::Inflector.transliterate(title.to_s).downcase
+
+      EXPLICIT_TITLE_NEIGHBORHOODS.find do |phrase, _neighborhood|
+        normalized_title.match?(/\b#{Regexp.escape(phrase)}\b/)
+      end&.last
     end
 
     def operation_type_from_id(operation_type_id)

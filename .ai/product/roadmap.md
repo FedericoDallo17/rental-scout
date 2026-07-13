@@ -26,6 +26,9 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
   to authenticated, persisted match results
 - Ticket 024: conservative cross-source deduplication - exact complete signatures
   share inventory while retaining each provider occurrence
+- Ticket 025: city-wide sources and authoritative neighborhoods - provider queries
+  cover Montevideo, IDE Uruguay polygons resolve coordinates, and runs report
+  location-quality diagnostics
 
 ## Now
 - Choose the next small unblocked product gap.

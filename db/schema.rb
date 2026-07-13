@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_12_190000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_12_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -166,8 +166,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_12_190000) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source_key"
+    t.string "source_url"
+    t.string "source_feature_id"
     t.index ["geom"], name: "index_zones_on_geom", using: :gist
     t.index ["slug"], name: "index_zones_on_slug", unique: true
+    t.index ["source_key", "source_feature_id"], name: "index_zones_on_source_key_and_source_feature_id", unique: true, where: "((source_key IS NOT NULL) AND (source_feature_id IS NOT NULL))"
   end
 
   add_foreign_key "listings", "listing_sources"

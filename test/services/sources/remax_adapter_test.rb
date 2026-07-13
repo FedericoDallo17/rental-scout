@@ -10,7 +10,7 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
 
       assert_equal "30206", listing[:external_id]
       assert_equal "ALQUILER Pocitos 1 dormitorio balcón garage", listing[:title]
-      assert_equal "https://www.remax.com.uy/listings/alquiler-pocitos-1-dormitorio-balcon-garage/30206", listing[:canonical_url]
+      assert_equal "https://www.remax.com.uy/listings/alquiler-pocitos-1-dormitorio-balcon-garage", listing[:canonical_url]
       assert_equal 3_800_000, listing[:price_cents]
       assert_equal "UYU", listing[:currency]
       assert_equal "Pocitos, Montevideo", listing[:location_text]
@@ -38,6 +38,18 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
       assert_equal "Pocitos", listing[:source_neighborhood]
       assert_equal "Montevideo", listing[:source_city]
     end
+  end
+
+  test "fetch_listings requests all neighborhoods and skips entries without location metadata" do
+    adapter = Sources::RemaxAdapter.new
+    seen_path = nil
+
+    stub_net_http_start(response_body: remax_response_body(geo_label: nil), request_assertion: ->(*, request) { seen_path = request.path }) do
+      assert_empty adapter.fetch_listings
+    end
+
+    refute_includes seen_path, "Pocitos"
+    refute_includes seen_path, "locations="
   end
 
   test "fetch_listings uses explicit HTTP timeouts for RedREMAX request" do
@@ -70,7 +82,7 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
 
   private
 
-  def remax_response_body(geo_label: "Pocitos")
+  def remax_response_body(geo_label: "Pocitos, Pocitos, Montevideo")
     JSON.generate(
       data: {
         data: [

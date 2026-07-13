@@ -4,7 +4,7 @@ require "uri"
 
 module Sources
   class HousiAdapter
-    SEARCH_URI = URI("https://www.housi.com.uy/Buscar?operation=2&ptypes=2&locations=51731&min-roofed=30&min-price=&max-price=65000&currency=UYU&o=2,2&1=1")
+    SEARCH_URI = URI("https://www.housi.com.uy/Buscar?operation=2&ptypes=2&locations=51720&min-roofed=30&min-price=&max-price=65000&currency=UYU&o=2,2&1=1")
     FRONTEND_BASE_URL = "https://www.housi.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
     READ_TIMEOUT_SECONDS = 15
@@ -44,6 +44,7 @@ module Sources
 
       title = text_at(card, "h4")
       address = normalized_text(text_at(card, ".card-address"))
+      neighborhood = neighborhood(card)
       price = text_at(card, ".fp_price")
 
       {
@@ -52,8 +53,8 @@ module Sources
         canonical_url: URI.join(FRONTEND_BASE_URL, escaped_href(href)).to_s,
         price_cents: price_cents(price),
         currency: currency(price),
-        location_text: [address, "Pocitos", "Montevideo"].compact_blank.join(", "),
-        source_neighborhood: "Pocitos",
+        location_text: [address, neighborhood, "Montevideo"].compact_blank.join(", "),
+        source_neighborhood: neighborhood,
         source_city: "Montevideo",
         operation_type: "alquiler",
         bedrooms: bedrooms(title),
@@ -75,6 +76,11 @@ module Sources
 
     def normalized_text(text)
       text.to_s.gsub(/\s+/, " ").strip.presence
+    end
+
+    def neighborhood(card)
+      alt = card.at_css("img[alt]")&.[]("alt").to_s
+      alt.match(/.*\ben\s+([^,]+),\s*Montevideo\b/i)&.[](1)&.strip.presence
     end
 
     def currency(price_text)

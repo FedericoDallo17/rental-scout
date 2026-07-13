@@ -158,6 +158,46 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings corrects a conflicting Centro fallback for Villa del Cerro" do
+    adapter = Sources::InfoCasasApiAdapter.new
+    entry = info_casas_entry(
+      id: 193982167,
+      title: "Casa en alquiler c/ cochera en Villa del Cerro",
+      link: "/casa-en-alquiler-c-cochera-en-villa-del-cerro/193982167",
+      location_name: "Centro, Montevideo",
+      neighborhood: "Centro",
+      estate: "Montevideo"
+    )
+
+    stub_http_response(adapter, stubbed_info_casas_response_for([entry])) do
+      listing = adapter.fetch_listings.first
+
+      assert_equal "Cerro, Montevideo", listing[:location_text]
+      assert_equal "Cerro", listing[:source_neighborhood]
+      assert_equal "Montevideo", listing[:source_city]
+    end
+  end
+
+  test "fetch_listings corrects a conflicting Centro fallback when Buceo is misspelled with a zero" do
+    adapter = Sources::InfoCasasApiAdapter.new
+    entry = info_casas_entry(
+      id: 193979816,
+      title: "ALQUILER | Casas en Buce0 2 dormitorios garaje $42000",
+      link: "/alquiler-casas-en-buce0-2-dormitorios-garaje-42000/193979816",
+      location_name: "Centro, Montevideo",
+      neighborhood: "Centro",
+      estate: "Montevideo"
+    )
+
+    stub_http_response(adapter, stubbed_info_casas_response_for([entry])) do
+      listing = adapter.fetch_listings.first
+
+      assert_equal "Buceo, Montevideo", listing[:location_text]
+      assert_equal "Buceo", listing[:source_neighborhood]
+      assert_equal "Montevideo", listing[:source_city]
+    end
+  end
+
   test "fetch_listings never fetches detail pages inline" do
     adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
     detail_fetch_attempted = false

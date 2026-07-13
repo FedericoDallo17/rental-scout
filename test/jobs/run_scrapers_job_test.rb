@@ -214,7 +214,7 @@ class RunScrapersJobTest < ActiveJob::TestCase
           type: { value: "departamento_estandar" },
           bedrooms: 1,
           dimensionCovered: 42,
-          geoLabel: "Pocitos",
+          geoLabel: "Pocitos, Pocitos, Montevideo",
           location: { type: "Point", coordinates: [-56.148, -34.908] }
         }]
       }

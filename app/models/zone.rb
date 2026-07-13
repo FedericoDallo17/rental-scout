@@ -14,6 +14,10 @@ class Zone < ApplicationRecord
     FACTORY.multi_polygon([FACTORY.polygon(FACTORY.linear_ring(points))])
   end
 
+  def self.containing(point)
+    where("ST_Intersects(geom, ?)", point).first
+  end
+
   private
 
   def normalize_aliases
