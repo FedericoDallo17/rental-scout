@@ -160,8 +160,9 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "UYU 4.500"
   assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Parking"
   assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "1"
-  assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Type"
-  assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "Apartamento"
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dt", text: "Type", count: 0
+  assert_select "section.listings-grid article.listing-card .listing-card__facts dd", text: "Apartamento", count: 0
+  assert_select "section.listings-grid article.listing-card .listing-card__fact--source", text: /Mock Source/
   assert_select "section.listings-grid article.listing-card a.listing-card__link[href='https://example.test/listings/pocitos-bright-loft'][target='_blank'][rel='noopener noreferrer']", count: 1
   assert_select "section.listings-grid article.listing-card .listing-card__location", text: "Pocitos, Montevideo"
     assert_select "section.listings-grid article.listing-card .listing-card__location", text: "POCITOS"

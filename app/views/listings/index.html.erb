@@ -64,11 +64,7 @@
                 <dt><%= t("feed.parking") %></dt>
                 <dd><%= listing.parking_spaces.nil? ? "-" : listing.parking_spaces %></dd>
               </div>
-              <div>
-                <dt><%= t("feed.type") %></dt>
-                <dd><%= listing.property_type.presence || "-" %></dd>
-              </div>
-              <div>
+              <div class="listing-card__fact--source">
                 <dt><%= t("feed.source") %></dt>
                 <dd><%= listing.listing_source.display_name %></dd>
               </div>

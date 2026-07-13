@@ -425,6 +425,10 @@ button {
   border-radius: 16px;
 }
 
+.listing-card__facts .listing-card__fact--source {
+  grid-column: 1 / -1;
+}
+
 .listing-card__facts dt,
 .listing-card__facts dd {
   margin: 0;

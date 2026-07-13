@@ -39,6 +39,8 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   common expenses and removed the acquisition-time peso-only filter
 - Ticket 030: added a bilingual UYU/USD saved-search price currency and made
   bounded feed filtering and scoring currency-safe
+- Ticket 031: removed the permanent Type fact from listing cards while preserving
+  provider type data for future conditional use
 
 ## Now
 - Resolve the remaining Ticket 028 product and provider-fetch decisions.
