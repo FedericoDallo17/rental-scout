@@ -7,10 +7,10 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; location-quality refinement complete
 
 ## Current Task
-Ticket 025 city-wide authoritative neighborhoods complete; MercadoLibre API keys pending
+Ticket 026 coordinate coverage and bounded provider validation complete
 
 ## Status
-Ticket 024 landed: provider-local identity remains primary, while complete exact title/price/currency/bedroom signatures conservatively reuse shared inventory across sources and retain each provider occurrence. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
+Ticket 026 live probes confirm city-wide neighborhood diversity and valid canonical URLs. Remax supplies coordinates for every sampled result; InfoCasas, Housi, and Imperium index responses do not. InfoCasas detail JSON-LD supplies coordinates, so its existing backfill is now capped and scheduled daily. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -39,6 +39,7 @@ Ticket 024 landed: provider-local identity remains primary, while complete exact
 - Source coverage follow-up: Remax, Housi, and Imperium queries are Montevideo-wide instead of Pocitos-only; missing neighborhoods are no longer mislabeled as Pocitos (07-12)
 - Authoritative neighborhoods: IDE Uruguay's 62-feature Montevideo GeoJSON has a reproducible import task and coordinate-based labels override provider metadata (07-12)
 - Ticket 025 landed: the runs workbench reports spatial, provider-fallback, unresolved, and provider-versus-polygon mismatch counts (07-12)
+- Ticket 026 landed: per-source coordinate coverage is visible; one-page probes validated all four real providers; InfoCasas detail backfill succeeded for 3/3 sampled listings and is scheduled daily with a limit of 20 (07-12)
 
 ## Doing
 - Waiting for MercadoLibre API keys or next product gap selection.
@@ -55,4 +56,4 @@ Ticket 024 landed: provider-local identity remains primary, while complete exact
   users can now enter their own Pushover keys in the app.
 
 ## Next Step
-Resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available; otherwise choose the next small unblocked product gap.
+Resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available; otherwise evaluate cached address geocoding for Housi and Imperium or choose another small unblocked product gap.

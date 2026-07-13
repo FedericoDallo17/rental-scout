@@ -25,5 +25,11 @@ class Scraping::LocationQualityMetricsTest < ActiveSupport::TestCase
     assert_equal 1, result.fallback_count
     assert_equal 1, result.unresolved_count
     assert_equal 1, result.provider_mismatch_count
+    source_result = result.by_source.find { |row| row.source_id == source.id }
+    assert_equal 3, source_result.total_count
+    assert_equal 1, source_result.spatial_count
+    assert_equal 1, source_result.fallback_count
+    assert_equal 1, source_result.unresolved_count
+    assert_equal 33, source_result.coverage_percentage
   end
 end

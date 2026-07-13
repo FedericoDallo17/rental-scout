@@ -823,6 +823,26 @@ button {
   font-weight: 800;
 }
 
+.location-quality-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.location-quality-table th,
+.location-quality-table td {
+  padding: 0.7rem 0.55rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.location-quality-table thead th {
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
 .run-card__error,
 .source-run__error {
   border: 1px solid #e3b7a9;

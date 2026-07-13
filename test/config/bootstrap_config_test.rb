@@ -79,7 +79,9 @@ class BootstrapConfigTest < ActiveSupport::TestCase
       assert_includes recurring_config, "#{environment}:"
       assert_includes recurring_config, "  run_scrapers:"
       assert_includes recurring_config, "  purge_stale_listings:"
+      assert_includes recurring_config, "  backfill_info_casas_coordinates:"
     end
+    assert_includes recurring_config, "args: [{ limit: 20 }]"
   end
 
   test "reshape migration backfills source runs from legacy scraping run provenance" do

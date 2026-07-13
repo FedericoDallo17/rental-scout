@@ -78,6 +78,8 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".run-card__facts", text: /1 provider labels/
     assert_select ".run-card__facts", text: /1 unresolved/
     assert_select ".run-card__facts", text: /provider conflicts/
+    assert_select ".location-quality-table tr", text: /Location Metrics/
+    assert_select ".location-quality-table tr", text: /0%/
   end
 
   test "signed in user sees only their persisted matches for a run" do

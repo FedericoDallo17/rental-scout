@@ -29,6 +29,8 @@ Last updated: 2026-07-12. Phases A/B and most unplanned auth/geo work are done; 
 - Ticket 025: city-wide sources and authoritative neighborhoods - provider queries
   cover Montevideo, IDE Uruguay polygons resolve coordinates, and runs report
   location-quality diagnostics
+- Ticket 026: coordinate coverage and live validation - per-source coverage metrics,
+  bounded provider probes, and a daily 20-listing InfoCasas coordinate backfill
 
 ## Now
 - Choose the next small unblocked product gap.

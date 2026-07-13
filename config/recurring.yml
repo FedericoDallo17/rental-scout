@@ -7,6 +7,11 @@ development:
     class: PurgeStaleListingsJob
     queue: default
     schedule: every day
+  backfill_info_casas_coordinates:
+    class: BackfillInfoCasasCoordinatesJob
+    queue: default
+    schedule: every day at 2am
+    args: [{ limit: 20 }]
 
 test:
   run_scrapers:
@@ -17,6 +22,11 @@ test:
     class: PurgeStaleListingsJob
     queue: default
     schedule: every day
+  backfill_info_casas_coordinates:
+    class: BackfillInfoCasasCoordinatesJob
+    queue: default
+    schedule: every day at 2am
+    args: [{ limit: 20 }]
 
 production:
   run_scrapers:
@@ -27,3 +37,8 @@ production:
     class: PurgeStaleListingsJob
     queue: default
     schedule: every day
+  backfill_info_casas_coordinates:
+    class: BackfillInfoCasasCoordinatesJob
+    queue: default
+    schedule: every day at 2am
+    args: [{ limit: 20 }]

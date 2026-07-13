@@ -23,6 +23,23 @@
       <div><dt>Unresolved</dt><dd><%= @location_quality.unresolved_count %> unresolved</dd></div>
       <div><dt>Mismatches</dt><dd><%= @location_quality.provider_mismatch_count %> provider conflicts</dd></div>
     </dl>
+    <table class="location-quality-table">
+      <thead>
+        <tr><th>Source</th><th>Total</th><th>Spatial</th><th>Fallback</th><th>Unresolved</th><th>Coverage</th></tr>
+      </thead>
+      <tbody>
+        <% @location_quality.by_source.each do |source| %>
+          <tr>
+            <th scope="row"><%= source.source_name %></th>
+            <td><%= source.total_count %></td>
+            <td><%= source.spatial_count %></td>
+            <td><%= source.fallback_count %></td>
+            <td><%= source.unresolved_count %></td>
+            <td><%= source.coverage_percentage %>%</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </section>
 
   <section class="source-controls" aria-label="Listing sources">
