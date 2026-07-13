@@ -62,6 +62,22 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_listings preserves rent currency while expenses remain in pesos" do
+    adapter = Sources::InfoCasasApiAdapter.new
+    uyu_entry = info_casas_entry(id: 124, currency: "$", currency_id: 2)
+    usd_entry = info_casas_entry(id: 125, price: 3500, currency: "U$S", currency_id: 1)
+
+    stub_http_response(adapter, stubbed_info_casas_response_for([uyu_entry, usd_entry])) do
+      uyu_listing, usd_listing = adapter.fetch_listings
+
+      assert_equal "UYU", uyu_listing[:currency]
+      assert_equal "USD", usd_listing[:currency]
+      assert_equal 350_000, usd_listing[:price_cents]
+      assert_equal "UYU", uyu_listing[:expenses_currency]
+      assert_equal "UYU", usd_listing[:expenses_currency]
+    end
+  end
+
   test "fetch_listings requests broad montevideo inventory without legacy map filters" do
     adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
 
@@ -72,6 +88,7 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     assert_equal 10, params[:estate_id]
     assert_equal [1, 2], params[:property_type_id]
     assert_equal 1, params[:publicationDate]
+    assert_nil params[:currencyID]
   end
 
   test "fetch_listings requests every recent page until results are exhausted" do
@@ -410,7 +427,9 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     operation_type_id: nil,
     property_type_id: nil,
     neighborhood: nil,
-    estate: nil
+    estate: nil,
+    currency: "$",
+    currency_id: 2
   )
     {
       id: id,
@@ -418,6 +437,8 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
       description: description,
       link: link,
       price: price,
+      currency: currency,
+      currency_id: currency_id,
       operation_type_id: operation_type_id,
       property_type_id: property_type_id,
       commonExpenses: 4500,
@@ -489,7 +510,7 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
       "order" => 2,
       "operation_type_id" => 2,
       "property_type_id" => [1, 2],
-      "currencyID" => 2,
+      "currencyID" => nil,
       "m2Currency" => 2,
       "mapView" => false,
       "estate_id" => 10,

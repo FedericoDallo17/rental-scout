@@ -35,6 +35,8 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   translated signed-in product surfaces
 - Ticket 028A: aligned listing-card text tracks and product-facing `InfoCasas`
   labels without exposing internal adapter keys
+- Ticket 029: preserved InfoCasas rent currency independently from peso-denominated
+  common expenses and removed the acquisition-time peso-only filter
 
 ## Now
 - Resolve the remaining Ticket 028 product and provider-fetch decisions.

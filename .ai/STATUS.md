@@ -7,7 +7,7 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; bilingual signed-in experience complete
 
 ## Current Task
-Ticket 028A card alignment and product-facing source labels complete
+Ticket 029 InfoCasas price currency complete
 
 ## Status
 Ticket 026 live probes confirm city-wide neighborhood diversity and valid canonical URLs. Remax supplies coordinates for every sampled result; InfoCasas, Housi, and Imperium index responses do not. InfoCasas detail JSON-LD supplies coordinates, so its existing backfill is now capped and scheduled daily. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
@@ -43,6 +43,7 @@ Ticket 026 live probes confirm city-wide neighborhood diversity and valid canoni
 - Ticket 027 landed: each user can persist English or Spanish; signed-in navigation, feed, searches, runs, notifications, flashes, and score explanations render request-scoped translations (07-12)
 - InfoCasas detail follow-up: `commonExpenses` now persists as UYU common expenses and appears on listing cards (07-12)
 - Ticket 028A landed: listing-card text tracks align across rows; all signed-in product surfaces show `InfoCasas` without exposing its internal adapter key (07-13)
+- Ticket 029 landed: InfoCasas acquisition no longer filters to peso listings; rent symbols normalize to USD/UYU while common expenses remain UYU (07-13)
 
 ## Doing
 - Discussing the remaining Ticket 028 product and provider-fetch decisions.

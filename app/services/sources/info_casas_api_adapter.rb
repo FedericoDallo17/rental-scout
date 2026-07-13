@@ -17,6 +17,14 @@ module Sources
       "buce0" => "Buceo",
       "villa del cerro" => "Cerro"
     }.freeze
+    PRICE_CURRENCIES = {
+      "$" => "UYU",
+      "UY$" => "UYU",
+      "UYU" => "UYU",
+      "U$S" => "USD",
+      "US$" => "USD",
+      "USD" => "USD"
+    }.freeze
 
     class UnexpectedResponseError < StandardError; end
     LEGACY_HEADERS = {
@@ -94,7 +102,7 @@ module Sources
         canonical_url: URI.join(FRONTEND_BASE_URL, entry[:link]).to_s,
         description: entry[:description],
         price_cents: normalize_price(entry[:price]),
-        currency: "UYU",
+        currency: normalize_currency(entry[:currency]),
         expenses_cents: normalize_price(entry[:commonExpenses]),
         expenses_currency: "UYU",
         location_text: location_name,
@@ -193,7 +201,7 @@ module Sources
         order: 2,
         operation_type_id: 2,
         property_type_id: [1, 2],
-        currencyID: 2,
+        currencyID: nil,
         m2Currency: 2,
         mapView: false,
         estate_id: 10,
@@ -213,6 +221,10 @@ module Sources
       return if price.blank?
 
       price.to_i * 100
+    end
+
+    def normalize_currency(currency)
+      PRICE_CURRENCIES[currency.to_s.strip.upcase]
     end
 
     def integer_or_nil(value)
