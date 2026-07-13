@@ -8,7 +8,8 @@
     <nav class="search-sidebar__nav" aria-label="<%= t("feed.saved_searches_label") %>">
       <% @searches.each do |search| %>
         <div class="search-sidebar__item">
-          <%= link_to listings_path(search_id: search.id), class: ["search-link", ("search-link--active" if search == @active_search)] do %>
+          <% search_path = search == @active_search ? listings_path(@feed_params) : listings_path(@feed_params.merge(search_id: search.id)) %>
+          <%= link_to search_path, class: ["search-link", ("search-link--active" if search == @active_search)] do %>
             <span class="search-link__name"><%= search.name %></span>
           <span class="search-link__meta"><%= search.location_query %></span>
           <span class="search-link__count"><%= t("count.listing", count: @search_counts.fetch(search, 0)) %></span>
@@ -26,6 +27,10 @@
         <h1><%= t("feed.title") %></h1>
         <% if @active_search %>
           <p class="feed-header__context"><%= t("feed.browsing_html", name: @active_search.name) %></p>
+        <% elsif @searches.any? %>
+          <p class="feed-header__context"><%= t("feed.all_search_matches") %></p>
+        <% end %>
+        <% if @searches.any? %>
           <p class="feed-header__refresh-cue"><%= t("feed.refresh") %></p>
         <% end %>
       </div>
@@ -33,7 +38,42 @@
       <p class="feed-header__count"><%= t("count.listing", count: @listings.size) %></p>
     </header>
 
-    <% if @active_search %>
+    <% if @searches.any? %>
+      <%= form_with url: listings_path, method: :get, class: "feed-controls" do |form| %>
+        <%= hidden_field_tag :search_id, @active_search.id if @active_search %>
+        <div class="feed-controls__field">
+          <%= form.label :sort, t("feed.sort") %>
+          <%= form.select :sort, [
+            [t("feed.sort_options.newest"), "newest"],
+            [t("feed.sort_options.price_low"), "price_low"],
+            [t("feed.sort_options.price_high"), "price_high"],
+            [t("feed.sort_options.total_monthly"), "total_monthly"],
+            [t("feed.sort_options.fit"), "fit"]
+          ], selected: @sort %>
+        </div>
+        <div class="feed-controls__field">
+          <%= form.label :source_id, t("feed.source") %>
+          <%= form.select :source_id, @filter_sources.map { |source| [source.display_name, source.id] }, { include_blank: t("feed.all_sources") }, selected: @selected_source_id %>
+        </div>
+        <div class="feed-controls__field">
+          <%= form.label :neighborhood, t("feed.neighborhood") %>
+          <%= form.select :neighborhood, @filter_neighborhoods, { include_blank: t("feed.all_neighborhoods") }, selected: @selected_neighborhood %>
+        </div>
+        <div class="feed-controls__field">
+          <%= form.label :currency, t("feed.currency") %>
+          <%= form.select :currency, ListingsController::CURRENCIES, { include_blank: t("feed.all_currencies") }, selected: @selected_currency %>
+        </div>
+        <label class="feed-controls__toggle">
+          <%= check_box_tag :expenses_known, "1", @expenses_known %>
+          <span><%= t("feed.expenses_known") %></span>
+        </label>
+        <div class="feed-controls__actions">
+          <%= form.submit t("feed.apply_controls"), class: "feed-controls__submit" %>
+          <%= link_to t("feed.clear_controls"), listings_path(search_id: @active_search&.id), class: "feed-controls__clear" %>
+        </div>
+      <% end %>
+
+      <% if @listings.any? %>
       <section class="listings-grid" aria-label="<%= t("feed.listings_label") %>">
         <% @listings.each do |listing| %>
       <article class="listing-card">
@@ -50,6 +90,9 @@
               <p class="listing-card__explanation"><%= match_score.explanations.join(" · ") %></p>
             <% end %>
             <p class="listing-card__completeness"><%= match_score.completeness %></p>
+            <% unless @active_search %>
+              <p class="listing-card__matches"><%= t("feed.matches_searches", searches: @listing_matches.fetch(listing).map(&:name).to_sentence) %></p>
+            <% end %>
             <h2><%= listing.title %></h2>
             <p class="listing-card__location"><%= listing.display_location %></p>
             <dl class="listing-card__facts">
@@ -80,6 +123,12 @@
       </article>
         <% end %>
       </section>
+      <% else %>
+        <section class="feed-empty-state" aria-label="<%= t("feed.no_results_label") %>">
+          <h2><%= t("feed.no_results_title") %></h2>
+          <p><%= t("feed.no_results_copy") %></p>
+        </section>
+      <% end %>
     <% else %>
       <section class="feed-empty-state" aria-label="<%= t("feed.setup_label") %>">
         <h2><%= t("feed.empty_title") %></h2>

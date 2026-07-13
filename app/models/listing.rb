@@ -26,7 +26,7 @@ class Listing < ApplicationRecord
     return recent_first unless search_preference
 
     listings = in_scope_inventory
-    listings = if search_preference.zones.exists?
+    listings = if search_has_zones?(search_preference)
       listings.where(id: zone_matching_ids(search_preference))
     else
       listings.where("LOWER(location_text) LIKE ?", "%#{sanitize_sql_like(search_preference.location_query.to_s.downcase)}%")
@@ -40,9 +40,15 @@ class Listing < ApplicationRecord
     listings.recent_first
   end
 
+  def self.search_has_zones?(search_preference)
+    association = search_preference.association(:zones)
+    association.loaded? ? association.target.any? : association.scope.exists?
+  end
+
   def self.zone_matching_ids(search_preference)
-    zone_ids = search_preference.zone_ids
-    aliases = search_preference.zones.flat_map(&:aliases).map(&:downcase).uniq
+    zones = search_preference.zones.to_a
+    zone_ids = zones.map(&:id)
+    aliases = zones.flat_map(&:aliases).map(&:downcase).uniq
 
     spatial_ids = joins("INNER JOIN zones feed_zones ON ST_Intersects(feed_zones.geom, listings.coordinates)")
       .where(location_resolution_status: "spatial")

@@ -43,6 +43,8 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   provider type data for future conditional use
 - Ticket 032: replaced mixed-purpose coincidence points with preference-only fit,
   separate completeness, and readable bilingual presentation
+- Ticket 033: added a deduplicated all-searches feed, active-search deselection,
+  match labels, and bilingual server-side sorting/filtering controls
 
 ## Now
 - Resolve the remaining Ticket 028 product and provider-fetch decisions.
@@ -55,8 +57,8 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   filtering, deselection, and all-search aggregation.
 
 ## Next
-- Shape aggregate saved-search feed controls and sorting/filtering; resume
-  MercadoLibre when API keys or an allowed index payload are available.
+- Implement provider-specific incremental fetching; resume MercadoLibre when API
+  keys or an allowed index payload are available.
 
 ## Dropped now
 - Map UI, match explanations (deferred in 06-27 frontend spec)

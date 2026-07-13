@@ -11,7 +11,7 @@ Shape the next feed refinement pass before implementation.
 - [x] Remove the permanent `Type` fact while retaining provider data for future conditional use.
 - [ ] Define incremental-fetch strategies per provider based on publication-date and ordering support.
 - [x] Replace coincidence points with preference-only fit, separate completeness, and readable contrast.
-- [ ] Design dashboard sorting/filtering, selected-search deselection, and an all-searches aggregate feed.
+- [x] Add dashboard sorting/filtering, selected-search deselection, and an all-searches aggregate feed.
 
 ## Questions to Resolve
 
@@ -61,6 +61,13 @@ space; Source spans the final facts row, and stored provider type data remains i
 Ticket 032 was completed on 2026-07-13. Fit now evaluates only active price and
 bedroom preferences at 70/30, normalizes a single active preference, disappears for
 broad searches, and presents listing completeness separately with readable contrast.
+
+Ticket 033 was completed on 2026-07-13. The unselected feed is the deduplicated
+union of saved-search matches; active searches can be cleared; aggregate cards name
+their matching searches; and bilingual server-side sorting/filtering controls cover
+newest, price, known monthly total, fit, source, neighborhood, currency, and expenses.
+Saved-search membership is composed into one SQL union rather than executed once per
+search. All-fresh inventory remains a separate future mode.
 
 ## Definition of Done
 

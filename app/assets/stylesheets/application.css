@@ -197,6 +197,75 @@ button {
   color: var(--muted);
 }
 
+.feed-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(130px, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: rgba(255, 253, 249, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.feed-controls__field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.feed-controls__field label {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.feed-controls__field select {
+  width: 100%;
+  min-height: 2.6rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.feed-controls__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.6rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.feed-controls__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.feed-controls__submit,
+.feed-controls__clear {
+  padding: 0.65rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.feed-controls__submit {
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--surface);
+  cursor: pointer;
+}
+
+.feed-controls__clear {
+  color: var(--muted);
+}
+
 .search-sidebar__eyebrow,
 .feed-header__eyebrow {
   margin: 0 0 0.5rem;
@@ -404,6 +473,14 @@ button {
   font-weight: 800;
 }
 
+.listing-card__matches {
+  margin: 0 0 0.65rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .listing-card h2 {
   display: -webkit-box;
   min-height: 2.5em;
@@ -482,6 +559,10 @@ button {
   .listings-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .feed-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -497,6 +578,10 @@ button {
   }
 
   .listings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feed-controls {
     grid-template-columns: 1fr;
   }
 }

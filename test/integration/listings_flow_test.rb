@@ -44,7 +44,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{edit_notification_settings_path}']", text: "Notifications"
   end
 
-  test "signed in root defaults to the first saved search feed" do
+  test "signed in root defaults to the aggregate saved search feed" do
     user = create_user!(email: "root-feed@example.com")
     sign_in user
 
@@ -55,9 +55,9 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Centro"
-    assert_select ".feed-header__context", text: /Browsing Centro/
+    assert_select ".feed-header__context", text: /All saved-search matches/
     assert_select ".feed-header__refresh-cue", text: /Updated automatically/
-    assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__name", text: "Centro"
+    assert_select "nav.search-sidebar__nav a.search-link.search-link--active", count: 0
   end
 
   test "signed in sidebar renders hybrid search workbench cards with counts" do
@@ -145,7 +145,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "aside.search-sidebar h2", text: "Saved searches"
     assert_select "nav.search-sidebar__nav a.search-link", count: 2
-    assert_select "nav.search-sidebar__nav a.search-link.search-link--active[href='#{listings_path(search_id: pocitos.id)}']", count: 1
+    assert_select "nav.search-sidebar__nav a.search-link.search-link--active[href='#{listings_path}']", count: 1
     assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__name", text: "Pocitos"
     assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__meta", text: "Pocitos"
     assert_select ".feed-header h1", text: "Scraped Apartments"
@@ -239,7 +239,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
       bedrooms: 1
     )
 
-    get listings_path(search_id: search.id)
+    get listings_path(search_id: search.id, sort: "fit")
 
     assert_response :success
     assert_equal ["Good Match", "Okay Match"], css_select(".listing-card h2").map { |node| node.text.strip }
