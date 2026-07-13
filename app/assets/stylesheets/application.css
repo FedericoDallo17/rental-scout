@@ -164,9 +164,10 @@ button {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
   gap: 2rem;
+  width: calc(100% - 4rem);
   max-width: 1440px;
   margin: 0 auto;
-  padding: 1.5rem 2rem 2rem;
+  padding: 1.5rem 0 2rem;
 }
 
 .search-sidebar {
@@ -455,7 +456,8 @@ button {
 @media (max-width: 720px) {
   .feed-layout {
     gap: 1.25rem;
-    padding: 1rem;
+    width: calc(100% - 2rem);
+    padding: 1rem 0;
   }
 
   .feed-header {
