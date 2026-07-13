@@ -41,6 +41,7 @@ Ticket 026 live probes confirm city-wide neighborhood diversity and valid canoni
 - Ticket 025 landed: the runs workbench reports spatial, provider-fallback, unresolved, and provider-versus-polygon mismatch counts (07-12)
 - Ticket 026 landed: per-source coordinate coverage is visible; one-page probes validated all four real providers; InfoCasas detail backfill succeeded for 3/3 sampled listings and is scheduled daily with a limit of 20 (07-12)
 - Ticket 027 landed: each user can persist English or Spanish; signed-in navigation, feed, searches, runs, notifications, flashes, and score explanations render request-scoped translations (07-12)
+- InfoCasas detail follow-up: `commonExpenses` now persists as UYU common expenses and appears on listing cards (07-12)
 
 ## Doing
 - Waiting for MercadoLibre API keys or next product gap selection.

@@ -95,6 +95,8 @@ module Sources
         description: entry[:description],
         price_cents: normalize_price(entry[:price]),
         currency: "UYU",
+        expenses_cents: normalize_price(entry[:commonExpenses]),
+        expenses_currency: "UYU",
         location_text: location_name,
         source_neighborhood: neighborhood,
         source_city: entry[:estate].presence || source_city(location_name),

@@ -16,6 +16,8 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
           description: "Apartamento luminoso con terraza",
           price_cents: 3_500_000,
           currency: "UYU",
+          expenses_cents: 450_000,
+          expenses_currency: "UYU",
           location_text: "Pocitos, Montevideo",
           source_neighborhood: "Pocitos, Montevideo",
           source_city: "Montevideo",
@@ -32,6 +34,8 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
           :description,
           :price_cents,
           :currency,
+          :expenses_cents,
+          :expenses_currency,
           :location_text,
           :source_neighborhood,
           :source_city,
@@ -42,6 +46,19 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
           :longitude
         )
       )
+    end
+  end
+
+  test "fetch_listings leaves expenses empty when InfoCasas does not publish common expenses" do
+    adapter = Sources::InfoCasasApiAdapter.new
+    entry = info_casas_entry(id: 124)
+    entry[:commonExpenses] = nil
+
+    stub_http_response(adapter, stubbed_info_casas_response_for([entry])) do
+      listing = adapter.fetch_listings.first
+
+      assert_nil listing[:expenses_cents]
+      assert_equal "UYU", listing[:expenses_currency]
     end
   end
 
