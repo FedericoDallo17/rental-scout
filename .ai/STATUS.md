@@ -7,7 +7,7 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle complete; bilingual signed-in experience complete
 
 ## Current Task
-Ticket 034 provider-specific incremental fetching complete
+Ticket 035 Spanish Devise authentication messages complete
 
 ## Status
 Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
@@ -49,9 +49,10 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 032 landed: the numeric score measures only active saved-search preferences at 70/30 price/bedrooms, disappears for broad searches, and separates listing completeness with higher-contrast styling (07-13)
 - Ticket 033 landed: the default feed deduplicates all saved-search matches, active searches can be deselected, cards name matching searches, and bilingual server-side controls sort/filter the dashboard without query-per-search membership execution (07-13)
 - Ticket 034 landed: source-local known IDs drive bounded recent pagination for Remax and Imperium; InfoCasas uses hourly publication windows; Housi stays single-page; weekly reconciliation scans deeper without notification fan-out (07-14)
+- Ticket 035 landed: Spanish Devise notices and errors cover sign-in, sign-out, registration, password, confirmation, and unlock flows without exposing missing-translation diagnostics (07-14)
 
 ## Doing
-- Ticket 028 is complete; selecting the next unblocked product slice.
+- Inventory-health observability is approved next, pending its database-migration gate.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
@@ -65,4 +66,4 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
   users can now enter their own Pushover keys in the app.
 
 ## Next Step
-Choose the next unblocked product slice; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.
+After migration approval, shape inventory-health observability as Ticket 036; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.

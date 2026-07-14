@@ -47,15 +47,17 @@ Last updated: 2026-07-14. Phases A/B and most unplanned auth/geo work are done; 
   match labels, and bilingual server-side sorting/filtering controls
 - Ticket 034: added provider-specific incremental acquisition and bounded weekly
   reconciliation without stale-catalog notification fan-out
+- Ticket 035: added complete Spanish Devise authentication messages and a real
+  Spanish-user sign-in regression test
 
 ## Now
-- Select the next unblocked product slice now that Ticket 028 is complete.
+- Shape Ticket 036 inventory-health observability after migration approval.
 - MercadoLibre remains paused pending API keys or allowed index payload.
 
 ## Product gaps to shape
 
-- Define the next product slice from observed use now that Ticket 028's feed and
-  source-efficiency work is complete.
+- Ticket 036: distinguish hourly and reconciliation runs, persist per-source fetch
+  diagnostics, verify recurring-job loading, and expose a safe manual reconciliation.
 
 ## Next
 - Resume MercadoLibre when API keys or an allowed index payload are available.

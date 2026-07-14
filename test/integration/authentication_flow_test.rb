@@ -161,4 +161,24 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_select ".app-flash", text: "Signed in successfully."
     assert_select ".auth-flash", count: 0
   end
+
+  test "Spanish users see translated Devise sign-in flashes" do
+    user = User.create!(
+      first_name: "Idioma",
+      last_name: "Español",
+      email: "spanish-auth@example.com",
+      password: "password123",
+      password_confirmation: "password123",
+      locale: "es"
+    )
+
+    post user_session_path, params: {
+      user: { email: user.email, password: "password123" }
+    }
+    follow_redirect!
+
+    assert_response :success
+    assert_select ".app-flash", text: "Iniciaste sesión correctamente."
+    refute_includes response.body, "Translation missing"
+  end
 end
