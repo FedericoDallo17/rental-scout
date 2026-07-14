@@ -8,40 +8,68 @@ module Sources
     FRONTEND_BASE_URL = "https://www.remax.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
     READ_TIMEOUT_SECONDS = 15
+    RECENT_PAGE_LIMIT = 3
+    RECONCILIATION_PAGE_LIMIT = 20
 
     HEADERS = {
       "accept" => "application/json, text/plain, */*",
       "user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
     }.freeze
 
-    def fetch_listings
-      entries.filter_map { |entry| normalized_listing(entry) }
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
+      listings = []
+      page_signatures = Set.new
+      page_limit = reconciliation ? RECONCILIATION_PAGE_LIMIT : RECENT_PAGE_LIMIT
+
+      page_limit.times do |page|
+        page_entries = entries(page:)
+        break if page_entries.empty?
+
+        page_ids = page_entries.filter_map { |entry| entry["id"]&.to_s }
+        signature = page_ids.sort
+        break if page_signatures.include?(signature)
+
+        page_signatures << signature
+        listings.concat(page_entries.filter_map { |entry| normalized_listing(entry) })
+        break if !reconciliation && page_ids.intersect?(known_external_ids.to_a)
+      end
+
+      listings
     rescue JSON::ParserError, KeyError, TypeError
       []
     end
 
     private
 
-    def entries
-      payload.dig("data", "data") || []
+    def entries(page:)
+      payload(page:).dig("data", "data") || []
     end
 
-    def payload
-      JSON.parse(http_response.body)
+    def payload(page:)
+      JSON.parse(http_response(page:).body)
     end
 
-    def http_response
+    def http_response(page:)
+      uri = request_uri(page:)
       Net::HTTP.start(
-        ENDPOINT_URI.host,
-        ENDPOINT_URI.port,
+        uri.host,
+        uri.port,
         use_ssl: true,
         open_timeout: OPEN_TIMEOUT_SECONDS,
         read_timeout: READ_TIMEOUT_SECONDS
       ) do |http|
-        request = Net::HTTP::Get.new(ENDPOINT_URI)
+        request = Net::HTTP::Get.new(uri)
         HEADERS.each { |header, value| request[header] = value }
         http.request(request)
       end
+    end
+
+    def request_uri(page:)
+      uri = ENDPOINT_URI.dup
+      pairs = URI.decode_www_form(uri.query)
+      pairs.map! { |key, value| key == "page" ? [key, page.to_s] : [key, value] }
+      uri.query = URI.encode_www_form(pairs)
+      uri
     end
 
     def normalized_listing(entry)

@@ -1,16 +1,16 @@
 # Status
 
-Last updated: 2026-07-13. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
+Last updated: 2026-07-14. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
 Freshness-first MVP lifecycle complete; bilingual signed-in experience complete
 
 ## Current Task
-Ticket 033 aggregate feed and dashboard controls complete
+Ticket 034 provider-specific incremental fetching complete
 
 ## Status
-Ticket 026 live probes confirm city-wide neighborhood diversity and valid canonical URLs. Remax supplies coordinates for every sampled result; InfoCasas, Housi, and Imperium index responses do not. InfoCasas detail JSON-LD supplies coordinates, so its existing backfill is now capped and scheduled daily. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
+Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -48,9 +48,10 @@ Ticket 026 live probes confirm city-wide neighborhood diversity and valid canoni
 - Ticket 031 landed: listing cards no longer reserve a fact cell for Type; Source spans the final row while provider type data remains available internally (07-13)
 - Ticket 032 landed: the numeric score measures only active saved-search preferences at 70/30 price/bedrooms, disappears for broad searches, and separates listing completeness with higher-contrast styling (07-13)
 - Ticket 033 landed: the default feed deduplicates all saved-search matches, active searches can be deselected, cards name matching searches, and bilingual server-side controls sort/filter the dashboard without query-per-search membership execution (07-13)
+- Ticket 034 landed: source-local known IDs drive bounded recent pagination for Remax and Imperium; InfoCasas uses hourly publication windows; Housi stays single-page; weekly reconciliation scans deeper without notification fan-out (07-14)
 
 ## Doing
-- Discussing the remaining Ticket 028 product and provider-fetch decisions.
+- Ticket 028 is complete; selecting the next unblocked product slice.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
@@ -64,4 +65,4 @@ Ticket 026 live probes confirm city-wide neighborhood diversity and valid canoni
   users can now enter their own Pushover keys in the app.
 
 ## Next Step
-Implement Ticket 028's provider-specific incremental-fetch strategy; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.
+Choose the next unblocked product slice; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.

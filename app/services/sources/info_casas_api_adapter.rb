@@ -62,12 +62,12 @@ module Sources
       @detail_throttle_seconds = detail_throttle_seconds
     end
 
-    def fetch_listings
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
       page = 1
       listings = []
 
       loop do
-        entries = payload(page).dig(0, :data, :searchFast, :data)
+        entries = payload(page, reconciliation:).dig(0, :data, :searchFast, :data)
         raise UnexpectedResponseError, "missing searchFast data on page #{page}" unless entries.is_a?(Array)
 
         listings.concat(entries.map { |entry| normalized_listing(entry) })
@@ -116,11 +116,11 @@ module Sources
       }
     end
 
-    def payload(page)
-      JSON.parse(http_response(page).body, symbolize_names: true)
+    def payload(page, reconciliation: false)
+      JSON.parse(http_response(page, reconciliation:).body, symbolize_names: true)
     end
 
-    def http_response(page)
+    def http_response(page, reconciliation: false)
       Net::HTTP.start(
         ENDPOINT_URI.host,
         ENDPOINT_URI.port,
@@ -132,7 +132,7 @@ module Sources
         LEGACY_HEADERS.each do |header, value|
           request[header] = value
         end
-        request.body = request_body(page:)
+        request.body = request_body(page:, reconciliation:)
         http.request(request)
       end
     end
@@ -173,13 +173,13 @@ module Sources
       html.scan(/<script[^>]+type="application\/ld\+json"[^>]*>(.*?)<\/script>/m).flatten
     end
 
-    def request_body(page: 1)
+    def request_body(page: 1, reconciliation: false)
       JSON.generate([
         {
           operationName: "ResultsGird_v2",
           variables: {
             rows: RESULTS_PER_PAGE,
-            params: legacy_search_params(page:),
+            params: legacy_search_params(page:, reconciliation:),
             page: page,
             source: 0
           },
@@ -188,14 +188,14 @@ module Sources
         {
           operationName: "searchUrl",
           variables: {
-            params: legacy_search_params(page:)
+            params: legacy_search_params(page:, reconciliation:)
           },
           query: SEARCH_URL_QUERY
         }
       ])
     end
 
-    def legacy_search_params(page: 1)
+    def legacy_search_params(page: 1, reconciliation: false)
       {
         page: page,
         order: 2,
@@ -207,7 +207,7 @@ module Sources
         estate_id: 10,
         neighborhood_id: [],
         bedrooms: nil,
-        publicationDate: LAST_HOUR_PUBLICATION_DATE,
+        publicationDate: reconciliation ? nil : LAST_HOUR_PUBLICATION_DATE,
         minPrice: nil,
         maxPrice: nil,
         m2Min: nil,

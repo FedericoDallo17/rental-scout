@@ -1,6 +1,6 @@
 # Roadmap
 
-Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-project.md).
+Last updated: 2026-07-14. Phases A/B and most unplanned auth/geo work are done; this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-project.md).
 
 ## Done
 - Discovery, look feel, MVP scope (stub docs only)
@@ -45,20 +45,20 @@ Last updated: 2026-07-13. Phases A/B and most unplanned auth/geo work are done; 
   separate completeness, and readable bilingual presentation
 - Ticket 033: added a deduplicated all-searches feed, active-search deselection,
   match labels, and bilingual server-side sorting/filtering controls
+- Ticket 034: added provider-specific incremental acquisition and bounded weekly
+  reconciliation without stale-catalog notification fan-out
 
 ## Now
-- Resolve the remaining Ticket 028 product and provider-fetch decisions.
+- Select the next unblocked product slice now that Ticket 028 is complete.
 - MercadoLibre remains paused pending API keys or allowed index payload.
 
 ## Product gaps to shape
 
-- Ticket 028: card alignment, user-facing source names, card fact density,
-  incremental provider fetching, score semantics/contrast, and feed sorting,
-  filtering, deselection, and all-search aggregation.
+- Define the next product slice from observed use now that Ticket 028's feed and
+  source-efficiency work is complete.
 
 ## Next
-- Implement provider-specific incremental fetching; resume MercadoLibre when API
-  keys or an allowed index payload are available.
+- Resume MercadoLibre when API keys or an allowed index payload are available.
 
 ## Dropped now
 - Map UI, match explanations (deferred in 06-27 frontend spec)

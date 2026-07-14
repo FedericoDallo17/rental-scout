@@ -91,6 +91,15 @@ class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
     assert_nil params[:currencyID]
   end
 
+  test "reconciliation removes the publication date window" do
+    adapter = Sources::InfoCasasApiAdapter.new
+
+    params = adapter.send(:legacy_search_params, reconciliation: true)
+
+    assert_nil params[:publicationDate]
+    assert_equal 1, adapter.send(:legacy_search_params)[:publicationDate]
+  end
+
   test "fetch_listings requests every recent page until results are exhausted" do
     adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
     test_case = self

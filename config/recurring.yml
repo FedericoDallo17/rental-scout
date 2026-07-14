@@ -3,6 +3,11 @@ development:
     class: RunScrapersJob
     queue: default
     schedule: every hour
+  reconcile_scrapers:
+    class: RunScrapersJob
+    queue: default
+    schedule: every Sunday at 3:30am
+    args: [{ reconciliation: true }]
   purge_stale_listings:
     class: PurgeStaleListingsJob
     queue: default
@@ -18,6 +23,11 @@ test:
     class: RunScrapersJob
     queue: default
     schedule: every hour
+  reconcile_scrapers:
+    class: RunScrapersJob
+    queue: default
+    schedule: every Sunday at 3:30am
+    args: [{ reconciliation: true }]
   purge_stale_listings:
     class: PurgeStaleListingsJob
     queue: default
@@ -33,6 +43,11 @@ production:
     class: RunScrapersJob
     queue: default
     schedule: every hour
+  reconcile_scrapers:
+    class: RunScrapersJob
+    queue: default
+    schedule: every Sunday at 3:30am
+    args: [{ reconciliation: true }]
   purge_stale_listings:
     class: PurgeStaleListingsJob
     queue: default

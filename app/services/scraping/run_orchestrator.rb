@@ -1,11 +1,11 @@
 module Scraping
   class RunOrchestrator
-    def call
+    def call(reconciliation: false)
       run = ScrapingRun.create!(status: "running", started_at: Time.current)
       intake = ListingIntake.new
 
       ListingSource.where(active: true).find_each do |listing_source|
-        process_source(run:, listing_source:, intake:)
+        process_source(run:, listing_source:, intake:, reconciliation:)
       end
 
       run.update!(
@@ -20,13 +20,17 @@ module Scraping
 
     private
 
-    def process_source(run:, listing_source:, intake:)
+    def process_source(run:, listing_source:, intake:, reconciliation:)
       source_run = run.scraping_source_runs.create!(
         listing_source:,
         status: "running",
         started_at: Time.current
       )
-      listings = Sources::AdapterRegistry.resolve(listing_source).fetch_listings
+      known_external_ids = listing_source.seen_listings.where.not(external_id: nil).pluck(:external_id).to_set
+      listings = Sources::AdapterRegistry.resolve(listing_source).fetch_listings(
+        known_external_ids:,
+        reconciliation:
+      )
       created_count = 0
 
       listings.each do |attributes|

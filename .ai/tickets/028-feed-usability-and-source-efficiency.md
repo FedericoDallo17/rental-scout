@@ -9,7 +9,7 @@ Shape the next feed refinement pass before implementation.
 - [x] Align listing cards in each dashboard row despite different title and URL lengths.
 - [x] Rename the user-facing `InfoCasas API` source label to `InfoCasas` without changing its adapter key.
 - [x] Remove the permanent `Type` fact while retaining provider data for future conditional use.
-- [ ] Define incremental-fetch strategies per provider based on publication-date and ordering support.
+- [x] Define incremental-fetch strategies per provider based on publication-date and ordering support.
 - [x] Replace coincidence points with preference-only fit, separate completeness, and readable contrast.
 - [x] Add dashboard sorting/filtering, selected-search deselection, and an all-searches aggregate feed.
 
@@ -69,9 +69,15 @@ newest, price, known monthly total, fit, source, neighborhood, currency, and exp
 Saved-search membership is composed into one SQL union rather than executed once per
 search. All-fresh inventory remains a separate future mode.
 
+Ticket 034 was completed on 2026-07-14. Hourly InfoCasas acquisition retains its
+publication window; Remax and Imperium use bounded recent-first pagination with
+source-local seen-ID stopping; Housi remains one page pending a confirmed pagination
+contract. A deeper weekly reconciliation is bounded, guarded against repeated pages,
+and deliberately skips new-listing notification fan-out.
+
 ## Definition of Done
 
-- [ ] Product decisions recorded
-- [ ] Design spec and implementation plan written
-- [ ] `bin/rails test` green after implementation
-- [ ] `.ai/STATUS.md` updated
+- [x] Product decisions recorded
+- [x] Design spec and implementation plan written
+- [x] `bin/rails test` green after implementation
+- [x] `.ai/STATUS.md` updated

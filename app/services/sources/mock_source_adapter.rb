@@ -103,7 +103,7 @@ module Sources
       }
     ].freeze
 
- def fetch_listings
+ def fetch_listings(known_external_ids: Set.new, reconciliation: false)
  LISTINGS.map do |listing|
  duplicated = listing.transform_values { |value| value.is_a?(String) ? value.dup : value }
  duplicated.merge(

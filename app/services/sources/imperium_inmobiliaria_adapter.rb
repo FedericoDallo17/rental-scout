@@ -9,6 +9,8 @@ module Sources
     FRONTEND_BASE_URL = "https://www.inmobiliariaimperium.com"
     OPEN_TIMEOUT_SECONDS = 5
     READ_TIMEOUT_SECONDS = 15
+    RECENT_PAGE_LIMIT = 3
+    RECONCILIATION_PAGE_LIMIT = 20
 
     QUERY = {
       currentPage: 0,
@@ -30,44 +32,62 @@ module Sources
       "user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
     }.freeze
 
-    def fetch_listings
-      properties.filter_map do |property|
-        normalized_listing(property)
-      rescue KeyError, TypeError
-        nil
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
+      listings = []
+      page_signatures = Set.new
+      page_limit = reconciliation ? RECONCILIATION_PAGE_LIMIT : RECENT_PAGE_LIMIT
+
+      page_limit.times do |page|
+        page_properties = properties(page:)
+        break if page_properties.empty?
+
+        page_ids = page_properties.filter_map { |property| property["id"]&.to_s }
+        signature = page_ids.sort
+        break if page_signatures.include?(signature)
+
+        page_signatures << signature
+        listings.concat(page_properties.filter_map do |property|
+          normalized_listing(property)
+        rescue KeyError, TypeError
+          nil
+        end)
+        break if !reconciliation && page_ids.intersect?(known_external_ids.to_a)
       end
+
+      listings
     rescue JSON::ParserError
       []
     end
 
     private
 
-    def properties
-      rows = payload.dig("response", "result") || []
+    def properties(page:)
+      rows = payload(page:).dig("response", "result") || []
       rows.filter_map { |row| row["property"] }
     end
 
-    def payload
-      JSON.parse(http_response.body)
+    def payload(page:)
+      JSON.parse(http_response(page:).body)
     end
 
-    def http_response
+    def http_response(page:)
+      uri = request_uri(page:)
       Net::HTTP.start(
-        request_uri.host,
-        request_uri.port,
+        uri.host,
+        uri.port,
         use_ssl: true,
         open_timeout: OPEN_TIMEOUT_SECONDS,
         read_timeout: READ_TIMEOUT_SECONDS
       ) do |http|
-        request = Net::HTTP::Get.new(request_uri)
+        request = Net::HTTP::Get.new(uri)
         HEADERS.each { |header, value| request[header] = value }
         http.request(request)
       end
     end
 
-    def request_uri
+    def request_uri(page:)
       uri = ENDPOINT_URI.dup
-      uri.query = URI.encode_www_form(QUERY)
+      uri.query = URI.encode_www_form(QUERY.merge(currentPage: page))
       uri
     end
 

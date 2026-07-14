@@ -14,7 +14,7 @@ module Sources
       "user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
     }.freeze
 
-    def fetch_listings
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
       cards.map { |card| normalized_listing(card) }.compact
     end
 

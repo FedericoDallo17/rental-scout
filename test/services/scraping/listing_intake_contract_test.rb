@@ -55,7 +55,7 @@ class Scraping::ListingIntakeContractTest < ActiveSupport::TestCase
   test "orchestrator marks source run failed when adapter violates contract" do
     ListingSource.where.not(id: @source.id).update_all(active: false)
     bad_adapter = Object.new
-    bad_adapter.define_singleton_method(:fetch_listings) do
+    bad_adapter.define_singleton_method(:fetch_listings) do |known_external_ids: Set.new, reconciliation: false|
       [
         {
           external_id: "1",

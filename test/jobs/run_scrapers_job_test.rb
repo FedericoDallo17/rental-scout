@@ -3,7 +3,7 @@ require "net/http"
 
 module Sources
   class StubSourceAdapter
-    def fetch_listings
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
       [{
         external_id: "stub-1",
         title: "Centro Loft",
@@ -36,6 +36,41 @@ class RunScrapersJobTest < ActiveJob::TestCase
     ensure
       ActiveJob::Base.queue_adapter = original_adapter
     end
+  end
+
+  test "reconciliation does not enqueue notification fan-out" do
+    original_adapter = ActiveJob::Base.queue_adapter
+    ActiveJob::Base.queue_adapter = :test
+
+    begin
+      assert_no_enqueued_jobs(only: NotifyNewListingsJob) do
+        RunScrapersJob.perform_now(reconciliation: true)
+      end
+    ensure
+      ActiveJob::Base.queue_adapter = original_adapter
+    end
+  end
+
+  test "passes source-local known ids and reconciliation mode to adapters" do
+    source = ListingSource.create!(name: "Stub Source", adapter_key: "stub_source")
+    source.seen_listings.create!(external_id: "known-1", canonical_url: "https://example.test/known-1", first_seen_at: 1.day.ago, last_seen_at: 1.day.ago)
+    received = nil
+    adapter = Object.new
+    adapter.define_singleton_method(:fetch_listings) do |known_external_ids:, reconciliation:|
+      received = { known_external_ids:, reconciliation: }
+      []
+    end
+    original_new = Sources::StubSourceAdapter.method(:new)
+
+    begin
+      Sources::StubSourceAdapter.define_singleton_method(:new) { adapter }
+      RunScrapersJob.perform_now(reconciliation: true)
+    ensure
+      Sources::StubSourceAdapter.define_singleton_method(:new, original_new)
+    end
+
+    assert_equal ["known-1"], received.fetch(:known_external_ids).to_a
+    assert_equal true, received.fetch(:reconciliation)
   end
 
   test "links the run to the records it processes" do
@@ -95,7 +130,7 @@ class RunScrapersJobTest < ActiveJob::TestCase
     ListingSource.create!(name: "InfoCasas API", adapter_key: "info_casas_api")
 
     adapter = Object.new
-    adapter.define_singleton_method(:fetch_listings) do
+    adapter.define_singleton_method(:fetch_listings) do |known_external_ids: Set.new, reconciliation: false|
       [{
         external_id: "123",
         title: "Apartamento en Pocitos",
