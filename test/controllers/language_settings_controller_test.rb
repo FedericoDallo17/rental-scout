@@ -52,7 +52,7 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
 
     get scraping_runs_path
     assert_includes response.body, "Ejecuciones de scraping"
-    assert_includes response.body, "Calidad de ubicación"
+    assert_includes response.body, "¿Qué tan confiable es la ubicación?"
 
     get edit_notification_settings_path
     assert_includes response.body, "Configuración de notificaciones"

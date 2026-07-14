@@ -11,9 +11,9 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
       assert_equal 1, listings.size
       listing = listings.first
 
-      assert_equal "MLU695091687", listing[:external_id]
+      assert_equal "IMP-2026-2101", listing[:external_id]
       assert_equal "ALQUILER | Apartamento 2 Dormitorios en Pocitos", listing[:title]
-      assert_equal "https://www.inmobiliariaimperium.com/propiedad/MLU695091687", listing[:canonical_url]
+      assert_equal "https://www.inmobiliariaimperium.com/propiedades/IMP-2026-2101", listing[:canonical_url]
       assert_equal 5_350_000, listing[:price_cents]
       assert_equal "UYU", listing[:currency]
       assert_equal "Coronel Alegre 1195, 11300 Montevideo, Uruguay", listing[:location_text]
@@ -22,8 +22,8 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
       assert_equal "alquiler", listing[:operation_type]
       assert_equal 2, listing[:bedrooms]
       assert_equal 76, listing[:square_meters]
-      assert_nil listing[:expenses_cents]
-      assert_nil listing[:expenses_currency]
+      assert_equal 450_000, listing[:expenses_cents]
+      assert_equal "UYU", listing[:expenses_currency]
       assert_equal 1, listing[:parking_spaces]
       assert_equal "Apartamento", listing[:property_type]
     end
@@ -35,7 +35,20 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
     stub_net_http_start(response_body: imperium_response_body) do
       external_ids = adapter.fetch_listings.map { |listing| listing[:external_id] }
 
-      assert_equal ["MLU695091687"], external_ids
+      assert_equal ["IMP-2026-2101"], external_ids
+    end
+  end
+
+  test "fetch_listings exposes only the Apartamento and Casa property types" do
+    adapter = Sources::ImperiumInmobiliariaAdapter.new
+    body = JSON.parse(imperium_response_body)
+    house = body.fetch("data").first.deep_dup
+    house["propertyId"] = "IMP-HOUSE"
+    house["type"] = "house"
+    body.fetch("data") << house
+
+    stub_net_http_start(response_body: JSON.generate(body)) do
+      assert_equal ["Apartamento", "Casa"], adapter.fetch_listings.map { |listing| listing[:property_type] }
     end
   end
 
@@ -45,15 +58,15 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
     stub_net_http_start(response_body: imperium_response_body(include_malformed: true)) do
       external_ids = adapter.fetch_listings.map { |listing| listing[:external_id] }
 
-      assert_equal ["MLU695091687"], external_ids
+      assert_equal ["IMP-2026-2101"], external_ids
     end
   end
 
   test "fetch_listings does not invent Pocitos when Imperium omits the neighborhood" do
     adapter = Sources::ImperiumInmobiliariaAdapter.new
     body = JSON.parse(imperium_response_body)
-    property = body.dig("response", "result", 0, "property")
-    property.delete("city")
+    property = body.dig("data", 0)
+    property["location"]["city"] = "Montevideo"
 
     stub_net_http_start(response_body: JSON.generate(body)) do
       listing = adapter.fetch_listings.first
@@ -67,15 +80,14 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
     adapter = Sources::ImperiumInmobiliariaAdapter.new
     seen_request = false
     request_assertion = lambda do |host, port, options, request|
-      assert_equal "imperium-prod.herokuapp.com", host
+      assert_equal "imperium-backend-production-9783.up.railway.app", host
       assert_equal 443, port
       assert_equal true, options[:use_ssl]
       assert options.key?(:open_timeout)
       assert options.key?(:read_timeout)
       assert_instance_of Net::HTTP::Get, request
-      assert_match(/operation=Alquiler/, request.path)
-      assert_match(/region=Todos/, request.path)
-      refute_match(/region=Pocitos/, request.path)
+      assert_match(/operation=rent/, request.path)
+      assert_match(/limit=12/, request.path)
       seen_request = true
     end
 
@@ -92,60 +104,48 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
 
     stub_paginated_responses(
       {
-        0 => imperium_response_body(id: "NEW-1"),
-        1 => imperium_response_body(id: "MLU695091687"),
-        2 => imperium_response_body(id: "OLD-1")
+        1 => imperium_response_body(id: "NEW-1"),
+        2 => imperium_response_body(id: "IMP-2026-2101"),
+        3 => imperium_response_body(id: "OLD-1")
       },
       requested_pages:
     ) do
-      listings = adapter.fetch_listings(known_external_ids: Set["MLU695091687"])
+      listings = adapter.fetch_listings(known_external_ids: Set["IMP-2026-2101"])
 
-      assert_equal [0, 1], requested_pages
-      assert_equal %w[NEW-1 MLU695091687], listings.map { |listing| listing[:external_id] }
+      assert_equal [1, 2], requested_pages
+      assert_equal %w[NEW-1 IMP-2026-2101], listings.map { |listing| listing[:external_id] }
     end
   end
 
   private
 
-  def imperium_response_body(include_malformed: false, id: "MLU695091687")
+  def imperium_response_body(include_malformed: false, id: "IMP-2026-2101")
     rows = [
       {
-        property: {
-          id: id,
-          title: "ALQUILER | Apartamento 2 Dormitorios en Pocitos",
-          description: "<p>Excelente apartamento de diseño en alquiler en Pocitos</p>",
-          price: "53500",
-          currency: "UYU",
-          city: "Pocitos",
-          area: "76",
-          bedrooms: "2",
-          parking: "1",
-          typeProperty: "Apartamento",
-          street: "Coronel Alegre 1195, 11300 Montevideo, Uruguay"
-        }
+        propertyId: id,
+        title: "ALQUILER | Apartamento 2 Dormitorios en Pocitos",
+        description: "<p>Excelente apartamento de diseño en alquiler en Pocitos</p>",
+        type: "apartment",
+        pricing: { rentPrice: 53500, currency: "UYU", monthlyExpenses: 4500, expensesCurrency: "UYU" },
+        location: { address: "Coronel Alegre 1195, 11300 Montevideo, Uruguay", city: "Pocitos", state: "Montevideo" },
+        features: { totalArea: 76, bedrooms: 2, garages: 1 }
       },
       {
-        property: {
-          id: "MLU974573946",
-          title: "ALQUILER | Local en Montevideo con 63 m² de Espacio",
-          price: "55000",
-          currency: "UYU",
-          city: "Pocitos",
-          area: "63",
-          bedrooms: nil,
-          typeProperty: "Local",
-          street: "Avenida General Rivera 2735, Montevideo, Uruguay"
-        }
+        propertyId: "IMP-COMMERCIAL",
+        title: "ALQUILER | Local en Montevideo con 63 m² de Espacio",
+        type: "commercial",
+        pricing: { rentPrice: 55000, currency: "UYU" },
+        location: { address: "Avenida General Rivera 2735, Montevideo, Uruguay", city: "Pocitos", state: "Montevideo" },
+        features: { totalArea: 63 }
       }
     ]
 
-    rows << { property: { title: "Malformed apartment", bedrooms: "1", typeProperty: "Apartamento" } } if include_malformed
+    rows << { title: "Malformed apartment", type: "apartment", features: { bedrooms: 1 } } if include_malformed
 
     JSON.generate(
       success: true,
-      response: {
-        result: rows
-      }
+      data: rows,
+      pagination: { page: 1, limit: 12, total: rows.size, totalPages: 1 }
     )
   end
 
@@ -153,9 +153,9 @@ class Sources::ImperiumInmobiliariaAdapterTest < ActiveSupport::TestCase
     original_start = Net::HTTP.method(:start)
     http = Object.new
     http.define_singleton_method(:request) do |request|
-      page = URI.decode_www_form(URI.parse("https://example.test#{request.path}").query).to_h.fetch("currentPage").to_i
+      page = URI.decode_www_form(URI.parse("https://example.test#{request.path}").query).to_h.fetch("page").to_i
       requested_pages << page
-      Struct.new(:body).new(responses.fetch(page, JSON.generate(success: true, response: { result: [] })))
+      Struct.new(:body).new(responses.fetch(page, JSON.generate(success: true, data: [])))
     end
     Net::HTTP.define_singleton_method(:start) { |_host, _port, **_options, &block| block.call(http) }
 

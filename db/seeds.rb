@@ -2,10 +2,6 @@
 # environment except production. It is idempotent and can be run repeatedly.
 
 unless Rails.env.production?
-  ListingSource.find_or_create_by!(adapter_key: "mock_source") do |source|
-    source.name = "Mock Source"
-  end
-
   ListingSource.find_or_create_by!(adapter_key: "info_casas_api") do |source|
     source.name = "InfoCasas API"
   end

@@ -50,7 +50,9 @@ button {
   position: sticky;
   top: 0;
   z-index: 10;
-  padding: 1rem 2rem 0;
+  padding: 1rem 2rem;
+  background: rgba(246, 243, 238, 0.98);
+  border-bottom: 1px solid rgba(233, 225, 212, 0.8);
 }
 
 .app-nav {
@@ -61,11 +63,10 @@ button {
   max-width: 1440px;
   margin: 0 auto;
   padding: 0.75rem 0.9rem;
-  background: rgba(255, 253, 249, 0.86);
+  background: var(--surface-strong);
   border: 1px solid var(--border);
   border-radius: 22px;
   box-shadow: 0 14px 35px rgba(53, 40, 24, 0.07);
-  backdrop-filter: blur(12px);
 }
 
 .app-nav__brand {
@@ -827,7 +828,7 @@ button {
 }
 
 .source-controls {
-  margin-bottom: 1.5rem;
+  margin: 1.5rem 0;
   padding: 1.25rem;
   border: 1px solid var(--border);
   border-radius: 22px;
@@ -837,10 +838,18 @@ button {
 
 .source-controls__header {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.source-controls__explanation {
+  max-width: 38rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: right;
 }
 
 .source-controls__eyebrow {
@@ -856,6 +865,10 @@ button {
 .source-control-card h3,
 .source-control-card p {
   margin: 0;
+}
+
+.source-controls__header h2 {
+  margin-top: 0.35rem;
 }
 
 .source-controls__grid {
@@ -949,6 +962,13 @@ button {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
   margin: 1rem 0;
+}
+
+.location-quality-intro {
+  max-width: 48rem;
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .run-card__facts div {
@@ -1379,11 +1399,44 @@ button {
   font-size: 0.85rem;
 }
 
-.notification-settings__remove {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  margin-top: 0.75rem;
+.notification-settings__danger {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.1rem;
+  border: 1px solid #e3b7a9;
+  border-radius: 18px;
+  background: #fff8f5;
+}
+
+.notification-settings__danger strong {
+  color: #7f3122;
+}
+
+.notification-settings__danger p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.notification-settings__danger form {
+  margin: 0;
+}
+
+.notification-settings__remove-button {
+  padding: 0.7rem 1rem;
+  border: 1px solid #9b3825;
+  border-radius: 999px;
+  background: #9b3825;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.notification-settings__remove-button:hover,
+.notification-settings__remove-button:focus-visible {
+  background: #7f2e20;
 }
 
 .notification-settings__actions {
@@ -1410,7 +1463,7 @@ button {
 
 @media (max-width: 720px) {
   .app-header {
-    padding: 0.75rem 1rem 0;
+    padding: 0.75rem 1rem;
   }
 
   .app-nav {
@@ -1431,9 +1484,14 @@ button {
   }
 
   .runs-header,
-  .run-card__summary {
+  .run-card__summary,
+  .source-controls__header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .source-controls__explanation {
+    text-align: left;
   }
 
   .runs-header__tools {

@@ -58,6 +58,7 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".source-controls"
+    assert_select ".source-controls__explanation", text: /Active sources are checked on the next run/
     assert_select ".source-control-card", count: 2
     assert_select ".source-control-card", text: /Remax/
     assert_select ".source-control-card", text: /Inactive/
@@ -77,10 +78,11 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     get scraping_runs_path
 
     assert_response :success
-    assert_select "#location-quality-heading", text: "Location quality"
-    assert_select ".run-card__facts", text: /1 provider labels/
-    assert_select ".run-card__facts", text: /1 unresolved/
-    assert_select ".run-card__facts", text: /provider conflicts/
+    assert_select "#location-quality-heading", text: "How reliable is the location?"
+    assert_select ".location-quality-intro", text: /official zones/
+    assert_select ".run-card__facts", text: /1 properties have no coordinates/
+    assert_select ".run-card__facts", text: /1 properties cannot be located/
+    assert_select ".run-card__facts", text: /supplied neighborhood disagrees/
     assert_select ".location-quality-table tr", text: /Location Metrics/
     assert_select ".location-quality-table tr", text: /0%/
   end

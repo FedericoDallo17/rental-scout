@@ -18,16 +18,22 @@
         <p><%= t("notifications.blank_hint") %></p>
       </div>
 
-      <% if current_user.pushover_user_key.present? %>
-        <label class="notification-settings__remove">
-          <%= form.check_box :remove_pushover_key %>
-          <span><%= t("notifications.remove") %></span>
-        </label>
-      <% end %>
-
       <div class="notification-settings__actions">
         <%= form.submit t("notifications.save"), class: "notification-settings__submit" %>
         <%= link_to t("notifications.back"), listings_path, class: "notification-settings__cancel" %>
+      </div>
+    <% end %>
+
+    <% if current_user.pushover_user_key.present? %>
+      <div class="notification-settings__danger">
+        <div>
+          <strong><%= t("notifications.remove_title") %></strong>
+          <p><%= t("notifications.remove_copy") %></p>
+        </div>
+        <%= button_to t("notifications.remove"), notification_settings_path,
+          method: :delete,
+          class: "notification-settings__remove-button",
+          data: { confirm: t("notifications.remove_confirmation"), turbo_confirm: t("notifications.remove_confirmation") } %>
       </div>
     <% end %>
   </section>

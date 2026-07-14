@@ -5,6 +5,6 @@ Rails.application.routes.draw do
   resources :listing_sources, only: [:update]
   resources :search_preferences, except: [:index, :show]
   resources :scraping_runs, only: [:index, :show]
-  resource :notification_settings, only: [:edit, :update]
+  resource :notification_settings, only: [:edit, :update, :destroy]
   resource :language_settings, only: [:update]
 end

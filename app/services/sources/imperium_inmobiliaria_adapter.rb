@@ -5,27 +5,18 @@ require "uri"
 
 module Sources
   class ImperiumInmobiliariaAdapter
-    ENDPOINT_URI = URI("https://imperium-prod.herokuapp.com/api/listing-properties")
+    ENDPOINT_URI = URI("https://imperium-backend-production-9783.up.railway.app/api/v2/public/properties")
     FRONTEND_BASE_URL = "https://www.inmobiliariaimperium.com"
     OPEN_TIMEOUT_SECONDS = 5
     READ_TIMEOUT_SECONDS = 15
     RECENT_PAGE_LIMIT = 3
     RECONCILIATION_PAGE_LIMIT = 20
-
-    QUERY = {
-      currentPage: 0,
-      bathrooms: "Todos",
-      bedrooms: "Todos",
-      state: "Montevideo",
-      type: "Todos",
-      operation: "Alquiler",
-      region: "Todos",
-      range: "$20.000 a $55.000",
-      parking_lots: "Todos",
-      has_patio: "Todos",
-      has_balcony: "Todos",
-      has_kitchen: "Todos"
+    PROPERTY_TYPES = {
+      "apartment" => "Apartamento",
+      "house" => "Casa"
     }.freeze
+
+    QUERY = { limit: 12, operation: "rent" }.freeze
 
     HEADERS = {
       "accept" => "application/json, text/plain, */*",
@@ -41,7 +32,7 @@ module Sources
         page_properties = properties(page:)
         break if page_properties.empty?
 
-        page_ids = page_properties.filter_map { |property| property["id"]&.to_s }
+        page_ids = page_properties.filter_map { |property| property["propertyId"]&.to_s }
         signature = page_ids.sort
         break if page_signatures.include?(signature)
 
@@ -62,8 +53,7 @@ module Sources
     private
 
     def properties(page:)
-      rows = payload(page:).dig("response", "result") || []
-      rows.filter_map { |row| row["property"] }
+      payload(page:)["data"] || []
     end
 
     def payload(page:)
@@ -87,36 +77,45 @@ module Sources
 
     def request_uri(page:)
       uri = ENDPOINT_URI.dup
-      uri.query = URI.encode_www_form(QUERY.merge(currentPage: page))
+      uri.query = URI.encode_www_form(QUERY.merge(page: page + 1))
       uri
     end
 
     def normalized_listing(property)
       return unless residential?(property)
-      return if integer_or_nil(property["bedrooms"]).to_i.zero?
+      features = property["features"] || {}
+      pricing = property["pricing"] || {}
+      location = property["location"] || {}
+      return if integer_or_nil(features["bedrooms"]).to_i.zero?
 
       {
-        external_id: property.fetch("id").to_s,
+        external_id: property.fetch("propertyId").to_s,
         title: property["title"],
-        canonical_url: "#{FRONTEND_BASE_URL}/propiedad/#{property.fetch("id")}",
+        canonical_url: "#{FRONTEND_BASE_URL}/propiedades/#{property.fetch("propertyId")}",
         description: plain_description(property["description"]),
-        price_cents: normalize_price(property["price"]),
-        currency: property["currency"],
-        location_text: property["street"].presence || [property["city"], "Montevideo"].compact_blank.join(", "),
-        source_neighborhood: property["city"].presence,
-        source_city: "Montevideo",
+        price_cents: normalize_price(pricing["rentPrice"]),
+        currency: pricing["currency"],
+        location_text: location["address"].presence || [location["city"], location["state"]].compact_blank.uniq.join(", "),
+        source_neighborhood: neighborhood(location),
+        source_city: location["state"].presence || location["city"].presence,
         operation_type: "alquiler",
-        bedrooms: integer_or_nil(property["bedrooms"]),
-        square_meters: integer_or_nil(property["area"]),
-        expenses_cents: nil,
-        expenses_currency: nil,
-        parking_spaces: integer_or_nil(property["parking"]),
-        property_type: property["typeProperty"]
+        bedrooms: integer_or_nil(features["bedrooms"]),
+        square_meters: integer_or_nil(features["totalArea"] || features["coveredArea"]),
+        expenses_cents: normalize_price(pricing["monthlyExpenses"]),
+        expenses_currency: pricing["monthlyExpenses"].present? ? pricing["expensesCurrency"] : nil,
+        parking_spaces: integer_or_nil(features["garages"]),
+        property_type: PROPERTY_TYPES.fetch(property["type"].to_s.downcase)
       }
     end
 
     def residential?(property)
-      property["typeProperty"].to_s.downcase.in?(["apartamento", "casa"])
+      PROPERTY_TYPES.key?(property["type"].to_s.downcase)
+    end
+
+    def neighborhood(location)
+      city = location["city"].presence
+      state = location["state"].presence
+      city unless city&.casecmp?(state.to_s)
     end
 
     def plain_description(html)

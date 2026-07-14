@@ -25,6 +25,8 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".notification-settings__status", text: /Ready/
     assert_select "input[name='user[pushover_user_key]'][type='password'][value]", count: 0
+    assert_select "form[action='#{notification_settings_path}'] button.notification-settings__remove-button", text: "Remove key"
+    assert_select "button.notification-settings__remove-button[data-turbo-confirm]"
     assert_no_match "secret-user-key", response.body
   end
 
@@ -53,7 +55,7 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     user = create_user!(email: "settings-remove@example.com", pushover_user_key: "remove-this-key")
     sign_in user
 
-    patch notification_settings_path, params: { user: { pushover_user_key: "", remove_pushover_key: "1" } }
+    delete notification_settings_path
 
     assert_redirected_to edit_notification_settings_path
     assert_nil user.reload.pushover_user_key

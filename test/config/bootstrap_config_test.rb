@@ -95,27 +95,26 @@ class BootstrapConfigTest < ActiveSupport::TestCase
   test "seeds bootstrap listing sources outside production" do
     ListingSource.delete_all
 
-    assert_difference("ListingSource.count", 5) do
+    assert_difference("ListingSource.count", 4) do
       load Rails.root.join("db/seeds.rb")
     end
 
-    assert_equal ["housi", "imperium_inmobiliaria", "info_casas_api", "mock_source", "remax"], ListingSource.order(:adapter_key).pluck(:adapter_key)
+    assert_equal ["housi", "imperium_inmobiliaria", "info_casas_api", "remax"], ListingSource.order(:adapter_key).pluck(:adapter_key)
     assert_equal(
       {
         "housi" => false,
         "imperium_inmobiliaria" => false,
         "info_casas_api" => true,
-        "mock_source" => true,
         "remax" => false
       },
       ListingSource.order(:adapter_key).pluck(:adapter_key, :active).to_h
     )
   end
 
-  test "seeds avoid registering the mock source in production" do
+  test "seeds do not register the mock source" do
     seeds = Rails.root.join("db/seeds.rb").read
 
-    assert_match(/unless\s+Rails\.env\.production\?/, seeds)
+    refute_match(/adapter_key:\s*["']mock_source["']/, seeds)
   end
 
   test "seeds correct zone backed demo saved searches on repeated runs" do

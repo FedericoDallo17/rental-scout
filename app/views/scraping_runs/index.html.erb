@@ -15,6 +15,7 @@
       <div>
         <p class="runs-header__eyebrow"><%= t("runs.inventory_diagnostics") %></p>
         <h2 id="location-quality-heading"><%= t("runs.location_quality") %></h2>
+        <p class="location-quality-intro"><%= t("runs.location_quality_intro") %></p>
       </div>
     </div>
     <dl class="run-card__facts">
@@ -25,7 +26,7 @@
     </dl>
     <table class="location-quality-table">
       <thead>
-        <tr><th><%= t("runs.source") %></th><th><%= t("runs.total") %></th><th><%= t("runs.spatial") %></th><th><%= t("runs.fallback") %></th><th><%= t("runs.unresolved") %></th><th><%= t("runs.coverage") %></th></tr>
+        <tr><th><%= t("runs.source") %></th><th><%= t("runs.total") %></th><th><%= t("runs.spatial_short") %></th><th><%= t("runs.fallback_short") %></th><th><%= t("runs.unresolved_short") %></th><th><%= t("runs.coverage") %></th></tr>
       </thead>
       <tbody>
         <% @location_quality.by_source.each do |source| %>
@@ -44,8 +45,11 @@
 
   <section class="source-controls" aria-label="<%= t("runs.sources_label") %>">
     <div class="source-controls__header">
-      <p class="source-controls__eyebrow"><%= t("runs.source_controls") %></p>
-      <h2><%= t("runs.listing_sources") %></h2>
+      <div>
+        <p class="source-controls__eyebrow"><%= t("runs.source_controls") %></p>
+        <h2><%= t("runs.listing_sources") %></h2>
+      </div>
+      <p class="source-controls__explanation"><%= t("runs.source_status_explanation") %></p>
     </div>
 
     <div class="source-controls__grid">
