@@ -4,7 +4,8 @@ en:
       eyebrow: Current scrape
       view: View current scrape
       progress: Run progress
-      refreshing: This page refreshes every 7 seconds while the scrape is running.
+      refreshing: This page refreshes while the scrape is running.
+      streaming: Progress updates appear here live. A periodic refresh is kept as a fallback.
       elapsed: Elapsed
     dashboard: "Admin dashboard"
     users:

@@ -68,7 +68,10 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
 
     get admin_scraping_run_path(run)
     assert_response :success
-    assert_select "meta[http-equiv='refresh'][content='7']"
+    assert_select "meta[http-equiv='refresh'][content='30']"
+    assert_select "script[type='importmap']"
+    assert_select "script[type='module']", text: /import "application"/
+    assert_select "turbo-cable-stream-source"
     assert_select "h1", text: "Run ##{run.id}"
     assert_includes response.body, "8 seen"
     assert_includes response.body, "2 new"

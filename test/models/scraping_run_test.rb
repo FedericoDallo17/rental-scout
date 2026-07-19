@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ScrapingRunTest < ActiveSupport::TestCase
+  include ActionCable::TestHelper
+
   test "close abandoned only fails stale running records" do
     stale = ScrapingRun.create!(status: "running", started_at: 3.hours.ago)
     active = ScrapingRun.create!(status: "running", started_at: 10.minutes.ago)
@@ -11,5 +13,14 @@ class ScrapingRunTest < ActiveSupport::TestCase
     assert_equal "failed", stale.reload.status
     assert_equal "running", active.reload.status
     assert_equal "succeeded", completed.reload.status
+  end
+
+  test "operational progress broadcasts to the run stream" do
+    run = ScrapingRun.create!(status: "running", started_at: Time.current)
+    stream = run.to_gid_param
+
+    assert_broadcasts(stream, 1) do
+      run.broadcast_admin_progress
+    end
   end
 end

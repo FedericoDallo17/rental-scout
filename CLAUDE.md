@@ -47,9 +47,9 @@ inventory is deliberately shared.
   update `.ai/STATUS.md`; record architectural decisions as ADRs in `.ai/decisions/`
   (template: `.ai/templates/adr.md`); commit specs/plans with the work. Mark
   superseded docs instead of abandoning them.**
-- `public/stylesheets/application.css` is a hand-maintained byte-identical mirror of
-  `app/assets/stylesheets/application.css` (no Propshaft) — edit both
-  (enforced by `test/assets/stylesheet_mirror_test.rb`).
+- Propshaft serves `app/assets/stylesheets/application.css`; the legacy
+  `public/stylesheets/application.css` compatibility copy remains a hand-maintained
+  byte-identical mirror (enforced by `test/assets/stylesheet_mirror_test.rb`).
 - Adapter contract is implicit: missing keys (e.g. `source_city`, `operation_type`)
   silently mark listings out of scope. Ticket 016 fixes this; until then, check
   `in_scope` when a feed looks empty.

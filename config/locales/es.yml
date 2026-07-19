@@ -4,7 +4,8 @@ es:
       eyebrow: Scraping actual
       view: Ver scraping actual
       progress: Progreso de la ejecución
-      refreshing: Esta página se actualiza cada 7 segundos mientras continúa el scraping.
+      refreshing: Esta página se actualiza mientras continúa el scraping.
+      streaming: El progreso aparece aquí en vivo. Se mantiene una actualización periódica como respaldo.
       elapsed: Tiempo transcurrido
     dashboard: "Panel de administración"
     users:

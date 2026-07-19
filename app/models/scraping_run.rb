@@ -7,6 +7,8 @@ class ScrapingRun < ApplicationRecord
 
   validates :status, :started_at, presence: true
 
+  after_update_commit :broadcast_admin_progress
+
   def run_type
     reconciliation? ? "reconciliation" : "hourly"
   end
@@ -32,5 +34,16 @@ class ScrapingRun < ApplicationRecord
         error_message: "Automatically closed after exceeding the maximum run time",
         updated_at: Time.current
       )
+  end
+
+  def broadcast_admin_progress
+    Turbo::StreamsChannel.broadcast_replace_to(
+      self,
+      target: ActionView::RecordIdentifier.dom_id(self, :operational),
+      partial: "admin/scraping_runs/operational_run",
+      locals: { scraping_run: self }
+    )
+  rescue StandardError => error
+    Rails.logger.warn("Scrape progress broadcast failed for run #{id}: #{error.message}")
   end
 end

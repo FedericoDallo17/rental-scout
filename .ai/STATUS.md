@@ -53,6 +53,7 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 036 landed: admin-only inventory operations, user-isolated run history, persisted provider request counts, durable hourly/reconciliation run types, guarded maintenance actions, and structurally verified recurring schedules (07-19)
 - Ticket 036 follow-up: scraping runs abandoned for more than two hours are closed automatically instead of blocking maintenance forever (07-19)
 - Ticket 036 follow-up: admins can open the current scrape from the dashboard or an overlapping-run warning and watch per-source progress on an auto-refreshing detail page (07-19)
+- Ticket 036 follow-up: current-scrape progress now broadcasts over Turbo Streams with cross-process Cable delivery; a slower page refresh remains as a disconnect fallback (07-19)
 
 ## Doing
 - No roadmap ticket is currently in flight.

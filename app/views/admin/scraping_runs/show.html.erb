@@ -1,6 +1,6 @@
 <% if @scraping_run.status == "running" %>
   <% content_for :head do %>
-    <meta http-equiv="refresh" content="7">
+    <meta http-equiv="refresh" content="30">
   <% end %>
 <% end %>
 
@@ -16,40 +16,6 @@
     </div>
   </header>
 
-  <section class="run-card">
-    <div class="run-card__summary">
-      <div>
-        <p class="run-card__started"><%= t("runs.types.#{@scraping_run.run_type}") %></p>
-        <h2><%= t("admin.current_run.progress") %></h2>
-        <% if @scraping_run.status == "running" %>
-          <p class="location-quality-intro"><%= t("admin.current_run.refreshing") %></p>
-        <% end %>
-      </div>
-      <span class="status-pill status-pill--<%= @scraping_run.status.to_s.dasherize %>"><%= t("runs.statuses.#{@scraping_run.status}", default: @scraping_run.status.humanize) %></span>
-    </div>
-
-    <dl class="run-card__facts">
-      <div><dt><%= t("runs.seen") %></dt><dd><%= t("runs.seen_count", count: @scraping_run.progress_listings_seen_count) %></dd></div>
-      <div><dt><%= t("runs.new") %></dt><dd><%= t("runs.new_count", count: @scraping_run.progress_listings_created_count) %></dd></div>
-      <div><dt><%= t("runs.third_party_calls_short") %></dt><dd><%= t("runs.call_count", count: @scraping_run.scraping_source_runs.sum(&:third_party_calls_count)) %></dd></div>
-      <div><dt><%= t("admin.current_run.elapsed") %></dt><dd><%= distance_of_time_in_words(@scraping_run.started_at, @scraping_run.finished_at || Time.current) %></dd></div>
-    </dl>
-
-    <% if @scraping_run.error_message.present? %>
-      <p class="run-card__error"><%= @scraping_run.error_message %></p>
-    <% end %>
-
-    <div class="source-runs">
-      <% @scraping_run.scraping_source_runs.each do |source_run| %>
-        <div class="source-run">
-          <div>
-            <p class="source-run__name"><%= source_run.listing_source.display_name %></p>
-            <p class="source-run__meta"><%= t("runs.seen_count", count: source_run.listings_seen_count) %> · <%= t("runs.new_count", count: source_run.listings_created_count) %> · <%= t("runs.call_count", count: source_run.third_party_calls_count) %></p>
-          </div>
-          <span class="status-pill status-pill--<%= source_run.status.to_s.dasherize %>"><%= t("runs.statuses.#{source_run.status}", default: source_run.status.humanize) %></span>
-          <% if source_run.error_message.present? %><p class="source-run__error"><%= source_run.error_message %></p><% end %>
-        </div>
-      <% end %>
-    </div>
-  </section>
+  <%= turbo_stream_from @scraping_run %>
+  <%= render "operational_run", scraping_run: @scraping_run %>
 </main>

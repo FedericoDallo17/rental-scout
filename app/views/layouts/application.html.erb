@@ -13,6 +13,7 @@
       <% stylesheet_source = "#{stylesheet_source}?v=#{Rails.root.join("public/stylesheets/application.css").mtime.to_i}" %>
     <% end %>
     <%= stylesheet_link_tag stylesheet_source, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
   </head>
 
   <body class="<%= user_signed_in? ? "app-body" : "auth-body" %>">

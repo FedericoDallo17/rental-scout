@@ -7,6 +7,10 @@ gem "rgeo"
 gem "puma"
 gem "solid_cache"
 gem "solid_queue"
+gem "solid_cable"
+gem "importmap-rails"
+gem "turbo-rails"
+gem "propshaft"
 gem "bootsnap", require: false
 gem "devise"
 
