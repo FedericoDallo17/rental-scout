@@ -49,6 +49,43 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".source-run__timeline", text: /Started/
   end
 
+  test "admin can inspect a running scrape and dashboard links to it" do
+    user = create_user!(email: "current-run@example.com", admin: true)
+    source = ListingSource.create!(name: "Current Source", adapter_key: "current_source")
+    run = ScrapingRun.create!(status: "running", started_at: 5.minutes.ago)
+    run.scraping_source_runs.create!(
+      listing_source: source,
+      status: "running",
+      started_at: 4.minutes.ago,
+      listings_seen_count: 8,
+      listings_created_count: 2,
+      third_party_calls_count: 3
+    )
+    sign_in user
+
+    get admin_root_path
+    assert_select "a[href='#{admin_scraping_run_path(run)}']", text: "View current scrape"
+
+    get admin_scraping_run_path(run)
+    assert_response :success
+    assert_select "meta[http-equiv='refresh'][content='7']"
+    assert_select "h1", text: "Run ##{run.id}"
+    assert_includes response.body, "8 seen"
+    assert_includes response.body, "2 new"
+    assert_includes response.body, "3 calls"
+    assert_includes response.body, "Current Source"
+  end
+
+  test "normal user cannot inspect operational scrape progress" do
+    user = create_user!(email: "current-run-member@example.com")
+    run = ScrapingRun.create!(status: "running", started_at: 5.minutes.ago)
+    sign_in user
+
+    get admin_scraping_run_path(run)
+
+    assert_response :not_found
+  end
+
   test "admin sees listing source activation controls" do
     user = create_user!(email: "source-controls@example.com", admin: true)
     sign_in user

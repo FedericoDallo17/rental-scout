@@ -1,5 +1,11 @@
 en:
   admin:
+    current_run:
+      eyebrow: Current scrape
+      view: View current scrape
+      progress: Run progress
+      refreshing: This page refreshes every 7 seconds while the scrape is running.
+      elapsed: Elapsed
     dashboard: "Admin dashboard"
     users:
       eyebrow: "Access management"

@@ -11,6 +11,18 @@ class ScrapingRun < ApplicationRecord
     reconciliation? ? "reconciliation" : "hourly"
   end
 
+  def progress_listings_seen_count
+    running? ? scraping_source_runs.sum(:listings_seen_count) : listings_seen_count
+  end
+
+  def progress_listings_created_count
+    running? ? scraping_source_runs.sum(:listings_created_count) : listings_created_count
+  end
+
+  def running?
+    status == "running"
+  end
+
   def self.close_abandoned!
     where(status: "running")
       .where("started_at < ?", ABANDONED_AFTER.ago)

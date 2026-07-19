@@ -8,9 +8,15 @@ module Admin
         .includes(scraping_source_runs: :listing_source)
         .order(started_at: :desc, id: :desc)
         .limit(25)
+      @active_run = @scraping_runs.find { |run| run.status.in?(%w[running queued]) }
 
       render "scraping_runs/index"
     end
 
+    def show
+      @scraping_run = ScrapingRun
+        .includes(scraping_source_runs: :listing_source)
+        .find(params[:id])
+    end
   end
 end

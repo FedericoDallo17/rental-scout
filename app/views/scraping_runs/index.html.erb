@@ -7,6 +7,9 @@
     <div class="runs-header__tools">
       <%= link_to t("runs.feed"), listings_path, class: "runs-header__link" %>
       <%= link_to t("admin.users.title"), admin_users_path, class: "runs-header__link" %>
+      <% if @active_run %>
+        <%= link_to t("admin.current_run.view"), admin_scraping_run_path(@active_run), class: "runs-header__link" %>
+      <% end %>
       <p class="runs-header__count"><%= t("count.run", count: @scraping_runs.size) %></p>
     </div>
   </header>

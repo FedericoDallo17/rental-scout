@@ -33,13 +33,13 @@ class Admin::MaintenanceControllerTest < ActionDispatch::IntegrationTest
 
   test "does not queue another scrape while a run is active" do
     sign_in create_admin!
-    ScrapingRun.create!(status: "running", started_at: Time.current)
+    run = ScrapingRun.create!(status: "running", started_at: Time.current)
 
     assert_no_enqueued_jobs do
       post admin_maintenance_path, params: { maintenance: { operation: "scrape" } }
     end
 
-    assert_redirected_to admin_root_path
+    assert_redirected_to admin_scraping_run_path(run)
   end
 
   test "closes an abandoned run and queues a new scrape" do

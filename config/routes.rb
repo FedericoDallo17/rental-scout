@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root "scraping_runs#index"
+    resources :scraping_runs, only: [:show]
     resources :listing_sources, only: [:update]
     resources :users, only: [:index, :update]
     resource :maintenance, only: [:create], controller: "maintenance"

@@ -11,9 +11,11 @@ module Admin
       operation = params.require(:maintenance).fetch(:operation)
       job = ACTIONS.fetch(operation) { raise ActiveRecord::RecordNotFound }
 
-      if %w[scrape reconcile].include?(operation) && scraping_run_in_progress?
-        redirect_to admin_root_path, alert: t("admin.maintenance.run_in_progress")
-        return
+      if %w[scrape reconcile].include?(operation)
+        if (active_run = scraping_run_in_progress)
+          redirect_to admin_scraping_run_path(active_run), alert: t("admin.maintenance.run_in_progress")
+          return
+        end
       end
 
       job.call
@@ -22,9 +24,9 @@ module Admin
 
     private
 
-    def scraping_run_in_progress?
+    def scraping_run_in_progress
       ScrapingRun.close_abandoned!
-      ScrapingRun.exists?(status: "running")
+      ScrapingRun.where(status: "running").order(started_at: :desc).first
     end
   end
 end
