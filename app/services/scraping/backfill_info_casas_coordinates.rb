@@ -3,8 +3,11 @@ module Scraping
     BATCH_SIZE = 20
     Result = Struct.new(:listings_seen_count, :listings_updated_count, keyword_init: true)
 
-    def call(limit: nil, external_ids: nil, adapter: Sources::InfoCasasApiAdapter.new)
+    def call(limit: nil, external_ids: nil, adapter: nil)
       source = ListingSource.find_by!(adapter_key: "info_casas_api")
+      adapter ||= Sources::InfoCasasApiAdapter.new(
+        on_request: Sources::ThirdPartyCallTracker.new(listing_source: source)
+      )
       geometry_builder = Scraping::ListingGeometryBuilder.new
       seen_count = 0
       updated_count = 0

@@ -4,6 +4,8 @@ require "uri"
 
 module Sources
   class RemaxAdapter
+    attr_writer :on_request
+
     ENDPOINT_URI = URI("https://api-ar.redremax.com/remaxweb-uy/api/listings/findAllWithEntrepreneurships?page=0&pageSize=50&sort=-createdAt&in=operationId:2&in=typeId:1,2,3,4,5,6,7,8&pricein=3:0:65000&gte=dimensionCovered:30&landingPath=")
     FRONTEND_BASE_URL = "https://www.remax.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
@@ -15,6 +17,10 @@ module Sources
       "accept" => "application/json, text/plain, */*",
       "user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
     }.freeze
+
+    def initialize(on_request: nil)
+      @on_request = on_request
+    end
 
     def fetch_listings(known_external_ids: Set.new, reconciliation: false)
       listings = []
@@ -60,6 +66,7 @@ module Sources
       ) do |http|
         request = Net::HTTP::Get.new(uri)
         HEADERS.each { |header, value| request[header] = value }
+        @on_request&.call
         http.request(request)
       end
     end

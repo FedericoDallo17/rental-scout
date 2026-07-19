@@ -26,6 +26,9 @@
 
         <div class="app-user">
           <%= link_to t("nav.runs"), scraping_runs_path, class: "app-nav__link" %>
+          <% if current_user.admin? %>
+            <%= link_to t("nav.admin"), admin_root_path, class: "app-nav__link" %>
+          <% end %>
           <%= link_to t("nav.notifications"), edit_notification_settings_path, class: "app-nav__link" %>
           <div class="app-language" aria-label="<%= t("nav.language") %>">
             <% User::SUPPORTED_LOCALES.each do |locale| %>

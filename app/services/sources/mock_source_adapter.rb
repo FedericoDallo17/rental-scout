@@ -1,5 +1,10 @@
 module Sources
   class MockSourceAdapter
+    attr_writer :on_request
+
+    def initialize(on_request: nil)
+    end
+
     LISTINGS = [
       {
         external_id: "mock-pocitos-2d-01",

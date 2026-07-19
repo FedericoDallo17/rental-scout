@@ -3,7 +3,14 @@ require "net/http"
 
 module Sources
   class StubSourceAdapter
+    attr_writer :on_request
+
+    def initialize(on_request: nil)
+      @on_request = on_request
+    end
+
     def fetch_listings(known_external_ids: Set.new, reconciliation: false)
+      @on_request&.call
       [{
         external_id: "stub-1",
         title: "Centro Loft",
@@ -44,11 +51,21 @@ class RunScrapersJobTest < ActiveJob::TestCase
 
     begin
       assert_no_enqueued_jobs(only: NotifyNewListingsJob) do
-        RunScrapersJob.perform_now(reconciliation: true)
+        run = RunScrapersJob.perform_now(reconciliation: true)
+
+        assert_predicate run, :reconciliation?
+        assert_equal "reconciliation", run.run_type
       end
     ensure
       ActiveJob::Base.queue_adapter = original_adapter
     end
+  end
+
+  test "ordinary acquisition is persisted as hourly" do
+    run = RunScrapersJob.perform_now
+
+    assert_not run.reconciliation?
+    assert_equal "hourly", run.run_type
   end
 
   test "passes source-local known ids and reconciliation mode to adapters" do
@@ -98,6 +115,15 @@ class RunScrapersJobTest < ActiveJob::TestCase
     assert_equal "succeeded", source_run.status
     assert_equal 10, source_run.listings_seen_count
     assert_equal 10, source_run.listings_created_count
+  end
+
+  test "records adapter requests on the source and source run" do
+    source = ListingSource.create!(name: "Stub Source", adapter_key: "stub_source")
+
+    run = RunScrapersJob.perform_now
+
+    assert_equal 1, source.reload.third_party_calls_count
+    assert_equal 1, run.scraping_source_runs.first.third_party_calls_count
   end
 
   test "does not run inactive sources" do

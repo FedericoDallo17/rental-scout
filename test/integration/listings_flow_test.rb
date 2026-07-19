@@ -73,7 +73,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".search-workbench"
     assert_select ".search-sidebar__item .search-link__count", text: "2 listings"
-    assert_select ".search-sidebar__item .search-sidebar__edit", text: "Edit"
+    assert_select ".search-sidebar__item .search-sidebar__edit[aria-label='Edit Pocitos'] svg"
   end
 
   test "signed in listings route shows an empty saved-search state when none exist" do

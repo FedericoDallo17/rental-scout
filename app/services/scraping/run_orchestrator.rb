@@ -1,7 +1,7 @@
 module Scraping
   class RunOrchestrator
     def call(reconciliation: false)
-      run = ScrapingRun.create!(status: "running", started_at: Time.current)
+      run = ScrapingRun.create!(status: "running", started_at: Time.current, reconciliation:)
       intake = ListingIntake.new
 
       ListingSource.where(active: true).find_each do |listing_source|
@@ -27,7 +27,10 @@ module Scraping
         started_at: Time.current
       )
       known_external_ids = listing_source.seen_listings.where.not(external_id: nil).pluck(:external_id).to_set
-      listings = Sources::AdapterRegistry.resolve(listing_source).fetch_listings(
+      tracker = Sources::ThirdPartyCallTracker.new(listing_source:, source_run:)
+      adapter = Sources::AdapterRegistry.resolve(listing_source)
+      adapter.on_request = tracker if adapter.respond_to?(:on_request=)
+      listings = adapter.fetch_listings(
         known_external_ids:,
         reconciliation:
       )

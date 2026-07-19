@@ -16,10 +16,21 @@ class Listing < ApplicationRecord
   scope :unresolved_location, -> { where(location_resolution_status: "unresolved") }
 
   def display_location
-    return location_text if source_neighborhood.blank?
+    neighborhood = provider_neighborhood.presence || source_neighborhood
+    return location_text if neighborhood.blank?
 
-    city = raw_payload&.fetch("source_city", nil)
-    [source_neighborhood, city].compact_blank.uniq.join(", ")
+    city = raw_payload_value("source_city")
+    [neighborhood, city].compact_blank.uniq.join(", ")
+  end
+
+  def provider_neighborhood
+    raw_payload_value("source_neighborhood").to_s.split(",").first&.strip
+  end
+
+  private
+
+  def raw_payload_value(key)
+    raw_payload&.[](key) || raw_payload&.[](key.to_sym)
   end
 
   def self.for_search_feed(search_preference)
@@ -27,16 +38,18 @@ class Listing < ApplicationRecord
 
     listings = in_scope_inventory
     listings = if search_has_zones?(search_preference)
-      listings.where(id: zone_matching_ids(search_preference))
+      listings.where(id: matching_zone_ids(search_preference.zones.to_a))
     else
       listings.where("LOWER(location_text) LIKE ?", "%#{sanitize_sql_like(search_preference.location_query.to_s.downcase)}%")
     end
-    if search_preference.min_price_cents.present? || search_preference.max_price_cents.present?
-      listings = listings.where(currency: search_preference.price_currency)
-      listings = listings.where("price_cents >= ?", search_preference.min_price_cents) if search_preference.min_price_cents.present?
-      listings = listings.where("price_cents <= ?", search_preference.max_price_cents) if search_preference.max_price_cents.present?
-    end
-    listings = listings.where("bedrooms >= ?", search_preference.min_bedrooms) if search_preference.min_bedrooms.present?
+    listings = Listings::CriteriaFilter.new(
+      listings,
+      currency: (search_preference.price_currency if search_preference.min_price_cents.present? || search_preference.max_price_cents.present?),
+      min_price_cents: search_preference.min_price_cents,
+      max_price_cents: search_preference.max_price_cents,
+      min_bedrooms: search_preference.min_bedrooms,
+      include_expenses: search_preference.include_expenses?
+    ).call
     listings.recent_first
   end
 
@@ -45,10 +58,9 @@ class Listing < ApplicationRecord
     association.loaded? ? association.target.any? : association.scope.exists?
   end
 
-  def self.zone_matching_ids(search_preference)
-    zones = search_preference.zones.to_a
+  def self.matching_zone_ids(zones)
     zone_ids = zones.map(&:id)
-    aliases = zones.flat_map(&:aliases).map(&:downcase).uniq
+    aliases = zones.flat_map { |zone| zone.aliases + [zone.name] }.map(&:downcase).uniq
 
     spatial_ids = joins("INNER JOIN zones feed_zones ON ST_Intersects(feed_zones.geom, listings.coordinates)")
       .where(location_resolution_status: "spatial")

@@ -1,6 +1,6 @@
 # Roadmap
 
-Last updated: 2026-07-14. Phases A/B and most unplanned auth/geo work are done; this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-project.md).
+Last updated: 2026-07-19. Phases A/B and most unplanned auth/geo work are done; this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-project.md).
 
 ## Done
 - Discovery, look feel, MVP scope (stub docs only)
@@ -49,15 +49,15 @@ Last updated: 2026-07-14. Phases A/B and most unplanned auth/geo work are done; 
   reconciliation without stale-catalog notification fan-out
 - Ticket 035: added complete Spanish Devise authentication messages and a real
   Spanish-user sign-in regression test
+- Ticket 036: added admin-only inventory health and maintenance operations,
+  persisted provider-request diagnostics and acquisition/reconciliation run types,
+  and structurally verified recurring schedules
 
 ## Now
-- Shape Ticket 036 inventory-health observability after migration approval.
 - MercadoLibre remains paused pending API keys or allowed index payload.
 
 ## Product gaps to shape
-
-- Ticket 036: distinguish hourly and reconciliation runs, persist per-source fetch
-  diagnostics, verify recurring-job loading, and expose a safe manual reconciliation.
+- No approved, unblocked gaps remain.
 
 ## Next
 - Resume MercadoLibre when API keys or an allowed index payload are available.

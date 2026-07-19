@@ -14,7 +14,14 @@
           <span class="search-link__meta"><%= search.location_query %></span>
           <span class="search-link__count"><%= t("count.listing", count: @search_counts.fetch(search, 0)) %></span>
         <% end %>
-          <%= link_to t("feed.edit"), edit_search_preference_path(search), class: "search-sidebar__edit" %>
+          <%= link_to edit_search_preference_path(search),
+            class: "search-sidebar__edit",
+            aria: { label: t("feed.edit_search", name: search.name) },
+            title: t("feed.edit") do %>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 20h4l10.5-10.5a2.8 2.8 0 0 0-4-4L4 16v4Zm11.2-12.8 1.6 1.6" />
+            </svg>
+          <% end %>
         </div>
       <% end %>
     </nav>
@@ -57,16 +64,39 @@
         </div>
         <div class="feed-controls__field">
           <%= form.label :neighborhood, t("feed.neighborhood") %>
-          <%= form.select :neighborhood, @filter_neighborhoods, { include_blank: t("feed.all_neighborhoods") }, selected: @selected_neighborhood %>
+          <%= form.select :neighborhood, @filter_zones.map { |zone| [zone.name, zone.slug] }, { include_blank: t("feed.all_neighborhoods") }, selected: @selected_neighborhood %>
         </div>
         <div class="feed-controls__field">
-          <%= form.label :currency, t("feed.currency") %>
-          <%= form.select :currency, ListingsController::CURRENCIES, { include_blank: t("feed.all_currencies") }, selected: @selected_currency %>
+          <%= form.label :min_bedrooms, t("feed.bedrooms") %>
+          <%= form.select :min_bedrooms, [
+            [t("feed.any_bedrooms"), ""],
+            [t("feed.bedroom_options.studio_plus"), 0],
+            [t("feed.bedroom_options.one_plus"), 1],
+            [t("feed.bedroom_options.two_plus"), 2],
+            [t("feed.bedroom_options.three_plus"), 3],
+            [t("feed.bedroom_options.four_plus"), 4]
+          ], selected: @min_bedrooms %>
         </div>
-        <label class="feed-controls__toggle">
-          <%= check_box_tag :expenses_known, "1", @expenses_known %>
-          <span><%= t("feed.expenses_known") %></span>
-        </label>
+        <fieldset class="feed-price-filter">
+          <legend><%= t("feed.price") %></legend>
+          <div class="feed-price-filter__currency" aria-label="<%= t("feed.currency") %>">
+            <%= radio_button_tag :currency, "", @selected_currency.nil?, id: "currency_all" %>
+            <%= label_tag :currency_all, t("feed.all_currency_short") %>
+            <%= radio_button_tag :currency, "UYU", @selected_currency == "UYU", id: "currency_uyu" %>
+            <%= label_tag :currency_uyu, "$" %>
+            <%= radio_button_tag :currency, "USD", @selected_currency == "USD", id: "currency_usd" %>
+            <%= label_tag :currency_usd, "U$S" %>
+          </div>
+          <div class="feed-price-filter__range">
+            <%= form.number_field :min_price, value: @min_price, min: 0, step: 1000, placeholder: t("feed.min_price_short"), aria: { label: t("feed.min_price") } %>
+            <span aria-hidden="true">–</span>
+            <%= form.number_field :max_price, value: @max_price, min: 0, step: 1000, placeholder: t("feed.max_price_short"), aria: { label: t("feed.max_price") } %>
+          </div>
+          <label class="feed-price-filter__expenses">
+            <%= check_box_tag :include_expenses, "1", @cost_basis == "total" %>
+            <span><%= t("feed.include_expenses") %></span>
+          </label>
+        </fieldset>
         <div class="feed-controls__actions">
           <%= form.submit t("feed.apply_controls"), class: "feed-controls__submit" %>
           <%= link_to t("feed.clear_controls"), listings_path(search_id: @active_search&.id), class: "feed-controls__clear" %>

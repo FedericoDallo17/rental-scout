@@ -19,14 +19,14 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".search-form-panel"
     assert_select ".search-form-aside", text: /Feed preview/
     assert_select "label", text: "Search name"
-    assert_select "label", text: "Min price"
-    assert_select "label", text: "Max price"
     assert_select "label", text: "Location note"
     assert_select "label", text: /cents/, count: 0
     assert_select "input[name='search_preference[min_price]']"
     assert_select "input[name='search_preference[max_price]']"
-    assert_select "select[name='search_preference[price_currency]'] option[value='UYU'][selected]", text: "UYU"
-    assert_select "select[name='search_preference[price_currency]'] option[value='USD']", text: "USD"
+    assert_select "input[name='search_preference[price_currency]'][value='UYU'][checked='checked']"
+    assert_select "input[name='search_preference[price_currency]'][value='USD']"
+    assert_select "select[name='search_preference[min_bedrooms]']"
+    assert_select "input[name='search_preference[include_expenses]'][type='checkbox']"
     assert_select ".search-form__zones label", text: /Pocitos/
   end
 
@@ -43,6 +43,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
             max_price: "40000",
             price_currency: "USD",
             min_bedrooms: "1",
+            include_expenses: "1",
             notifications_enabled: "0",
             zone_ids: [zone.id]
       }
@@ -54,6 +55,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 4_000_000, search.max_price_cents
     assert_equal "USD", search.price_currency
     assert_equal 1, search.min_bedrooms
+    assert_predicate search, :include_expenses?
     assert_not search.notifications_enabled
     assert_redirected_to listings_path(search_id: search.id)
   end
@@ -131,6 +133,22 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to listings_path
   end
 
+  test "edit page confirms before deleting a saved search" do
+    user = create_user!(email: "delete-confirmation@example.com")
+    search = user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    sign_in user
+
+    get edit_search_preference_path(search)
+
+    assert_response :success
+    assert_select "button[data-delete-search-open]", text: "Delete search"
+    assert_select "dialog[data-delete-search-dialog]" do
+      assert_select "h2", text: "Delete saved search?"
+      assert_select "p", text: "Delete Pocitos? This cannot be undone."
+      assert_select "form[action='#{search_preference_path(search)}'] button", text: "Delete permanently"
+    end
+  end
+
   test "signed in user deletes search with notification history by keeping events" do
     user = create_user!(email: "delete-search-events@example.com")
     search = user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
@@ -165,7 +183,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "a[href='#{new_search_preference_path}']", text: "New search"
-    assert_select "a[href='#{edit_search_preference_path(search)}']", text: "Edit"
+    assert_select "a.search-sidebar__edit[href='#{edit_search_preference_path(search)}'][aria-label='Edit Pocitos'] svg"
   end
 
   private

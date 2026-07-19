@@ -1,11 +1,15 @@
 class ScrapingRunsController < ApplicationController
   def index
-    @listing_sources = ListingSource.order(:name)
     @location_quality = Scraping::LocationQualityMetrics.new.call
-    @scraping_runs = ScrapingRun
-      .includes(scraping_source_runs: :listing_source)
-      .order(started_at: :desc, id: :desc)
-      .limit(25)
+    events = NotificationEvent
+      .joins(:search_preference, :listing)
+      .where(search_preferences: { user_id: current_user.id })
+      .where.not(listings: { scraping_run_id: nil })
+      .includes(:listing)
+    @events_by_run_id = events.group_by { |event| event.listing.scraping_run_id }
+    @matched_runs = ScrapingRun.where(id: @events_by_run_id.keys).order(started_at: :desc, id: :desc)
+
+    render "scraping_runs/user_index"
   end
 
   def show

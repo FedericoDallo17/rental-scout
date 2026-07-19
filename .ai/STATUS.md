@@ -1,13 +1,13 @@
 # Status
 
-Last updated: 2026-07-14. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
+Last updated: 2026-07-19. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
-Freshness-first MVP lifecycle complete; bilingual signed-in experience complete
+Freshness-first MVP lifecycle and inventory-health observability complete
 
 ## Current Task
-Ticket 035 Spanish Devise authentication messages complete
+Ticket 036 inventory-health observability complete
 
 ## Status
 Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
@@ -50,9 +50,10 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 033 landed: the default feed deduplicates all saved-search matches, active searches can be deselected, cards name matching searches, and bilingual server-side controls sort/filter the dashboard without query-per-search membership execution (07-13)
 - Ticket 034 landed: source-local known IDs drive bounded recent pagination for Remax and Imperium; InfoCasas uses hourly publication windows; Housi stays single-page; weekly reconciliation scans deeper without notification fan-out (07-14)
 - Ticket 035 landed: Spanish Devise notices and errors cover sign-in, sign-out, registration, password, confirmation, and unlock flows without exposing missing-translation diagnostics (07-14)
+- Ticket 036 landed: admin-only inventory operations, user-isolated run history, persisted provider request counts, durable hourly/reconciliation run types, guarded maintenance actions, and structurally verified recurring schedules (07-19)
 
 ## Doing
-- Inventory-health observability is approved next, pending its database-migration gate.
+- No roadmap ticket is currently in flight.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
@@ -66,4 +67,4 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
   users can now enter their own Pushover keys in the app.
 
 ## Next Step
-After migration approval, shape inventory-health observability as Ticket 036; resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.
+Resume Ticket 018 when MercadoLibre API keys or an allowed index payload sample are available.

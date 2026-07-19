@@ -12,6 +12,16 @@ class ListingTest < ActiveSupport::TestCase
     assert_equal "Rivera 3200", listing.location_text
   end
 
+  test "display location preserves a provider neighborhood alias after spatial normalization" do
+    listing = Listing.new(
+      source_neighborhood: "Pocitos",
+      location_resolution_status: "spatial",
+      raw_payload: { source_neighborhood: "Pocitos Nuevo", source_city: "Montevideo" }
+    )
+
+    assert_equal "Pocitos Nuevo, Montevideo", listing.display_location
+  end
+
   test "spatially_resolvable scope returns listings with coordinates" do
  source = ListingSource.create!(name: "Mock Source", adapter_key: "mock_source")
     Listing.create!(listing_source: source, title: "Spatial", canonical_url: "https://example.test/spatial", location_resolution_status: "spatial", latitude: -34.90, longitude: -56.16, coordinates: Zone::FACTORY.point(-56.16, -34.90))
@@ -165,6 +175,17 @@ test "for_search_feed applies scalar filters" do
       in_scope: false
     )
     search = user.search_preferences.create!(name: "Malvin", location_query: "legacy", zones: [malvin])
+
+    assert_equal [matching], Listing.for_search_feed(search).to_a
+  end
+
+  test "for_search_feed can apply saved rent plus expenses criteria" do
+    user = create_user!("listing-owner-expenses@example.com")
+    source = ListingSource.create!(name: "Expenses Source", adapter_key: "expenses_search_source")
+    matching = Listing.create!(listing_source: source, title: "Known total", canonical_url: "https://example.test/saved-known-total", location_text: "Pocitos", price_cents: 3_000_000, currency: "UYU", expenses_cents: 500_000, expenses_currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "Too expensive total", canonical_url: "https://example.test/saved-high-total", location_text: "Pocitos", price_cents: 3_500_000, currency: "UYU", expenses_cents: 600_000, expenses_currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "Unknown total", canonical_url: "https://example.test/saved-unknown-total", location_text: "Pocitos", price_cents: 3_000_000, currency: "UYU", expenses_cents: nil, in_scope: true)
+    search = user.search_preferences.create!(name: "Total budget", location_query: "Pocitos", price_currency: "UYU", max_price_cents: 3_800_000, include_expenses: true)
 
     assert_equal [matching], Listing.for_search_feed(search).to_a
   end

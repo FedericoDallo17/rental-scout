@@ -1,4 +1,56 @@
 es:
+  admin:
+    dashboard: "Panel de administración"
+    users:
+      eyebrow: "Gestión de acceso"
+      title: "Usuarios"
+      count:
+        one: "%{count} usuario"
+        other: "%{count} usuarios"
+      name: "Nombre"
+      email: "Correo"
+      searches: "Búsquedas guardadas"
+      role: "Rol"
+      actions: "Acciones"
+      admin: "Administrador"
+      user: "Usuario"
+      current_account: "Cuenta actual"
+      make_admin: "Hacer administrador"
+      remove_admin: "Quitar administrador"
+      role_confirmation: "¿Cambiar el rol de %{email}?"
+      role_updated: "Se actualizó el rol de %{email}."
+      self_demote_blocked: "No podés quitar tu propio acceso de administrador."
+    maintenance:
+      eyebrow: "Gestión del sistema"
+      title: "Acciones de mantenimiento"
+      intro: "Los trabajos se ejecutan en segundo plano. Usá la reconciliación y la limpieza con moderación porque revisan todo el inventario."
+      run_in_progress: "Ya hay una ejecución de scraping en curso."
+      enqueued:
+        scrape: "Ejecución de scraping encolada."
+        reconcile: "Reconciliación completa encolada."
+        purge: "Limpieza de propiedades antiguas encolada."
+        backfill_coordinates: "Actualización de coordenadas encolada."
+      actions:
+        scrape:
+          title: "Buscar propiedades nuevas"
+          copy: "Consulta las fuentes activas en su ventana reciente y notifica a los usuarios con coincidencias."
+          button: "Ejecutar scraper"
+          confirmation: "¿Iniciar una ejecución de scraping ahora?"
+        reconcile:
+          title: "Reconciliar todo el inventario"
+          copy: "Revisa más páginas del historial sin enviar notificaciones de propiedades nuevas."
+          button: "Ejecutar reconciliación"
+          confirmation: "¿Iniciar una reconciliación completa? Puede realizar muchas llamadas externas."
+        backfill_coordinates:
+          title: "Completar coordenadas"
+          copy: "Obtiene coordenadas faltantes de InfoCasas para mejorar la coincidencia por barrio."
+          button: "Ejecutar actualización"
+          confirmation: "¿Iniciar la actualización de coordenadas? Hace una solicitud por propiedad elegible."
+        purge:
+          title: "Limpiar propiedades antiguas"
+          copy: "Elimina propiedades que ya no están vigentes según la política de retención."
+          button: "Ejecutar limpieza"
+          confirmation: "¿Encolar la limpieza? Esta acción puede eliminar propiedades."
   support:
     array:
       words_connector: ", "
@@ -10,6 +62,7 @@ es:
   nav:
     account: "Cuenta"
     runs: "Ejecuciones"
+    admin: "Administración"
     notifications: "Notificaciones"
     language: "Idioma"
     sign_out: "Cerrar sesión"
@@ -36,6 +89,7 @@ es:
     saved_searches_copy: "Volvé rápidamente a los barrios que consultás con más frecuencia."
     new_search: "Nueva búsqueda"
     edit: "Editar"
+    edit_search: "Editar %{name}"
     marketplace: "Resultados del mercado"
     title: "Apartamentos encontrados"
     browsing_html: "Viendo <strong>%{name}</strong>"
@@ -47,12 +101,30 @@ es:
     match: "coincidencia"
     fit: "afinidad"
     bedrooms: "Dormitorios"
+    any_bedrooms: "Cualquier cantidad"
+    bedroom_options:
+      studio_plus: "Monoambiente o más"
+      one_plus: "1+ dormitorios"
+      two_plus: "2+ dormitorios"
+      three_plus: "3+ dormitorios"
+      four_plus: "4+ dormitorios"
     expenses: "Gastos comunes"
     parking: "Garaje"
     type: "Tipo"
     source: "Fuente"
     neighborhood: "Barrio"
     currency: "Moneda"
+    price: "Precio"
+    all_currency_short: "Todas"
+    min_price_short: "Mínimo"
+    max_price_short: "Máximo"
+    include_expenses: "Incluir gastos comunes"
+    cost_basis: "Tipo de precio"
+    min_price: "Precio mínimo"
+    max_price: "Precio máximo"
+    cost_basis_options:
+      rent: "Solo alquiler"
+      total: "Alquiler + gastos comunes"
     sort: "Ordenar"
     all_sources: "Todas las fuentes"
     all_neighborhoods: "Todos los barrios"
@@ -103,12 +175,42 @@ es:
     create: "Crear búsqueda"
     cancel: "Cancelar"
     delete: "Eliminar búsqueda"
+    delete_confirmation: "¿Eliminar %{name}? Esta acción no se puede deshacer."
+    delete_modal_title: "¿Eliminar la búsqueda guardada?"
+    confirm_delete: "Eliminar definitivamente"
     preview: "Vista previa"
     preview_copy: "Las búsquedas guardadas aparecen en la barra lateral y filtran el inventario compartido de propiedades recientes."
     notifications_on: "Notificaciones activas"
     notifications_off: "Notificaciones desactivadas"
+    any_price: "Cualquier precio"
+    expenses_included_short: "gastos incluidos"
     context: "Contexto de la búsqueda"
   runs:
+    types:
+      hourly: Adquisición por hora
+      reconciliation: Reconciliación de inventario
+    user_eyebrow: "Tu historial de notificaciones"
+    user_title: "Ejecuciones con resultados para vos"
+    user_runs_label: "Ejecuciones con tus coincidencias"
+    your_matches:
+      one: "%{count} coincidencia"
+      other: "%{count} coincidencias"
+    user_run_copy:
+      one: "Esta ejecución encontró %{count} propiedad nueva para tus búsquedas guardadas."
+      other: "Esta ejecución encontró %{count} propiedades nuevas para tus búsquedas guardadas."
+    view_matches: "Ver estas propiedades"
+    no_user_runs: "Todavía no hay ejecuciones con coincidencias."
+    no_user_runs_copy: "Las ejecuciones que encuentren propiedades para tus búsquedas aparecerán acá."
+    request_observability: "Observabilidad de solicitudes"
+    third_party_calls: "Llamadas a servicios externos"
+    third_party_calls_short: "Llamadas externas"
+    third_party_calls_intro: "Contamos cada solicitud saliente para detectar fácilmente ejecuciones inusualmente costosas."
+    calls_overall:
+      one: "%{count} llamada total"
+      other: "%{count} llamadas totales"
+    call_count:
+      one: "%{count} llamada"
+      other: "%{count} llamadas"
     eyebrow: "Observabilidad del scraper"
     title: "Ejecuciones de scraping"
     feed: "Resultados"

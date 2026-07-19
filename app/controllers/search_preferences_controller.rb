@@ -52,6 +52,7 @@ class SearchPreferencesController < ApplicationController
       :max_price,
       :price_currency,
       :min_bedrooms,
+      :include_expenses,
       :notifications_enabled,
       zone_ids: []
     )

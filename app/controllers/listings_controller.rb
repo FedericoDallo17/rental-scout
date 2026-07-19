@@ -1,6 +1,7 @@
 class ListingsController < ApplicationController
   SORT_OPTIONS = %w[newest price_low price_high total_monthly fit].freeze
   CURRENCIES = %w[UYU USD].freeze
+  COST_BASES = %w[rent total].freeze
 
   def index
     @searches = current_user.search_preferences.includes(:zones).ordered_for_sidebar
@@ -25,7 +26,7 @@ class ListingsController < ApplicationController
     end
     @listing_scores = @listings.index_with { |listing| best_score_for(listing) }
     @listings = sort_listings(@listings)
-    @feed_params = params.permit(:sort, :source_id, :neighborhood, :currency, :expenses_known).to_h.symbolize_keys
+    @feed_params = params.permit(:sort, :source_id, :neighborhood, :currency, :cost_basis, :include_expenses, :min_price, :max_price, :min_bedrooms, :expenses_known).to_h.symbolize_keys
   end
 
   private
@@ -33,20 +34,39 @@ class ListingsController < ApplicationController
   def prepare_filter_options(base_scope)
     source_ids = base_scope.reorder(nil).select(:listing_source_id)
     @filter_sources = ListingSource.where(id: source_ids).order(:name).to_a
-    @filter_neighborhoods = base_scope.where.not(source_neighborhood: [nil, ""]).distinct.order(:source_neighborhood).pluck(:source_neighborhood)
+    @filter_zones = Zone.order(:name).to_a
     @selected_source_id = params[:source_id].to_i if @filter_sources.any? { |source| source.id == params[:source_id].to_i }
-    @selected_neighborhood = params[:neighborhood] if @filter_neighborhoods.include?(params[:neighborhood])
+    @selected_zone = @filter_zones.find { |zone| [zone.slug, zone.name].include?(params[:neighborhood]) }
+    @selected_neighborhood = @selected_zone&.slug
     @selected_currency = params[:currency] if CURRENCIES.include?(params[:currency])
+    @cost_basis = params[:include_expenses] == "1" || params[:cost_basis] == "total" ? "total" : "rent"
+    @min_price = non_negative_integer(params[:min_price])
+    @max_price = non_negative_integer(params[:max_price])
+    @min_bedrooms = non_negative_integer(params[:min_bedrooms])
     @expenses_known = params[:expenses_known] == "1"
     @sort = SORT_OPTIONS.include?(params[:sort]) ? params[:sort] : "newest"
   end
 
   def apply_filters(scope)
     scope = scope.where(listing_source_id: @selected_source_id) if @selected_source_id
-    scope = scope.where(source_neighborhood: @selected_neighborhood) if @selected_neighborhood
-    scope = scope.where(currency: @selected_currency) if @selected_currency
+    scope = scope.where(id: Listing.matching_zone_ids([@selected_zone])) if @selected_zone
+    scope = Listings::CriteriaFilter.new(
+      scope,
+      currency: @selected_currency,
+      min_price_cents: @min_price&.*(100),
+      max_price_cents: @max_price&.*(100),
+      min_bedrooms: @min_bedrooms,
+      include_expenses: @cost_basis == "total"
+    ).call
     scope = scope.where.not(expenses_cents: nil) if @expenses_known
     scope
+  end
+
+  def non_negative_integer(value)
+    return if value.blank?
+
+    integer = Integer(value, exception: false)
+    integer if integer && integer >= 0
   end
 
   def best_score_for(listing)

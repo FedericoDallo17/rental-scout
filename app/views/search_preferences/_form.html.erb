@@ -1,4 +1,4 @@
-<div class="search-form-shell">
+<div class="search-form-shell" data-search-preview-root>
   <%= form_with model: search_preference, class: "search-form search-form-panel" do |form| %>
     <% if search_preference.errors.any? %>
       <div class="form-errors">
@@ -22,26 +22,38 @@
         <%= form.text_field :location_query %>
       </div>
 
-      <div class="search-form__field">
-        <%= form.label :price_currency, t("searches.price_currency") %>
-        <%= form.select :price_currency, SearchPreference::PRICE_CURRENCIES.map { |currency| [currency, currency] } %>
-      </div>
-
-      <div class="search-form__field">
-        <%= form.label :min_price, t("searches.min_price") %>
-        <%= form.number_field :min_price, min: 0, step: 1000 %>
-      </div>
-
-      <div class="search-form__field">
-        <%= form.label :max_price, t("searches.max_price") %>
-        <%= form.number_field :max_price, min: 0, step: 1000 %>
-      </div>
-
-      <div class="search-form__field">
-        <%= form.label :min_bedrooms, t("searches.min_bedrooms") %>
-        <%= form.number_field :min_bedrooms, min: 0, step: 1 %>
-      </div>
     </div>
+
+    <div class="search-form__field search-form__bedrooms">
+      <%= form.label :min_bedrooms, t("feed.bedrooms") %>
+      <%= form.select :min_bedrooms, [
+        [t("feed.any_bedrooms"), ""],
+        [t("feed.bedroom_options.studio_plus"), 0],
+        [t("feed.bedroom_options.one_plus"), 1],
+        [t("feed.bedroom_options.two_plus"), 2],
+        [t("feed.bedroom_options.three_plus"), 3],
+        [t("feed.bedroom_options.four_plus"), 4]
+      ] %>
+    </div>
+
+    <fieldset class="feed-price-filter search-form__price-filter">
+      <legend><%= t("feed.price") %></legend>
+      <div class="feed-price-filter__currency" aria-label="<%= t("feed.currency") %>">
+        <%= form.radio_button :price_currency, "UYU", id: "search_currency_uyu" %>
+        <%= label_tag :search_currency_uyu, "$" %>
+        <%= form.radio_button :price_currency, "USD", id: "search_currency_usd" %>
+        <%= label_tag :search_currency_usd, "U$S" %>
+      </div>
+      <div class="feed-price-filter__range">
+        <%= form.number_field :min_price, min: 0, step: 1000, placeholder: t("feed.min_price_short"), aria: { label: t("feed.min_price") } %>
+        <span aria-hidden="true">–</span>
+        <%= form.number_field :max_price, min: 0, step: 1000, placeholder: t("feed.max_price_short"), aria: { label: t("feed.max_price") } %>
+      </div>
+      <label class="feed-price-filter__expenses">
+        <%= form.check_box :include_expenses %>
+        <span><%= t("feed.include_expenses") %></span>
+      </label>
+    </fieldset>
 
     <fieldset class="search-form__zones">
       <legend><%= t("searches.neighborhoods") %></legend>
@@ -69,9 +81,58 @@
     <p class="search-form-aside__eyebrow"><%= t("searches.preview") %></p>
     <h2><%= search_preference.name.presence || t("searches.new_title") %></h2>
     <p><%= t("searches.preview_copy") %></p>
-    <div class="search-form-aside__facts">
-      <span><%= t("count.zone", count: search_preference.zones.size) %></span>
-      <span><%= search_preference.notifications_enabled? ? t("searches.notifications_on") : t("searches.notifications_off") %></span>
+    <div class="search-form-aside__facts"
+      data-zone-one="<%= t("count.zone", count: 1) %>"
+      data-zone-other="<%= t("count.zone", count: 2).sub("2", "%{count}") %>"
+      data-notifications-on="<%= t("searches.notifications_on") %>"
+      data-notifications-off="<%= t("searches.notifications_off") %>">
+      <span data-search-preview-zones><%= t("count.zone", count: search_preference.zones.size) %></span>
+      <span data-search-preview-bedrooms><%= t("feed.any_bedrooms") %></span>
+      <span data-search-preview-price><%= t("searches.any_price") %></span>
+      <span data-search-preview-notifications><%= search_preference.notifications_enabled? ? t("searches.notifications_on") : t("searches.notifications_off") %></span>
     </div>
   </aside>
 </div>
+
+<%= javascript_tag nonce: true do %>
+  (() => {
+    const root = document.querySelector("[data-search-preview-root]");
+    if (!root || root.dataset.previewReady) return;
+    root.dataset.previewReady = "true";
+
+    const form = root.querySelector("form.search-form");
+    const title = root.querySelector(".search-form-aside h2");
+    const facts = root.querySelector(".search-form-aside__facts");
+    const zones = root.querySelector("[data-search-preview-zones]");
+    const bedrooms = root.querySelector("[data-search-preview-bedrooms]");
+    const price = root.querySelector("[data-search-preview-price]");
+    const notifications = root.querySelector("[data-search-preview-notifications]");
+
+    const update = () => {
+      const name = form.querySelector("[name='search_preference[name]']").value.trim();
+      title.textContent = name || <%= t("searches.new_title").to_json.html_safe %>;
+
+      const zoneCount = form.querySelectorAll("input[name='search_preference[zone_ids][]'][type='checkbox']:checked").length;
+      zones.textContent = zoneCount === 1 ? facts.dataset.zoneOne : facts.dataset.zoneOther.replace("%{count}", zoneCount);
+
+      const bedroomSelect = form.querySelector("[name='search_preference[min_bedrooms]']");
+      bedrooms.textContent = bedroomSelect.options[bedroomSelect.selectedIndex].text;
+
+      const currency = form.querySelector("[name='search_preference[price_currency]']:checked");
+      const currencyLabel = currency ? form.querySelector(`label[for='${currency.id}']`).textContent.trim() : "";
+      const min = form.querySelector("[name='search_preference[min_price]']").value;
+      const max = form.querySelector("[name='search_preference[max_price]']").value;
+      const range = min && max ? `${currencyLabel} ${min}–${max}` : min ? `${<%= t("feed.min_price_short").to_json.html_safe %>} ${currencyLabel} ${min}` : max ? `${<%= t("feed.max_price_short").to_json.html_safe %>} ${currencyLabel} ${max}` : <%= t("searches.any_price").to_json.html_safe %>;
+      const includesExpenses = form.querySelector("[name='search_preference[include_expenses]']").checked;
+      price.textContent = includesExpenses && (min || max) ? `${range} · ${<%= t("searches.expenses_included_short").to_json.html_safe %>}` : range;
+
+      const notify = form.querySelector("[name='search_preference[notifications_enabled]']").checked;
+      notifications.textContent = notify ? facts.dataset.notificationsOn : facts.dataset.notificationsOff;
+    };
+
+    form.addEventListener("input", update);
+    form.addEventListener("change", update);
+    update();
+    window.setTimeout(update, 100);
+  })();
+<% end %>

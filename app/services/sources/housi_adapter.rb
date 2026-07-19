@@ -4,6 +4,8 @@ require "uri"
 
 module Sources
   class HousiAdapter
+    attr_writer :on_request
+
     SEARCH_URI = URI("https://www.housi.com.uy/Buscar?operation=2&ptypes=2&locations=51720&min-roofed=30&min-price=&max-price=65000&currency=UYU&o=2,2&1=1")
     FRONTEND_BASE_URL = "https://www.housi.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
@@ -13,6 +15,10 @@ module Sources
       "accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
     }.freeze
+
+    def initialize(on_request: nil)
+      @on_request = on_request
+    end
 
     def fetch_listings(known_external_ids: Set.new, reconciliation: false)
       cards.map { |card| normalized_listing(card) }.compact
@@ -34,6 +40,7 @@ module Sources
       ) do |http|
         request = Net::HTTP::Get.new(SEARCH_URI)
         HEADERS.each { |header, value| request[header] = value }
+        @on_request&.call
         http.request(request)
       end
     end

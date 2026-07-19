@@ -1,6 +1,10 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
+  test "users are not admins by default" do
+    assert_not User.new.admin?
+  end
+
   test "locale defaults to English and only supports English or Spanish" do
     user = User.new
     assert_equal "en", user.locale

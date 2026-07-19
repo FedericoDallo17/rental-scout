@@ -43,14 +43,14 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "Spanish preference translates signed-in product surfaces" do
-    user = create_user!("spanish-surfaces@example.com", locale: "es")
+    user = create_user!("spanish-surfaces@example.com", locale: "es", admin: true)
     sign_in user
 
     get new_search_preference_path
     assert_includes response.body, "Nueva búsqueda"
     assert_includes response.body, "Barrios"
 
-    get scraping_runs_path
+    get admin_root_path
     assert_includes response.body, "Ejecuciones de scraping"
     assert_includes response.body, "¿Qué tan confiable es la ubicación?"
 
@@ -61,14 +61,15 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def create_user!(email, locale: "en")
+  def create_user!(email, locale: "en", admin: false)
     User.create!(
       first_name: "Locale",
       last_name: "User",
       email:,
       password: "password123",
       password_confirmation: "password123",
-      locale:
+      locale:,
+      admin:
     )
   end
 end

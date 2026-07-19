@@ -7,6 +7,29 @@
   <%= render "form", search_preference: @search_preference, zones: @zones %>
 
   <div class="search-form-danger">
-    <%= button_to t("searches.delete"), search_preference_path(@search_preference), method: :delete, class: "search-form-danger__button" %>
+    <button type="button" class="search-form-danger__button" data-delete-search-open><%= t("searches.delete") %></button>
   </div>
+
+  <dialog class="delete-confirmation" data-delete-search-dialog aria-labelledby="delete-search-title">
+    <h2 id="delete-search-title"><%= t("searches.delete_modal_title") %></h2>
+    <p><%= t("searches.delete_confirmation", name: @search_preference.name) %></p>
+    <div class="delete-confirmation__actions">
+      <form method="dialog">
+        <button type="submit" class="search-form__cancel"><%= t("searches.cancel") %></button>
+      </form>
+      <%= button_to t("searches.confirm_delete"), search_preference_path(@search_preference), method: :delete, class: "search-form-danger__button" %>
+    </div>
+  </dialog>
+
+  <%= javascript_tag nonce: true do %>
+    (() => {
+      const dialog = document.querySelector("[data-delete-search-dialog]");
+      const opener = document.querySelector("[data-delete-search-open]");
+      if (!dialog || !opener) return;
+      opener.addEventListener("click", () => dialog.showModal());
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+    })();
+  <% end %>
 </main>

@@ -4,4 +4,8 @@ class ScrapingRun < ApplicationRecord
   has_many :seen_listings, dependent: :nullify
 
   validates :status, :started_at, presence: true
+
+  def run_type
+    reconciliation? ? "reconciliation" : "hourly"
+  end
 end

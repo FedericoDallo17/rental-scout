@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_13_150000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_19_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -21,6 +21,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_150000) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "third_party_calls_count", default: 0, null: false
     t.index ["adapter_key"], name: "index_listing_sources_on_adapter_key", unique: true
   end
 
@@ -86,6 +87,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_150000) do
     t.text "error_message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "reconciliation", default: false, null: false
   end
 
   create_table "scraping_source_runs", force: :cascade do |t|
@@ -99,6 +101,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_150000) do
     t.text "error_message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "third_party_calls_count", default: 0, null: false
     t.index ["listing_source_id"], name: "index_scraping_source_runs_on_listing_source_id"
     t.index ["scraping_run_id"], name: "index_scraping_source_runs_on_scraping_run_id"
   end
@@ -114,6 +117,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_150000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "price_currency", default: "UYU", null: false
+    t.boolean "include_expenses", default: false, null: false
     t.index ["user_id"], name: "index_search_preferences_on_user_id"
   end
 
@@ -156,6 +160,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_150000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "locale", default: "en", null: false
+    t.boolean "admin", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

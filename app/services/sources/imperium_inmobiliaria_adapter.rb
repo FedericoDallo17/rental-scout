@@ -5,6 +5,8 @@ require "uri"
 
 module Sources
   class ImperiumInmobiliariaAdapter
+    attr_writer :on_request
+
     ENDPOINT_URI = URI("https://imperium-backend-production-9783.up.railway.app/api/v2/public/properties")
     FRONTEND_BASE_URL = "https://www.inmobiliariaimperium.com"
     OPEN_TIMEOUT_SECONDS = 5
@@ -22,6 +24,10 @@ module Sources
       "accept" => "application/json, text/plain, */*",
       "user-agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
     }.freeze
+
+    def initialize(on_request: nil)
+      @on_request = on_request
+    end
 
     def fetch_listings(known_external_ids: Set.new, reconciliation: false)
       listings = []
@@ -71,6 +77,7 @@ module Sources
       ) do |http|
         request = Net::HTTP::Get.new(uri)
         HEADERS.each { |header, value| request[header] = value }
+        @on_request&.call
         http.request(request)
       end
     end

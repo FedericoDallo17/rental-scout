@@ -6,9 +6,56 @@
     </div>
     <div class="runs-header__tools">
       <%= link_to t("runs.feed"), listings_path, class: "runs-header__link" %>
+      <%= link_to t("admin.users.title"), admin_users_path, class: "runs-header__link" %>
       <p class="runs-header__count"><%= t("count.run", count: @scraping_runs.size) %></p>
     </div>
   </header>
+
+  <section class="source-controls" aria-labelledby="maintenance-heading">
+    <div class="source-controls__header">
+      <div>
+        <p class="source-controls__eyebrow"><%= t("admin.maintenance.eyebrow") %></p>
+        <h2 id="maintenance-heading"><%= t("admin.maintenance.title") %></h2>
+      </div>
+      <p class="source-controls__explanation"><%= t("admin.maintenance.intro") %></p>
+    </div>
+    <div class="source-controls__grid">
+      <% %w[scrape reconcile backfill_coordinates purge].each do |action| %>
+        <%= button_to(
+          admin_maintenance_path,
+          method: :post,
+          params: { maintenance: { operation: action } },
+          class: "source-control-card maintenance-action-card",
+          form_class: "maintenance-action-card-form",
+          form: { data: { turbo_confirm: t("admin.maintenance.actions.#{action}.confirmation") } }
+        ) do %>
+          <div>
+            <h3><%= t("admin.maintenance.actions.#{action}.title") %></h3>
+            <p class="location-quality-intro"><%= t("admin.maintenance.actions.#{action}.copy") %></p>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="run-card" aria-labelledby="request-metrics-heading">
+    <div class="run-card__summary">
+      <div>
+        <p class="runs-header__eyebrow"><%= t("runs.request_observability") %></p>
+        <h2 id="request-metrics-heading"><%= t("runs.third_party_calls") %></h2>
+        <p class="location-quality-intro"><%= t("runs.third_party_calls_intro") %></p>
+      </div>
+      <span class="status-pill"><%= t("runs.calls_overall", count: @total_third_party_calls) %></span>
+    </div>
+    <dl class="run-card__facts">
+      <% @listing_sources.each do |source| %>
+        <div>
+          <dt><%= source.display_name %></dt>
+          <dd><%= t("runs.call_count", count: source.third_party_calls_count) %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </section>
 
   <section class="run-card" aria-labelledby="location-quality-heading">
     <div class="run-card__summary">
@@ -64,7 +111,7 @@
             </span>
             <%= button_to(
               source.active? ? t("runs.deactivate") : t("runs.activate"),
-              listing_source_path(source),
+              admin_listing_source_path(source),
               method: :patch,
               params: { listing_source: { active: source.active? ? "0" : "1" } },
               class: "source-control-card__button"
@@ -83,6 +130,7 @@
             <div>
               <p class="run-card__started"><%= l(run.started_at, format: :short) %></p>
               <h2><%= t("runs.run", id: run.id) %></h2>
+              <p class="source-run__meta"><%= t("runs.types.#{run.run_type}") %></p>
             </div>
             <span class="status-pill status-pill--<%= run.status.to_s.dasherize %>"><%= t("runs.statuses.#{run.status}", default: run.status.humanize) %></span>
           </div>
@@ -95,6 +143,10 @@
             <div>
               <dt><%= t("runs.new") %></dt>
               <dd><%= t("runs.new_count", count: run.listings_created_count) %></dd>
+            </div>
+            <div>
+              <dt><%= t("runs.third_party_calls_short") %></dt>
+              <dd><%= t("runs.call_count", count: run.scraping_source_runs.sum(&:third_party_calls_count)) %></dd>
             </div>
             <div>
               <dt><%= t("runs.finished") %></dt>
@@ -114,6 +166,7 @@
                 <p class="source-run__meta">
                   <%= t("runs.seen_count", count: source_run.listings_seen_count) %> ·
                   <%= t("runs.new_count", count: source_run.listings_created_count) %>
+                  · <%= t("runs.call_count", count: source_run.third_party_calls_count) %>
                 </p>
                 <p class="source-run__timeline">
                   <%= t("runs.started_at", time: l(source_run.started_at, format: :short)) %>

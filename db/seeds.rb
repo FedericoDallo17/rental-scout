@@ -24,6 +24,8 @@ unless Rails.env.production?
     user.password_confirmation = "password123"
   end
 
+  User.where("LOWER(email) = ?", "federico@neocoast.com").update_all(admin: true)
+
 zone_definitions = {
   "Pocitos" => {
     slug: "pocitos",

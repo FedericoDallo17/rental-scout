@@ -73,16 +73,19 @@ class BootstrapConfigTest < ActiveSupport::TestCase
   end
 
   test "recurring config defines the scraper schedule in every Rails environment" do
-    recurring_config = Rails.root.join("config/recurring.yml").read
+    recurring_config = YAML.safe_load_file(Rails.root.join("config/recurring.yml"))
 
     %w[development test production].each do |environment|
-      assert_includes recurring_config, "#{environment}:"
-      assert_includes recurring_config, "  run_scrapers:"
-      assert_includes recurring_config, "  reconcile_scrapers:"
-      assert_includes recurring_config, "  purge_stale_listings:"
-      assert_includes recurring_config, "  backfill_info_casas_coordinates:"
+      schedules = recurring_config.fetch(environment)
+      assert_equal "RunScrapersJob", schedules.dig("run_scrapers", "class")
+      assert_equal "every hour", schedules.dig("run_scrapers", "schedule")
+      assert_equal "RunScrapersJob", schedules.dig("reconcile_scrapers", "class")
+      assert_equal "every Sunday at 3:30am", schedules.dig("reconcile_scrapers", "schedule")
+      assert_equal [{ "reconciliation" => true }], schedules.dig("reconcile_scrapers", "args")
+      assert_equal "PurgeStaleListingsJob", schedules.dig("purge_stale_listings", "class")
+      assert_equal "BackfillInfoCasasCoordinatesJob", schedules.dig("backfill_info_casas_coordinates", "class")
+      assert_equal [{ "limit" => 20 }], schedules.dig("backfill_info_casas_coordinates", "args")
     end
-    assert_includes recurring_config, "args: [{ limit: 20 }]"
   end
 
   test "reshape migration backfills source runs from legacy scraping run provenance" do

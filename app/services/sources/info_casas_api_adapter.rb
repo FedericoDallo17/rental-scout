@@ -4,6 +4,8 @@ require "uri"
 
 module Sources
   class InfoCasasApiAdapter
+    attr_writer :on_request
+
     ENDPOINT_URI = URI("https://graph.infocasas.com.uy/graphql")
     FRONTEND_BASE_URL = "https://www.infocasas.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
@@ -57,9 +59,10 @@ module Sources
       }
     GRAPHQL
 
-    def initialize(page_throttle_seconds: DEFAULT_PAGE_THROTTLE_SECONDS, detail_throttle_seconds: DEFAULT_DETAIL_THROTTLE_SECONDS)
+    def initialize(page_throttle_seconds: DEFAULT_PAGE_THROTTLE_SECONDS, detail_throttle_seconds: DEFAULT_DETAIL_THROTTLE_SECONDS, on_request: nil)
       @page_throttle_seconds = page_throttle_seconds
       @detail_throttle_seconds = detail_throttle_seconds
+      @on_request = on_request
     end
 
     def fetch_listings(known_external_ids: Set.new, reconciliation: false)
@@ -133,6 +136,7 @@ module Sources
           request[header] = value
         end
         request.body = request_body(page:, reconciliation:)
+        @on_request&.call
         http.request(request)
       end
     end
@@ -149,6 +153,7 @@ module Sources
         request = Net::HTTP::Get.new(uri)
         request["accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         request["user-agent"] = LEGACY_HEADERS[:"ic-user-agent"]
+        @on_request&.call
         http.request(request)
       end
     end

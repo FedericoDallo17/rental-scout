@@ -186,6 +186,28 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".listing-card", count: 1
   end
 
+  test "neighborhood filter uses the same canonical zones and aliases as saved searches" do
+    user = create_user!(email: "canonical-neighborhood-filter@example.com")
+    source = ListingSource.create!(name: "Canonical Source", adapter_key: "canonical_filter_source")
+    pocitos = create_zone("Pocitos", "pocitos", ["pocitos", "pocitos nuevo"], [[-56.17, -34.92], [-56.14, -34.92], [-56.14, -34.89], [-56.17, -34.89], [-56.17, -34.92]])
+    centro = create_zone("Centro", "centro", ["centro"], [[-56.21, -34.92], [-56.17, -34.92], [-56.17, -34.89], [-56.21, -34.89], [-56.21, -34.92]])
+    user.search_preferences.create!(name: "Both zones", location_query: "legacy", zones: [pocitos, centro])
+    Listing.create!(listing_source: source, title: "Pocitos canonical", canonical_url: "https://example.test/pocitos-canonical", source_neighborhood: "Pocitos", location_resolution_status: "fallback", in_scope: true)
+    Listing.create!(listing_source: source, title: "Pocitos Nuevo alias", canonical_url: "https://example.test/pocitos-nuevo-alias", source_neighborhood: "Pocitos", location_resolution_status: "spatial", coordinates: Zone::FACTORY.point(-56.16, -34.90), raw_payload: { source_neighborhood: "Pocitos Nuevo", source_city: "Montevideo" }, in_scope: true)
+    Listing.create!(listing_source: source, title: "Centro listing", canonical_url: "https://example.test/centro-canonical", source_neighborhood: "Centro", location_resolution_status: "fallback", in_scope: true)
+    sign_in user
+
+    get listings_path, params: { neighborhood: "pocitos" }
+
+    assert_response :success
+    assert_select "select[name='neighborhood'] option[value='pocitos']", text: "Pocitos"
+    assert_select "select[name='neighborhood'] option", text: "Pocitos Nuevo", count: 0
+    assert_includes response.body, "Pocitos canonical"
+    assert_includes response.body, "Pocitos Nuevo alias"
+    assert_select ".listing-card__location", text: "Pocitos Nuevo, Montevideo"
+    assert_not_includes response.body, "Centro listing"
+  end
+
   test "feed sorts by ascending price within currency" do
     user = create_user!(email: "feed-sorting@example.com")
     source = ListingSource.create!(name: "Sort Source", adapter_key: "feed_sort_source")
@@ -197,6 +219,61 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     get listings_path, params: { sort: "price_low", currency: "UYU" }
 
     assert_equal ["Lower", "Higher"], css_select(".listing-card h2").map { |node| node.text.strip }
+  end
+
+  test "feed filters by rent price range" do
+    user = create_user!(email: "rent-range@example.com")
+    source = ListingSource.create!(name: "Rent Range Source", adapter_key: "rent_range_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "Below range", canonical_url: "https://example.test/below-rent-range", location_text: "Pocitos", price_cents: 2_000_000, currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "Inside range", canonical_url: "https://example.test/inside-rent-range", location_text: "Pocitos", price_cents: 3_000_000, currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "Above range", canonical_url: "https://example.test/above-rent-range", location_text: "Pocitos", price_cents: 4_000_000, currency: "UYU", in_scope: true)
+    sign_in user
+
+    get listings_path, params: { currency: "UYU", cost_basis: "rent", min_price: "25000", max_price: "35000" }
+
+    assert_select ".listing-card h2", text: "Inside range"
+    assert_select ".listing-card", count: 1
+    assert_select "input[name='min_price'][value='25000']"
+    assert_select "input[name='max_price'][value='35000']"
+  end
+
+  test "feed filters by minimum bedrooms" do
+    user = create_user!(email: "bedroom-filter@example.com")
+    source = ListingSource.create!(name: "Bedroom Filter Source", adapter_key: "bedroom_filter_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "One bedroom", canonical_url: "https://example.test/one-bedroom-filter", location_text: "Pocitos", bedrooms: 1, in_scope: true)
+    Listing.create!(listing_source: source, title: "Two bedrooms", canonical_url: "https://example.test/two-bedroom-filter", location_text: "Pocitos", bedrooms: 2, in_scope: true)
+    Listing.create!(listing_source: source, title: "Three bedrooms", canonical_url: "https://example.test/three-bedroom-filter", location_text: "Pocitos", bedrooms: 3, in_scope: true)
+    Listing.create!(listing_source: source, title: "Bedrooms unknown", canonical_url: "https://example.test/unknown-bedroom-filter", location_text: "Pocitos", bedrooms: nil, in_scope: true)
+    sign_in user
+
+    get listings_path, params: { min_bedrooms: "2" }
+
+    assert_response :success
+    assert_includes response.body, "Two bedrooms"
+    assert_includes response.body, "Three bedrooms"
+    assert_not_includes response.body, "One bedroom"
+    assert_not_includes response.body, "Bedrooms unknown"
+    assert_select "select[name='min_bedrooms'] option[value='2'][selected='selected']"
+  end
+
+  test "feed filters by rent plus same-currency expenses" do
+    user = create_user!(email: "total-range@example.com")
+    source = ListingSource.create!(name: "Total Range Source", adapter_key: "total_range_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "Matching total", canonical_url: "https://example.test/matching-total-range", location_text: "Pocitos", price_cents: 3_000_000, currency: "UYU", expenses_cents: 500_000, expenses_currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "High total", canonical_url: "https://example.test/high-total-range", location_text: "Pocitos", price_cents: 3_400_000, currency: "UYU", expenses_cents: 700_000, expenses_currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "Unknown expenses", canonical_url: "https://example.test/unknown-total-range", location_text: "Pocitos", price_cents: 3_000_000, currency: "UYU", expenses_cents: nil, in_scope: true)
+    Listing.create!(listing_source: source, title: "Mismatched expenses", canonical_url: "https://example.test/mismatched-total-range", location_text: "Pocitos", price_cents: 3_000_000, currency: "UYU", expenses_cents: 100, expenses_currency: "USD", in_scope: true)
+    sign_in user
+
+    get listings_path, params: { currency: "UYU", cost_basis: "total", max_price: "38000" }
+
+    assert_select ".listing-card h2", text: "Matching total"
+    assert_select ".listing-card", count: 1
+    assert_select "input[name='include_expenses'][type='checkbox'][checked='checked']"
+    assert_select "input[name='currency'][value='UYU'][checked='checked']"
   end
 
   test "feed sorts known same-currency monthly totals before unknown totals" do
