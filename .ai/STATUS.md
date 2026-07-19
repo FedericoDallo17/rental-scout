@@ -51,6 +51,7 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 034 landed: source-local known IDs drive bounded recent pagination for Remax and Imperium; InfoCasas uses hourly publication windows; Housi stays single-page; weekly reconciliation scans deeper without notification fan-out (07-14)
 - Ticket 035 landed: Spanish Devise notices and errors cover sign-in, sign-out, registration, password, confirmation, and unlock flows without exposing missing-translation diagnostics (07-14)
 - Ticket 036 landed: admin-only inventory operations, user-isolated run history, persisted provider request counts, durable hourly/reconciliation run types, guarded maintenance actions, and structurally verified recurring schedules (07-19)
+- Ticket 036 follow-up: scraping runs abandoned for more than two hours are closed automatically instead of blocking maintenance forever (07-19)
 
 ## Doing
 - No roadmap ticket is currently in flight.

@@ -1,6 +1,7 @@
 module Scraping
   class RunOrchestrator
     def call(reconciliation: false)
+      ScrapingRun.close_abandoned!
       run = ScrapingRun.create!(status: "running", started_at: Time.current, reconciliation:)
       intake = ListingIntake.new
 

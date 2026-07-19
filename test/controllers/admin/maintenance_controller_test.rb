@@ -42,6 +42,20 @@ class Admin::MaintenanceControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_root_path
   end
 
+  test "closes an abandoned run and queues a new scrape" do
+    sign_in create_admin!
+    stale_run = ScrapingRun.create!(status: "running", started_at: 3.hours.ago)
+
+    assert_enqueued_with(job: RunScrapersJob) do
+      post admin_maintenance_path, params: { maintenance: { operation: "scrape" } }
+    end
+
+    assert_redirected_to admin_root_path
+    assert_equal "failed", stale_run.reload.status
+    assert_predicate stale_run.finished_at, :present?
+    assert_match(/maximum run time/, stale_run.error_message)
+  end
+
   test "normal user cannot queue maintenance" do
     user = create_admin!(email: "normal-maintenance@example.com", admin: false)
     sign_in user

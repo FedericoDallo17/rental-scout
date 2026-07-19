@@ -7,7 +7,7 @@ Give administrators enough durable evidence and safe controls to understand and 
 - Persist whether each scrape run is hourly acquisition or reconciliation and show it in the admin run history.
 - Persist third-party request counts per source run and lifetime source, including coordinate-backfill requests.
 - Load and verify hourly, weekly reconciliation, purge, and coordinate-backfill recurring configuration in every environment.
-- Let admins safely enqueue acquisition, reconciliation, purge, and coordinate backfill; reject overlapping scrape runs.
+- Let admins safely enqueue acquisition, reconciliation, purge, and coordinate backfill; reject overlapping scrape runs and automatically close runs abandoned for more than two hours.
 - Keep provider controls, inventory location diagnostics, and all maintenance operations inaccessible to non-admin users.
 - Cover diagnostics, authorization, request tracking, recurring configuration, and run types with tests.
 
