@@ -1,0 +1,73 @@
+# Replace the example values before the first deployment.
+service: rental-scout-lite
+image: federicodallo17/rental-scout-lite
+
+servers:
+  web:
+    - 167.233.115.254
+  job:
+    hosts:
+      - 167.233.115.254
+    cmd: bin/jobs
+
+proxy:
+  ssl: false
+  app_port: 3000
+  healthcheck:
+    path: /up
+    interval: 10
+    timeout: 5
+
+registry:
+  server: ghcr.io
+  username: FedericoDallo17
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+
+volumes:
+  - /var/backups/rental-scout-lite:/rails/backups
+
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: "true"
+    RAILS_SERVE_STATIC_FILES: "true"
+    RAILS_ASSUME_SSL: "false"
+    RAILS_FORCE_SSL: "false"
+    APP_PROTOCOL: http
+    APP_HOST: 167.233.115.254
+    MAIL_FROM: notifications@example.com
+    DB_HOST: rental-scout-lite-db
+    DB_PORT: "5432"
+    DB_USER: rental_scout_lite
+    RAILS_MAX_THREADS: "3"
+    WEB_CONCURRENCY: "1"
+    JOB_CONCURRENCY: "1"
+    RAILS_LOG_LEVEL: info
+  secret:
+    - RAILS_MASTER_KEY
+    - DB_PASSWORD
+
+accessories:
+  db:
+    image: postgis/postgis:16-3.5
+    host: 167.233.115.254
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_USER: rental_scout_lite
+        POSTGRES_DB: rental_scout_lite_production
+      secret:
+        - POSTGRES_PASSWORD
+    files:
+      - config/postgres/init-production.sql:/docker-entrypoint-initdb.d/10-init-production.sql
+    directories:
+      - rental_scout_postgres:/var/lib/postgresql/data
+
+ssh:
+  user: deploy
+
+retain_containers: 3

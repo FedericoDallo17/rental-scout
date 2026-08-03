@@ -1,0 +1,28 @@
+#!/bin/bash -e
+
+backup_dir="${BACKUP_DIR:-/rails/backups}"
+retention_days="${BACKUP_RETENTION_DAYS:-7}"
+timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+databases=(
+  rental_scout_lite_production
+  rental_scout_lite_production_cache
+  rental_scout_lite_production_queue
+  rental_scout_lite_production_cable
+)
+
+mkdir -p "$backup_dir"
+export PGPASSWORD="${DB_PASSWORD:?DB_PASSWORD is required}"
+
+for database in "${databases[@]}"; do
+  pg_dump \
+    --host="${DB_HOST:?DB_HOST is required}" \
+    --port="${DB_PORT:-5432}" \
+    --username="${DB_USER:-rental_scout_lite}" \
+    --format=custom \
+    --file="$backup_dir/${database}_${timestamp}.dump" \
+    "$database"
+done
+
+find "$backup_dir" -type f -name 'rental_scout_lite_production*.dump' -mtime "+$retention_days" -delete
+
+echo "Database backup completed at $timestamp"

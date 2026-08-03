@@ -98,8 +98,10 @@ production:
   primary: &primary_production
     <<: *default
     database: rental_scout_lite_production
-    username: rental_scout_lite
-    password: <%= ENV["RENTAL_SCOUT_LITE_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST", "127.0.0.1") %>
+    port: <%= ENV.fetch("DB_PORT", 5432) %>
+    username: <%= ENV.fetch("DB_USER", "rental_scout_lite") %>
+    password: <%= ENV["DB_PASSWORD"] %>
   cache:
     <<: *primary_production
     database: rental_scout_lite_production_cache
