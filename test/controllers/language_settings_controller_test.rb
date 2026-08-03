@@ -1,6 +1,34 @@
 require "test_helper"
 
 class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
+  test "guest browser language selects Spanish sign-in page" do
+    get new_user_session_path, headers: { "Accept-Language" => "es-UY,es;q=0.9,en;q=0.8" }
+
+    assert_response :success
+    assert_select "html[lang='es']"
+    assert_select ".auth-title", text: "Iniciar sesión"
+    assert_select ".app-language__button--active", text: "ES"
+  end
+
+  test "guest language switch persists and overrides browser language" do
+    patch language_settings_path, params: { locale: "en" },
+      headers: { "HTTP_REFERER" => new_user_session_url }
+
+    assert_redirected_to new_user_session_url
+    assert_equal "en", cookies[:locale]
+
+    get new_user_session_path, headers: { "Accept-Language" => "es-UY,es;q=0.9" }
+    assert_select "html[lang='en']"
+    assert_select ".auth-title", text: "Sign in"
+  end
+
+  test "guest cannot persist an unsupported locale" do
+    patch language_settings_path, params: { locale: "fr" }
+
+    assert_response :unprocessable_entity
+    assert_nil cookies[:locale]
+  end
+
   test "user switches to Spanish and subsequent pages use the persisted locale" do
     user = create_user!("spanish@example.com")
     sign_in user
@@ -9,6 +37,7 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to root_path
     assert_equal "es", user.reload.locale
+    assert_equal "es", cookies[:locale]
     follow_redirect!
     assert_select "html[lang='es']"
     assert_includes response.body, "Búsquedas guardadas"

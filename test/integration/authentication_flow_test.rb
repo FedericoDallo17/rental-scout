@@ -39,6 +39,26 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'name="user[first_name]"'
     assert_includes response.body, 'name="user[last_name]"'
     assert_includes response.body, 'name="user[pushover_user_key]"'
+    assert_select "input[name='user[locale]'][type='hidden'][value='en']", count: 1
+  end
+
+  test "Spanish signup inherits the public language choice" do
+    patch language_settings_path, params: { locale: "es" }
+
+    post user_registration_path, params: {
+      user: {
+        first_name: "Idioma",
+        last_name: "Español",
+        email: "spanish-signup@example.com",
+        password: "password123",
+        password_confirmation: "password123",
+        locale: "es"
+      }
+    }
+
+    assert_equal "es", User.find_by!(email: "spanish-signup@example.com").locale
+    follow_redirect!
+    assert_select "html[lang='es']"
   end
 
   test "password reset pages render the shared auth shell" do

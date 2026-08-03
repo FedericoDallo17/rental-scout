@@ -1,0 +1,9 @@
+<div class="app-language" aria-label="<%= t("nav.language") %>">
+  <% User::SUPPORTED_LOCALES.each do |locale| %>
+    <%= button_to locale.upcase, language_settings_path,
+      method: :patch, params: { locale: locale },
+      form: { data: { turbo: false } },
+      class: ["app-language__button", ("app-language__button--active" if I18n.locale.to_s == locale)],
+      aria: { pressed: I18n.locale.to_s == locale } %>
+  <% end %>
+</div>

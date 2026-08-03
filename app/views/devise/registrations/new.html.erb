@@ -1,47 +1,48 @@
 <div class="auth-header">
-  <h1 class="auth-title">Create account</h1>
-  <p class="auth-copy">Create your account to start tracking rental opportunities privately.</p>
+  <h1 class="auth-title"><%= t("auth.sign_up.title") %></h1>
+  <p class="auth-copy"><%= t("auth.sign_up.copy") %></p>
 </div>
 
 <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "auth-form" }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
+  <%= f.hidden_field :locale, value: I18n.locale %>
 
   <div class="auth-field">
-    <%= f.label :first_name %>
+    <%= f.label :first_name, t("auth.fields.first_name") %>
     <%= f.text_field :first_name, autofocus: true, autocomplete: "given-name" %>
   </div>
 
   <div class="auth-field">
-    <%= f.label :last_name %>
+    <%= f.label :last_name, t("auth.fields.last_name") %>
     <%= f.text_field :last_name, autocomplete: "family-name" %>
   </div>
 
   <div class="auth-field">
-    <%= f.label :email %>
+    <%= f.label :email, t("auth.fields.email") %>
     <%= f.email_field :email, autocomplete: "email" %>
   </div>
 
   <div class="auth-field">
     <div class="auth-field__label-row">
-      <%= f.label :password %>
+      <%= f.label :password, t("auth.fields.password") %>
       <% if @minimum_password_length %>
-        <span class="auth-hint"><%= @minimum_password_length %> characters minimum</span>
+        <span class="auth-hint"><%= t("auth.fields.minimum_characters", count: @minimum_password_length) %></span>
       <% end %>
     </div>
     <%= f.password_field :password, autocomplete: "new-password" %>
   </div>
 
   <div class="auth-field">
-    <%= f.label :password_confirmation %>
+    <%= f.label :password_confirmation, t("auth.fields.password_confirmation") %>
     <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
   </div>
 
   <div class="auth-field">
-    <%= f.label :pushover_user_key %>
+    <%= f.label :pushover_user_key, t("auth.fields.pushover_key") %>
     <%= f.text_field :pushover_user_key %>
   </div>
 
-  <%= f.button "Create account", class: "auth-submit" %>
+  <%= f.button t("auth.sign_up.submit"), class: "auth-submit" %>
 <% end %>
 
 <%= render "devise/shared/links" %>

@@ -667,12 +667,20 @@ button {
 }
 
 .auth-brand {
-  margin-bottom: 1rem;
+  margin: 0;
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+.auth-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .auth-header {

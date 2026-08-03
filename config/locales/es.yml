@@ -1,4 +1,35 @@
 es:
+  auth:
+    fields:
+      first_name: "Nombre"
+      last_name: "Apellido"
+      email: "Correo electrónico"
+      password: "Contraseña"
+      password_confirmation: "Confirmar contraseña"
+      pushover_key: "Clave de usuario de Pushover"
+      minimum_characters: "Mínimo %{count} caracteres"
+    sign_in:
+      title: "Iniciar sesión"
+      copy: "Iniciá sesión para continuar a tu espacio privado de búsqueda de alquileres."
+      remember: "Recordarme"
+      submit: "Iniciar sesión"
+    sign_up:
+      title: "Crear cuenta"
+      copy: "Creá tu cuenta para empezar a seguir oportunidades de alquiler de forma privada."
+      submit: "Crear cuenta"
+    password:
+      forgot_title: "¿Olvidaste tu contraseña?"
+      forgot_copy: "Ingresá tu correo y te enviaremos instrucciones para restablecerla."
+      send_instructions: "Enviar instrucciones"
+      change_title: "Cambiar tu contraseña"
+      change_copy: "Elegí una nueva contraseña para tu cuenta."
+      new_password: "Nueva contraseña"
+      confirm_new_password: "Confirmar nueva contraseña"
+      change_submit: "Cambiar contraseña"
+    links:
+      sign_in: "Iniciar sesión"
+      sign_up: "Crear cuenta"
+      forgot_password: "¿Olvidaste tu contraseña?"
   admin:
     current_run:
       eyebrow: Scraping actual

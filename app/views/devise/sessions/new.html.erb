@@ -1,27 +1,27 @@
 <div class="auth-header">
-  <h1 class="auth-title">Sign in</h1>
-  <p class="auth-copy">Sign in to continue to your private rental scouting workspace.</p>
+  <h1 class="auth-title"><%= t("auth.sign_in.title") %></h1>
+  <p class="auth-copy"><%= t("auth.sign_in.copy") %></p>
 </div>
 
 <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "auth-form" }) do |f| %>
   <div class="auth-field">
-    <%= f.label :email %>
+    <%= f.label :email, t("auth.fields.email") %>
     <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
   </div>
 
   <div class="auth-field">
-    <%= f.label :password %>
+    <%= f.label :password, t("auth.fields.password") %>
     <%= f.password_field :password, autocomplete: "current-password" %>
   </div>
 
   <% if devise_mapping.rememberable? %>
     <label class="auth-checkbox-row">
       <%= f.check_box :remember_me %>
-      <span>Remember me</span>
+      <span><%= t("auth.sign_in.remember") %></span>
     </label>
   <% end %>
 
-  <%= f.button "Sign in", class: "auth-submit" %>
+  <%= f.button t("auth.sign_in.submit"), class: "auth-submit" %>
 <% end %>
 
 <%= render "devise/shared/links" %>

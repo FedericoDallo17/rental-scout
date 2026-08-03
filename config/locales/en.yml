@@ -1,4 +1,35 @@
 en:
+  auth:
+    fields:
+      first_name: "First name"
+      last_name: "Last name"
+      email: "Email"
+      password: "Password"
+      password_confirmation: "Password confirmation"
+      pushover_key: "Pushover user key"
+      minimum_characters: "%{count} characters minimum"
+    sign_in:
+      title: "Sign in"
+      copy: "Sign in to continue to your private rental scouting workspace."
+      remember: "Remember me"
+      submit: "Sign in"
+    sign_up:
+      title: "Create account"
+      copy: "Create your account to start tracking rental opportunities privately."
+      submit: "Create account"
+    password:
+      forgot_title: "Forgot your password?"
+      forgot_copy: "Enter your email and we'll send password reset instructions."
+      send_instructions: "Send reset instructions"
+      change_title: "Change your password"
+      change_copy: "Set a new password for your account."
+      new_password: "New password"
+      confirm_new_password: "Confirm new password"
+      change_submit: "Change password"
+    links:
+      sign_in: "Log in"
+      sign_up: "Sign up"
+      forgot_password: "Forgot your password?"
   admin:
     current_run:
       eyebrow: Current scrape

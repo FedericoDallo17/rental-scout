@@ -31,13 +31,7 @@
             <%= link_to t("nav.admin"), admin_root_path, class: "app-nav__link" %>
           <% end %>
           <%= link_to t("nav.notifications"), edit_notification_settings_path, class: "app-nav__link" %>
-          <div class="app-language" aria-label="<%= t("nav.language") %>">
-            <% User::SUPPORTED_LOCALES.each do |locale| %>
-              <%= button_to locale.upcase, language_settings_path,
-                method: :patch, params: { locale: locale },
-                class: ["app-language__button", ("app-language__button--active" if current_user.locale == locale)] %>
-            <% end %>
-          </div>
+          <%= render "layouts/language_switcher" %>
           <span class="app-user__email"><%= current_user.email %></span>
             <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, form_class: "app-sign-out", class: "app-sign-out__button" %>
           </div>
@@ -52,7 +46,10 @@
     <% else %>
       <main class="auth-shell">
         <section class="auth-card">
-          <div class="auth-brand">Rental Scout Lite</div>
+          <div class="auth-card__topline">
+            <div class="auth-brand">Rental Scout Lite</div>
+            <%= render "layouts/language_switcher" %>
+          </div>
 
           <% flash.each do |key, message| %>
             <p class="flash auth-flash flash--<%= key %>"><%= message %></p>
