@@ -28,7 +28,12 @@ RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 FROM base
 
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libpq5 postgresql-client && \
+    apt-get install --no-install-recommends -y ca-certificates curl libjemalloc2 libpq5 && \
+    install -d /usr/share/postgresql-common/pgdg && \
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc && \
+    echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    apt-get update -qq && \
+    apt-get install --no-install-recommends -y postgresql-client-16 && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"

@@ -12,15 +12,20 @@ databases=(
 
 mkdir -p "$backup_dir"
 export PGPASSWORD="${DB_PASSWORD:?DB_PASSWORD is required}"
+temporary=""
+trap 'if [ -n "$temporary" ]; then rm -f "$temporary"; fi' ERR
 
 for database in "${databases[@]}"; do
+  destination="$backup_dir/${database}_${timestamp}.dump"
+  temporary="$destination.tmp"
   pg_dump \
     --host="${DB_HOST:?DB_HOST is required}" \
     --port="${DB_PORT:-5432}" \
     --username="${DB_USER:-rental_scout_lite}" \
     --format=custom \
-    --file="$backup_dir/${database}_${timestamp}.dump" \
+    --file="$temporary" \
     "$database"
+  mv "$temporary" "$destination"
 done
 
 find "$backup_dir" -type f -name 'rental_scout_lite_production*.dump' -mtime "+$retention_days" -delete
