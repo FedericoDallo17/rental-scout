@@ -27,6 +27,8 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='search_preference[price_currency]'][value='USD']"
     assert_select "select[name='search_preference[min_bedrooms]']"
     assert_select "input[name='search_preference[include_expenses]'][type='checkbox']"
+    assert_select "input[name='search_preference[notifications_enabled]'][type='checkbox'][checked='checked']"
+    assert_includes response.body, %q(form.querySelector("[name='search_preference[notifications_enabled]'][type='checkbox']").checked)
     assert_select ".search-form__zones label", text: /Pocitos/
   end
 
@@ -76,6 +78,28 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_includes response.body, "could not be saved"
+  end
+
+  test "validation errors use the user's language and friendly field labels" do
+    user = create_user!(email: "invalid-search-es@example.com")
+    user.update!(locale: "es")
+    sign_in user
+
+    post search_preferences_path, params: {
+      search_preference: {
+        name: "",
+        location_query: "",
+        zone_ids: []
+      }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select ".form-errors" do
+      assert_select "h2", text: "No se pudo guardar la búsqueda"
+      assert_select "li", text: "Nombre de la búsqueda no puede estar vacío"
+      assert_select "li", text: "Nota de ubicación no puede estar vacío"
+    end
+    assert_not_includes response.body, "Location query"
   end
 
   test "signed in user edits own saved search" do

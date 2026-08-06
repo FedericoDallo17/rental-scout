@@ -1524,6 +1524,17 @@ button {
   line-height: 1.55;
 }
 
+.notification-settings__resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.notification-settings__resources a {
+  color: var(--accent-deep);
+  font-weight: 800;
+}
+
 .notification-settings__status {
   display: grid;
   gap: 0.25rem;

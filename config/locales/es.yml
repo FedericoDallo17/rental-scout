@@ -1,4 +1,21 @@
 es:
+  errors:
+    messages:
+      blank: "no puede estar vacío"
+      inclusion: "no es una opción válida"
+      required: "es obligatorio"
+  activerecord:
+    attributes:
+      search_preference:
+        name: "Nombre de la búsqueda"
+        location_query: "Nota de ubicación"
+        price_currency: "Moneda del precio"
+        min_price: "Precio mínimo"
+        max_price: "Precio máximo"
+        min_bedrooms: "Dormitorios mínimos"
+        include_expenses: "Incluir gastos comunes"
+        notifications_enabled: "Notificaciones de nuevas coincidencias"
+        zones: "Barrios"
   auth:
     fields:
       first_name: "Nombre"
@@ -305,13 +322,17 @@ es:
   notifications:
     account: "Cuenta"
     title: "Configuración de notificaciones"
-    intro: "Agregá tu clave de usuario de Pushover para recibir nuevas coincidencias de búsquedas con notificaciones activas."
+    intro: "Recibí alertas instantáneas de nuevas coincidencias en tu teléfono con Pushover, una aplicación externa de notificaciones."
+    setup_copy: "Instalá Pushover, creá una cuenta y pegá aquí tu clave. Rental Scout la usa únicamente para enviarte alertas de propiedades que coincidan con tus búsquedas. Pushover tiene sus propios precios y términos de privacidad."
+    resources: "Ayuda sobre Pushover"
+    learn_more: "¿Qué es Pushover?"
+    get_key: "Obtener mi clave de Pushover"
     ready: "Lista"
     setup_needed: "Requiere configuración"
     configured: "Hay una clave de Pushover configurada."
     not_configured: "No hay una clave de Pushover configurada."
-    replace_key: "Reemplazar clave de usuario de Pushover"
-    key: "Clave de usuario de Pushover"
+    replace_key: "Reemplazar clave de Pushover"
+    key: "Clave de Pushover"
     blank_hint: "Dejá el campo vacío para conservar la clave configurada."
     remove: "Eliminar clave"
     remove_title: "Eliminar clave de Pushover"

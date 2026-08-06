@@ -5,6 +5,11 @@
     <p class="notification-settings__intro">
       <%= t("notifications.intro") %>
     </p>
+    <p class="notification-settings__intro"><%= t("notifications.setup_copy") %></p>
+    <nav class="notification-settings__resources" aria-label="<%= t("notifications.resources") %>">
+      <%= link_to t("notifications.learn_more"), "https://pushover.net/", target: "_blank", rel: "noopener noreferrer" %>
+      <%= link_to t("notifications.get_key"), "https://pushover.net/login", target: "_blank", rel: "noopener noreferrer" %>
+    </nav>
 
     <div class="notification-settings__status notification-settings__status--<%= current_user.pushover_user_key.present? ? "ready" : "missing" %>">
       <strong><%= current_user.pushover_user_key.present? ? t("notifications.ready") : t("notifications.setup_needed") %></strong>

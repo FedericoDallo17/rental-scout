@@ -126,7 +126,7 @@
       const includesExpenses = form.querySelector("[name='search_preference[include_expenses]']").checked;
       price.textContent = includesExpenses && (min || max) ? `${range} · ${<%= t("searches.expenses_included_short").to_json.html_safe %>}` : range;
 
-      const notify = form.querySelector("[name='search_preference[notifications_enabled]']").checked;
+      const notify = form.querySelector("[name='search_preference[notifications_enabled]'][type='checkbox']").checked;
       notifications.textContent = notify ? facts.dataset.notificationsOn : facts.dataset.notificationsOff;
     };
 

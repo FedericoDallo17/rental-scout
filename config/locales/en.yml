@@ -1,4 +1,16 @@
 en:
+  activerecord:
+    attributes:
+      search_preference:
+        name: "Search name"
+        location_query: "Location note"
+        price_currency: "Price currency"
+        min_price: "Minimum price"
+        max_price: "Maximum price"
+        min_bedrooms: "Minimum bedrooms"
+        include_expenses: "Include common expenses"
+        notifications_enabled: "New-match notifications"
+        zones: "Neighborhoods"
   auth:
     fields:
       first_name: "First name"
@@ -297,13 +309,17 @@ en:
   notifications:
     account: "Account"
     title: "Notification settings"
-    intro: "Add your Pushover user key to receive new matches from searches with notifications enabled."
+    intro: "Get instant new-match alerts on your phone with Pushover, a third-party notification app."
+    setup_copy: "Install Pushover, create an account, then paste your key here. Rental Scout uses it only to send alerts for your matching listings. Pushover has its own pricing and privacy terms."
+    resources: "Pushover help"
+    learn_more: "What is Pushover?"
+    get_key: "Get my Pushover key"
     ready: "Ready"
     setup_needed: "Setup needed"
     configured: "A Pushover key is configured."
     not_configured: "No Pushover key is configured."
-    replace_key: "Replace Pushover user key"
-    key: "Pushover user key"
+    replace_key: "Replace Pushover key"
+    key: "Pushover key"
     blank_hint: "Leave blank to keep the currently configured key."
     remove: "Remove key"
     remove_title: "Remove Pushover key"

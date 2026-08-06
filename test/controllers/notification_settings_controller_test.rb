@@ -24,10 +24,31 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".notification-settings__status", text: /Ready/
+    assert_select ".notification-settings__intro", text: /third-party notification app/
+    assert_select ".notification-settings__resources[aria-label='Pushover help']" do
+      assert_select "a[href='https://pushover.net/'][target='_blank']", text: "What is Pushover?"
+      assert_select "a[href='https://pushover.net/login'][target='_blank']", text: "Get my Pushover key"
+    end
+    assert_select "label", text: "Replace Pushover key"
     assert_select "input[name='user[pushover_user_key]'][type='password'][value]", count: 0
     assert_select "form[action='#{notification_settings_path}'] button.notification-settings__remove-button", text: "Remove key"
     assert_select "button.notification-settings__remove-button[data-turbo-confirm]"
     assert_no_match "secret-user-key", response.body
+  end
+
+  test "explains Pushover setup in the user's language" do
+    user = create_user!(email: "settings-es@example.com")
+    user.update!(locale: "es")
+    sign_in user
+
+    get edit_notification_settings_path
+
+    assert_response :success
+    assert_select ".notification-settings__intro", text: /aplicación externa de notificaciones/
+    assert_select ".notification-settings__intro", text: /Instalá Pushover, creá una cuenta/
+    assert_select "label", text: "Clave de Pushover"
+    assert_select "a[href='https://pushover.net/']", text: "¿Qué es Pushover?"
+    assert_select "a[href='https://pushover.net/login']", text: "Obtener mi clave de Pushover"
   end
 
   test "updates only the signed in user's key" do
