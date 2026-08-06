@@ -1717,3 +1717,311 @@ button {
     gap: 0.35rem;
   }
 }
+
+/* Phone layout: keep every surface within the viewport and make primary
+   actions comfortably tappable. This block intentionally comes last so it
+   can tighten responsive rules shared by the feed and account screens. */
+@media (max-width: 720px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .app-header {
+    position: static;
+    padding: 0.5rem;
+  }
+
+  .app-nav {
+    gap: 0.65rem;
+    padding: 0.7rem;
+    border-radius: 18px;
+  }
+
+  .app-nav__brand {
+    padding-inline: 0.15rem;
+    font-size: 0.86rem;
+  }
+
+  .app-user {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .app-nav__link,
+  .app-sign-out__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.55rem 0.65rem;
+    text-align: center;
+  }
+
+  .app-language {
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+
+  .app-language__button {
+    min-width: 2.5rem;
+    min-height: 2.25rem;
+  }
+
+  .app-user__email {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding: 0 0.2rem;
+    font-size: 0.78rem;
+    text-align: center;
+  }
+
+  .app-sign-out,
+  .app-sign-out__button {
+    width: 100%;
+  }
+
+  .feed-layout,
+  .runs-page,
+  .search-form-page,
+  .notification-settings {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 0.75rem;
+  }
+
+  .feed-layout {
+    gap: 1rem;
+  }
+
+  .search-sidebar,
+  .feed-controls,
+  .listing-card,
+  .feed-empty-state,
+  .run-card,
+  .source-controls,
+  .search-form,
+  .search-form-danger,
+  .search-form-aside,
+  .notification-settings__panel,
+  .notification-settings__aside {
+    border-radius: 18px;
+  }
+
+  .search-sidebar {
+    padding: 1rem;
+  }
+
+  .search-sidebar__copy {
+    margin-bottom: 1rem;
+  }
+
+  .search-sidebar__nav {
+    display: flex;
+    gap: 0.6rem;
+    margin-inline: -1rem;
+    padding: 0 1rem 0.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .search-sidebar__item {
+    flex: 0 0 min(15rem, 82vw);
+    scroll-snap-align: start;
+  }
+
+  .feed-header {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .feed-header h1,
+  .runs-header h1,
+  .search-form-header h1,
+  .notification-settings h1 {
+    font-size: clamp(1.65rem, 8vw, 2.1rem);
+    line-height: 1.1;
+  }
+
+  .feed-header__count,
+  .runs-header__count {
+    align-self: flex-start;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .feed-controls,
+  .source-controls,
+  .run-card,
+  .search-form,
+  .search-form-danger,
+  .notification-settings__panel,
+  .notification-settings__aside {
+    padding: 1rem;
+  }
+
+  .feed-controls__field select,
+  .feed-price-filter__range input,
+  .search-form__field select,
+  .search-form__field input,
+  .notification-settings__field input {
+    min-height: 3rem;
+    font-size: 1rem;
+  }
+
+  .feed-price-filter {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .feed-price-filter__currency {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .search-form__price-filter .feed-price-filter__currency {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .feed-price-filter__currency label {
+    display: grid;
+    place-items: center;
+    min-height: 2.8rem;
+    min-width: 0;
+    padding-inline: 0.4rem;
+  }
+
+  .feed-controls__actions,
+  .search-form__actions,
+  .notification-settings__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .feed-controls__submit,
+  .feed-controls__clear,
+  .search-form__submit,
+  .search-form__cancel,
+  .notification-settings__submit,
+  .notification-settings__cancel {
+    min-height: 2.8rem;
+    text-align: center;
+  }
+
+  .listing-card__body {
+    padding: 1rem;
+  }
+
+  .listing-card__summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .listing-card h2,
+  .listing-card__explanation,
+  .listing-card__location,
+  .listing-card__url {
+    min-height: 0;
+  }
+
+  .listing-card__location {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .listing-card__facts {
+    gap: 0.5rem;
+  }
+
+  .listing-card__facts div {
+    min-width: 0;
+    padding: 0.65rem;
+  }
+
+  .listing-card__facts dd,
+  .source-run__meta,
+  .source-run__timeline,
+  .run-card h2 {
+    overflow-wrap: anywhere;
+  }
+
+  .runs-header__tools {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .runs-header__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .source-controls__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .source-control-card,
+  .source-run {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .source-control-card__actions {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .location-quality-table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .auth-body {
+    place-items: start center;
+    padding: 0.75rem;
+  }
+
+  .auth-card {
+    padding: 1.25rem;
+    border-radius: 20px;
+  }
+
+  .auth-card__topline {
+    align-items: flex-start;
+  }
+
+  .delete-confirmation__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .delete-confirmation__actions > *,
+  .delete-confirmation__actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 390px) {
+  .app-user {
+    grid-template-columns: 1fr;
+  }
+
+  .app-user__email {
+    grid-column: 1;
+  }
+
+  .listing-card__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .listing-card__facts .listing-card__fact--source {
+    grid-column: auto;
+  }
+}
