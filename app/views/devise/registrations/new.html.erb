@@ -37,11 +37,6 @@
     <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
   </div>
 
-  <div class="auth-field">
-    <%= f.label :pushover_user_key, t("auth.fields.pushover_key") %>
-    <%= f.text_field :pushover_user_key %>
-  </div>
-
   <%= f.button t("auth.sign_up.submit"), class: "auth-submit" %>
 <% end %>
 

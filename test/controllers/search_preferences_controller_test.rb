@@ -29,7 +29,22 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='search_preference[include_expenses]'][type='checkbox']"
     assert_select "input[name='search_preference[notifications_enabled]'][type='checkbox'][checked='checked']"
     assert_includes response.body, %q(form.querySelector("[name='search_preference[notifications_enabled]'][type='checkbox']").checked)
+    assert_select "[data-search-notification-warning]:not([hidden])", text: /phone notifications aren't connected yet/
+    assert_select "[data-search-notification-warning] a[href='#{edit_notification_settings_path}']", text: "Connect phone notifications"
+    assert_includes response.body, 'notificationWarning.hidden = !notify || root.dataset.phoneNotificationsConfigured === "true"'
     assert_select ".search-form__zones label", text: /Pocitos/
+  end
+
+  test "new search hides the setup warning when phone notifications are connected" do
+    user = create_user!(email: "search-form-notifications@example.com")
+    user.update!(pushover_user_key: "configured-key")
+    sign_in user
+
+    get new_search_preference_path
+
+    assert_response :success
+    assert_select "[data-phone-notifications-configured='true']"
+    assert_select "[data-search-notification-warning][hidden]"
   end
 
   test "signed in user creates saved search with zones" do

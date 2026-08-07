@@ -6,7 +6,9 @@ Rails.application.routes.draw do
   resources :listings, only: [:index]
   resources :scraping_runs, only: [:index, :show]
   resources :search_preferences, except: [:index, :show]
-  resource :notification_settings, only: [:edit, :update, :destroy]
+  resource :notification_settings, only: [:edit, :update, :destroy] do
+    post :test_delivery
+  end
   resource :language_settings, only: [:update]
 
   namespace :admin do

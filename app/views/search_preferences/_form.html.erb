@@ -1,4 +1,4 @@
-<div class="search-form-shell" data-search-preview-root>
+<div class="search-form-shell" data-search-preview-root data-phone-notifications-configured="<%= current_user.pushover_user_key.present? %>">
   <%= form_with model: search_preference, class: "search-form search-form-panel" do |form| %>
     <% if search_preference.errors.any? %>
       <div class="form-errors">
@@ -70,6 +70,12 @@
       <%= form.check_box :notifications_enabled %>
       <span><%= t("searches.notify") %></span>
     </label>
+    <p class="search-form__notification-warning"
+      data-search-notification-warning
+      <%= "hidden" unless search_preference.notifications_enabled? && current_user.pushover_user_key.blank? %>>
+      <%= t("searches.notification_setup_warning") %>
+      <%= link_to t("searches.connect_phone_notifications"), edit_notification_settings_path %>
+    </p>
 
     <div class="search-form__actions">
       <%= form.submit search_preference.persisted? ? t("searches.save") : t("searches.create"), class: "search-form__submit" %>
@@ -107,6 +113,7 @@
     const bedrooms = root.querySelector("[data-search-preview-bedrooms]");
     const price = root.querySelector("[data-search-preview-price]");
     const notifications = root.querySelector("[data-search-preview-notifications]");
+    const notificationWarning = root.querySelector("[data-search-notification-warning]");
 
     const update = () => {
       const name = form.querySelector("[name='search_preference[name]']").value.trim();
@@ -128,6 +135,7 @@
 
       const notify = form.querySelector("[name='search_preference[notifications_enabled]'][type='checkbox']").checked;
       notifications.textContent = notify ? facts.dataset.notificationsOn : facts.dataset.notificationsOff;
+      notificationWarning.hidden = !notify || root.dataset.phoneNotificationsConfigured === "true";
     };
 
     form.addEventListener("input", update);

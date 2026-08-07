@@ -2,34 +2,53 @@
   <section class="notification-settings__panel">
     <p class="notification-settings__eyebrow"><%= t("notifications.account") %></p>
     <h1><%= t("notifications.title") %></h1>
-    <p class="notification-settings__intro">
-      <%= t("notifications.intro") %>
-    </p>
-    <p class="notification-settings__intro"><%= t("notifications.setup_copy") %></p>
-    <nav class="notification-settings__resources" aria-label="<%= t("notifications.resources") %>">
-      <%= link_to t("notifications.learn_more"), "https://pushover.net/", target: "_blank", rel: "noopener noreferrer" %>
-      <%= link_to t("notifications.get_key"), "https://pushover.net/login", target: "_blank", rel: "noopener noreferrer" %>
-    </nav>
+    <p class="notification-settings__intro"><%= t("notifications.intro") %></p>
 
     <div class="notification-settings__status notification-settings__status--<%= current_user.pushover_user_key.present? ? "ready" : "missing" %>">
       <strong><%= current_user.pushover_user_key.present? ? t("notifications.ready") : t("notifications.setup_needed") %></strong>
       <span><%= current_user.pushover_user_key.present? ? t("notifications.configured") : t("notifications.not_configured") %></span>
     </div>
 
-    <%= form_with url: notification_settings_path, method: :patch, scope: :user, class: "notification-settings__form" do |form| %>
-      <div class="notification-settings__field">
-        <%= form.label :pushover_user_key, current_user.pushover_user_key.present? ? t("notifications.replace_key") : t("notifications.key") %>
-        <%= form.password_field :pushover_user_key, value: nil, autocomplete: "off", spellcheck: false %>
-        <p><%= t("notifications.blank_hint") %></p>
-      </div>
-
-      <div class="notification-settings__actions">
-        <%= form.submit t("notifications.save"), class: "notification-settings__submit" %>
-        <%= link_to t("notifications.back"), listings_path, class: "notification-settings__cancel" %>
-      </div>
-    <% end %>
+    <section class="notification-settings__searches" aria-labelledby="notification-searches-title">
+      <h2 id="notification-searches-title"><%= t("notifications.searches_title") %></h2>
+      <p><%= t("notifications.searches_count", count: @notification_searches.size) %></p>
+      <% if @notification_searches.any? %>
+        <ul>
+          <% @notification_searches.each do |search| %>
+            <li><%= link_to search.name, edit_search_preference_path(search) %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p><%= t("notifications.no_enabled_searches") %></p>
+        <%= link_to t("notifications.create_search"), new_search_preference_path, class: "notification-settings__inline-link" %>
+      <% end %>
+    </section>
 
     <% if current_user.pushover_user_key.present? %>
+      <div class="notification-settings__connected-actions">
+        <%= button_to t("notifications.send_test"), test_delivery_notification_settings_path,
+          method: :post,
+          class: "notification-settings__submit" %>
+        <%= link_to t("notifications.back"), listings_path, class: "notification-settings__cancel" %>
+      </div>
+
+      <details class="notification-settings__disclosure">
+        <summary><%= t("notifications.replace_key") %></summary>
+        <%= form_with url: notification_settings_path, method: :patch, scope: :user, class: "notification-settings__form" do |form| %>
+          <div class="notification-settings__field">
+            <%= form.label :pushover_user_key, t("notifications.new_key") %>
+            <%= form.password_field :pushover_user_key, value: nil, autocomplete: "off", spellcheck: false %>
+            <p><%= t("notifications.key_validation_hint") %></p>
+          </div>
+          <%= form.submit t("notifications.replace_key_action"), class: "notification-settings__submit" %>
+        <% end %>
+      </details>
+
+      <details class="notification-settings__disclosure">
+        <summary><%= t("notifications.about_pushover") %></summary>
+        <%= render "pushover_explanation" %>
+      </details>
+
       <div class="notification-settings__danger">
         <div>
           <strong><%= t("notifications.remove_title") %></strong>
@@ -40,6 +59,37 @@
           class: "notification-settings__remove-button",
           data: { confirm: t("notifications.remove_confirmation"), turbo_confirm: t("notifications.remove_confirmation") } %>
       </div>
+    <% else %>
+      <%= render "pushover_explanation" %>
+
+      <ol class="notification-settings__steps">
+        <li>
+          <strong><%= t("notifications.steps.install_title") %></strong>
+          <span><%= t("notifications.steps.install_copy") %></span>
+          <%= link_to t("notifications.learn_more"), "https://pushover.net/", target: "_blank", rel: "noopener noreferrer" %>
+        </li>
+        <li>
+          <strong><%= t("notifications.steps.key_title") %></strong>
+          <span><%= t("notifications.steps.key_copy") %></span>
+          <%= link_to t("notifications.get_key"), "https://pushover.net/login", target: "_blank", rel: "noopener noreferrer" %>
+        </li>
+        <li>
+          <strong><%= t("notifications.steps.connect_title") %></strong>
+          <span><%= t("notifications.steps.connect_copy") %></span>
+        </li>
+      </ol>
+
+      <%= form_with url: notification_settings_path, method: :patch, scope: :user, class: "notification-settings__form" do |form| %>
+        <div class="notification-settings__field">
+          <%= form.label :pushover_user_key, t("notifications.key") %>
+          <%= form.password_field :pushover_user_key, value: nil, autocomplete: "off", spellcheck: false, required: true %>
+          <p><%= t("notifications.key_validation_hint") %></p>
+        </div>
+        <div class="notification-settings__actions">
+          <%= form.submit t("notifications.connect"), class: "notification-settings__submit" %>
+          <%= link_to t("notifications.back"), listings_path, class: "notification-settings__cancel" %>
+        </div>
+      <% end %>
     <% end %>
   </section>
 
@@ -47,6 +97,17 @@
     <p class="notification-settings__eyebrow"><%= t("notifications.privacy") %></p>
     <h2><%= t("notifications.private_title") %></h2>
     <p><%= t("notifications.private_copy") %></p>
-    <p><%= t("notifications.no_test") %></p>
+    <p><%= t("notifications.validation_copy") %></p>
+
+    <section class="notification-settings__troubleshooting" aria-labelledby="notification-troubleshooting-title">
+      <h2 id="notification-troubleshooting-title"><%= t("notifications.troubleshooting_title") %></h2>
+      <p><%= t("notifications.troubleshooting_intro") %></p>
+      <ul>
+        <li><%= t("notifications.troubleshooting_device") %></li>
+        <li><%= t("notifications.troubleshooting_muted") %></li>
+        <li><%= t("notifications.troubleshooting_key") %></li>
+        <li><%= t("notifications.troubleshooting_searches") %></li>
+      </ul>
+    </section>
   </aside>
 </main>

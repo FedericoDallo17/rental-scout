@@ -1386,6 +1386,24 @@ button {
   cursor: pointer;
 }
 
+.search-form__notification-warning {
+  margin: 0.65rem 0 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ead7a8;
+  border-radius: 14px;
+  background: #fff8e8;
+  color: #6e571f;
+  line-height: 1.45;
+}
+
+.search-form__notification-warning[hidden] {
+  display: none;
+}
+
+.search-form__notification-warning a {
+  font-weight: 800;
+}
+
 .search-form__actions {
   display: flex;
   align-items: center;
@@ -1524,6 +1542,39 @@ button {
   line-height: 1.55;
 }
 
+.notification-settings__explanation {
+  margin: 1.25rem 0;
+  padding: 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-strong);
+}
+
+.notification-settings__explanation h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.notification-settings__explanation h3 {
+  margin: 1rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.notification-settings__explanation p,
+.notification-settings__explanation ul {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.notification-settings__explanation p {
+  margin: 0;
+}
+
+.notification-settings__explanation ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.2rem;
+}
+
 .notification-settings__resources {
   display: flex;
   flex-wrap: wrap;
@@ -1531,7 +1582,7 @@ button {
 }
 
 .notification-settings__resources a {
-  color: var(--accent-deep);
+  color: var(--text);
   font-weight: 800;
 }
 
@@ -1552,6 +1603,104 @@ button {
 .notification-settings__status--missing {
   background: #fff8e8;
   border-color: #ead7a8;
+}
+
+.notification-settings__searches {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-strong);
+}
+
+.notification-settings__searches h2,
+.notification-settings__troubleshooting h2 {
+  margin-bottom: 0.35rem;
+  font-size: 1.05rem;
+}
+
+.notification-settings__searches p {
+  margin: 0.35rem 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.notification-settings__searches ul,
+.notification-settings__troubleshooting ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.notification-settings__searches a,
+.notification-settings__inline-link {
+  font-weight: 800;
+}
+
+.notification-settings__steps {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1.25rem 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: setup-step;
+}
+
+.notification-settings__steps li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.2rem 0.75rem;
+  counter-increment: setup-step;
+}
+
+.notification-settings__steps li::before {
+  display: grid;
+  grid-row: 1 / 4;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--surface);
+  content: counter(setup-step);
+  font-weight: 800;
+}
+
+.notification-settings__steps span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.notification-settings__steps a {
+  width: fit-content;
+  font-weight: 800;
+}
+
+.notification-settings__connected-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.notification-settings__connected-actions form {
+  margin: 0;
+}
+
+.notification-settings__disclosure {
+  margin-top: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.notification-settings__disclosure summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.notification-settings__disclosure[open] summary {
+  margin-bottom: 1rem;
 }
 
 .notification-settings__form,
@@ -1576,6 +1725,18 @@ button {
 .notification-settings__field p {
   margin: 0;
   font-size: 0.85rem;
+}
+
+.notification-settings__troubleshooting {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.notification-settings__troubleshooting li {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .notification-settings__danger {

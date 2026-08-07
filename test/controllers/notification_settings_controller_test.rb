@@ -16,20 +16,37 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "keep-key", user.reload.pushover_user_key
   end
 
+  test "guest cannot send a test notification" do
+    post test_delivery_notification_settings_path
+
+    assert_redirected_to new_user_session_path
+  end
+
   test "renders configured state without exposing the saved key" do
     user = create_user!(email: "settings-view@example.com", pushover_user_key: "secret-user-key")
     sign_in user
 
+    search = user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos", notifications_enabled: true)
+
     get edit_notification_settings_path
 
     assert_response :success
-    assert_select ".notification-settings__status", text: /Ready/
-    assert_select ".notification-settings__intro", text: /third-party notification app/
-    assert_select ".notification-settings__resources[aria-label='Pushover help']" do
-      assert_select "a[href='https://pushover.net/'][target='_blank']", text: "What is Pushover?"
-      assert_select "a[href='https://pushover.net/login'][target='_blank']", text: "Get my Pushover key"
+    assert_select ".notification-settings__status", text: /Phone notifications connected/
+    assert_select ".notification-settings__explanation" do
+      assert_select "h2", text: "What is Pushover?"
+      assert_select "p", text: /independent notification service/
+      assert_select "h3", text: "Why do we use Pushover?"
+      assert_select "p", text: /even when Rental Scout isn't open/
+      assert_select "li", text: /Pushover app and a Pushover account/
+      assert_select "li", text: /separate from Rental Scout/
     end
-    assert_select "label", text: "Replace Pushover key"
+    assert_select ".notification-settings__searches" do
+      assert_select "a[href='#{edit_search_preference_path(search)}']", text: "Pocitos"
+      assert_select "p", text: "1 saved search has phone notifications enabled."
+    end
+    assert_select "form[action='#{test_delivery_notification_settings_path}'] button", text: "Send test notification"
+    assert_select "details summary", text: "Replace Pushover key"
+    assert_select "label", text: "New Pushover key"
     assert_select "input[name='user[pushover_user_key]'][type='password'][value]", count: 0
     assert_select "form[action='#{notification_settings_path}'] button.notification-settings__remove-button", text: "Remove key"
     assert_select "button.notification-settings__remove-button[data-turbo-confirm]"
@@ -44,11 +61,23 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     get edit_notification_settings_path
 
     assert_response :success
-    assert_select ".notification-settings__intro", text: /aplicación externa de notificaciones/
-    assert_select ".notification-settings__intro", text: /Instalá Pushover, creá una cuenta/
+    assert_select ".notification-settings__explanation" do
+      assert_select "h2", text: "¿Qué es Pushover?"
+      assert_select "p", text: /servicio independiente de notificaciones/
+      assert_select "h3", text: "¿Por qué usamos Pushover?"
+      assert_select "p", text: /incluso cuando Rental Scout no está abierto/
+      assert_select "li", text: /Necesitás la aplicación de Pushover/
+      assert_select "li", text: /independiente de Rental Scout/
+    end
+    assert_select ".notification-settings__status", text: /Conectá las notificaciones al teléfono/
+    assert_select ".notification-settings__steps" do
+      assert_select "li", count: 3
+      assert_select "strong", text: "Instalá Pushover"
+      assert_select "a[href='https://pushover.net/']", text: "Visitar el sitio de Pushover"
+      assert_select "a[href='https://pushover.net/login']", text: "Obtener mi clave de Pushover"
+    end
     assert_select "label", text: "Clave de Pushover"
-    assert_select "a[href='https://pushover.net/']", text: "¿Qué es Pushover?"
-    assert_select "a[href='https://pushover.net/login']", text: "Obtener mi clave de Pushover"
+    assert_select ".notification-settings__troubleshooting", text: /¿No recibís alertas?/
   end
 
   test "updates only the signed in user's key" do
@@ -56,11 +85,109 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     other_user = create_user!(email: "settings-other@example.com", pushover_user_key: "other-key")
     sign_in user
 
-    patch notification_settings_path, params: { user: { pushover_user_key: "new-user-key" } }
+    client = validating_client
+    with_pushover_client(client) do
+      patch notification_settings_path, params: { user: { pushover_user_key: "new-user-key" } }
+    end
 
     assert_redirected_to edit_notification_settings_path
+    assert_equal ["new-user-key"], client.validated_keys
     assert_equal "new-user-key", user.reload.pushover_user_key
     assert_equal "other-key", other_user.reload.pushover_user_key
+  end
+
+  test "does not save a key Pushover rejects" do
+    user = create_user!(email: "settings-invalid-key@example.com", pushover_user_key: "keep-key")
+    sign_in user
+    client = Object.new
+    client.define_singleton_method(:validate_user_key!) do |**|
+      raise Notifications::PushoverClient::InvalidUserKey, "raw provider response"
+    end
+
+    with_pushover_client(client) do
+      patch notification_settings_path, params: { user: { pushover_user_key: "bad-key" } }
+    end
+
+    assert_redirected_to edit_notification_settings_path
+    assert_equal "keep-key", user.reload.pushover_user_key
+    assert_equal "That Pushover key wasn't recognized. Check it and try again.", flash[:alert]
+    assert_not_includes flash[:alert], "raw provider response"
+  end
+
+  test "reports a temporary validation outage without saving the key" do
+    user = create_user!(email: "settings-outage@example.com")
+    sign_in user
+    client = Object.new
+    client.define_singleton_method(:validate_user_key!) do |**|
+      raise Notifications::PushoverClient::ServiceUnavailable, "provider is down"
+    end
+
+    with_pushover_client(client) do
+      patch notification_settings_path, params: { user: { pushover_user_key: "new-key" } }
+    end
+
+    assert_nil user.reload.pushover_user_key
+    assert_equal "Pushover couldn't be reached. Try again shortly.", flash[:alert]
+  end
+
+  test "sends a localized test notification using the saved key" do
+    user = create_user!(email: "settings-test@example.com", pushover_user_key: "saved-key")
+    sign_in user
+    deliveries = []
+    client = Object.new
+    client.define_singleton_method(:deliver) { |**attributes| deliveries << attributes }
+
+    with_pushover_client(client) do
+      post test_delivery_notification_settings_path
+    end
+
+    assert_redirected_to edit_notification_settings_path
+    assert_equal "Test sent—check your phone.", flash[:notice]
+    assert_equal 1, deliveries.size
+    assert_equal "saved-key", deliveries.first.fetch(:user_key)
+    assert_equal "Rental Scout test", deliveries.first.fetch(:title)
+    assert_equal listings_url, deliveries.first.fetch(:url)
+  end
+
+  test "test notification explains when setup is missing" do
+    user = create_user!(email: "settings-test-missing@example.com")
+    sign_in user
+
+    post test_delivery_notification_settings_path
+
+    assert_redirected_to edit_notification_settings_path
+    assert_equal "Connect Pushover before sending a test notification.", flash[:alert]
+  end
+
+  test "test notification gives an actionable message for an invalid saved key" do
+    user = create_user!(email: "settings-test-invalid@example.com", pushover_user_key: "old-key")
+    sign_in user
+    client = Object.new
+    client.define_singleton_method(:deliver) do |**|
+      raise Notifications::PushoverClient::InvalidUserKey, "provider details"
+    end
+
+    with_pushover_client(client) do
+      post test_delivery_notification_settings_path
+    end
+
+    assert_equal "Your saved Pushover key is no longer valid. Replace it to resume phone notifications.", flash[:alert]
+    assert_not_includes flash[:alert], "provider details"
+  end
+
+  test "test notification reports a temporary delivery problem" do
+    user = create_user!(email: "settings-test-outage@example.com", pushover_user_key: "saved-key")
+    sign_in user
+    client = Object.new
+    client.define_singleton_method(:deliver) do |**|
+      raise Notifications::PushoverClient::ServiceUnavailable, "provider details"
+    end
+
+    with_pushover_client(client) do
+      post test_delivery_notification_settings_path
+    end
+
+    assert_equal "The test notification couldn't be delivered. Check Pushover and try again.", flash[:alert]
   end
 
   test "blank key preserves the configured key" do
@@ -89,6 +216,22 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def validating_client
+    client = Object.new
+    validated_keys = []
+    client.define_singleton_method(:validated_keys) { validated_keys }
+    client.define_singleton_method(:validate_user_key!) { |user_key:| validated_keys << user_key }
+    client
+  end
+
+  def with_pushover_client(client)
+    original_new = Notifications::PushoverClient.method(:new)
+    Notifications::PushoverClient.define_singleton_method(:new) { client }
+    yield
+  ensure
+    Notifications::PushoverClient.define_singleton_method(:new, original_new)
+  end
 
   def create_user!(email:, pushover_user_key: nil)
     User.create!(

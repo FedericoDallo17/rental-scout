@@ -38,7 +38,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_select ".auth-links a", text: "Log in"
     assert_includes response.body, 'name="user[first_name]"'
     assert_includes response.body, 'name="user[last_name]"'
-    assert_includes response.body, 'name="user[pushover_user_key]"'
+    assert_not_includes response.body, 'name="user[pushover_user_key]"'
     assert_select "input[name='user[locale]'][type='hidden'][value='en']", count: 1
   end
 
@@ -90,7 +90,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_select "form.auth-form input.auth-submit[type='submit'][value='Change password']", count: 1
   end
 
-  test "user can sign up sign in and sign out with names and optional pushover key" do
+  test "user can sign up sign in and sign out while unverified notification keys are ignored" do
     post user_registration_path, params: {
       user: {
         first_name: "Lara",
@@ -105,7 +105,8 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_includes response.body, "Signed in successfully"
-    assert User.exists?(email: "new-user@example.com", first_name: "Lara", last_name: "Scout", pushover_user_key: "uQiRzpo4DXghDmr9QzzfQu27cmVRsG")
+    user = User.find_by!(email: "new-user@example.com", first_name: "Lara", last_name: "Scout")
+    assert_nil user.pushover_user_key
 
     delete destroy_user_session_path
     follow_redirect!
