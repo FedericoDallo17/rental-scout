@@ -42,7 +42,7 @@
         <% end %>
       </div>
 
-      <p class="feed-header__count"><%= t("count.listing", count: @listings.size) %></p>
+      <p class="feed-header__count"><%= t("count.listing", count: @total_listings) %></p>
     </header>
 
     <% if @searches.any? %>
@@ -55,16 +55,18 @@
             [t("feed.sort_options.price_low"), "price_low"],
             [t("feed.sort_options.price_high"), "price_high"],
             [t("feed.sort_options.total_monthly"), "total_monthly"],
+            [t("feed.sort_options.price_per_m2_low"), "price_per_m2_low"],
+            [t("feed.sort_options.price_per_m2_high"), "price_per_m2_high"],
             [t("feed.sort_options.fit"), "fit"]
           ], selected: @sort %>
         </div>
         <div class="feed-controls__field">
           <%= form.label :source_id, t("feed.source") %>
-          <%= form.select :source_id, @filter_sources.map { |source| [source.display_name, source.id] }, { include_blank: t("feed.all_sources") }, selected: @selected_source_id %>
+          <%= form.select :source_id, @filter_sources.map { |source| [source.display_name, source.id] }, { include_blank: t("feed.all_sources"), selected: @selected_source_id } %>
         </div>
         <div class="feed-controls__field">
           <%= form.label :neighborhood, t("feed.neighborhood") %>
-          <%= form.select :neighborhood, @filter_zones.map { |zone| [zone.name, zone.slug] }, { include_blank: t("feed.all_neighborhoods") }, selected: @selected_neighborhood %>
+          <%= form.select :neighborhood, @filter_zones.map { |zone| [zone.name, zone.slug] }, { include_blank: t("feed.all_neighborhoods"), selected: @selected_neighborhood } %>
         </div>
         <div class="feed-controls__field">
           <%= form.label :min_bedrooms, t("feed.bedrooms") %>
@@ -97,6 +99,43 @@
             <span><%= t("feed.include_expenses") %></span>
           </label>
         </fieldset>
+        <fieldset class="feed-range-filter">
+          <legend><%= t("feed.surface_area") %></legend>
+          <div class="feed-range-filter__inputs">
+            <%= form.number_field :min_square_meters, value: @min_square_meters, min: 0, step: 1, placeholder: t("feed.min_area_short"), aria: { label: t("feed.min_area") } %>
+            <span aria-hidden="true">–</span>
+            <%= form.number_field :max_square_meters, value: @max_square_meters, min: 0, step: 1, placeholder: t("feed.max_area_short"), aria: { label: t("feed.max_area") } %>
+          </div>
+          <label>
+            <%= hidden_field_tag :include_unknown_area, "0" %>
+            <%= check_box_tag :include_unknown_area, "1", @include_unknown_area %>
+            <span><%= t("feed.include_unknown_area") %></span>
+          </label>
+        </fieldset>
+        <fieldset class="feed-range-filter">
+          <legend><%= t("feed.max_expenses") %></legend>
+          <div class="feed-range-filter__inputs">
+            <%= form.select :expenses_currency, [["$", "UYU"], ["U$S", "USD"]], { selected: @expenses_currency }, aria: { label: t("feed.expenses_currency") } %>
+            <%= form.number_field :max_expenses, value: @max_expenses, min: 0, step: 500, placeholder: t("feed.max_expenses_short"), aria: { label: t("feed.max_expenses") } %>
+          </div>
+          <label>
+            <%= hidden_field_tag :include_unknown_expenses, "0" %>
+            <%= check_box_tag :include_unknown_expenses, "1", @include_unknown_expenses %>
+            <span><%= t("feed.include_unknown_expenses") %></span>
+          </label>
+        </fieldset>
+        <% if @filter_property_types.any? %>
+          <div class="feed-controls__field">
+            <%= form.label :property_type, t("feed.property_type") %>
+            <%= form.select :property_type, @filter_property_types, { include_blank: t("feed.all_property_types"), selected: @selected_property_type } %>
+          </div>
+        <% end %>
+        <% if @parking_filter_available %>
+          <label class="feed-controls__checkbox">
+            <%= check_box_tag :parking_required, "1", @parking_required %>
+            <span><%= t("feed.parking_required") %></span>
+          </label>
+        <% end %>
         <div class="feed-controls__actions">
           <%= form.submit t("feed.apply_controls"), class: "feed-controls__submit" %>
           <%= link_to t("feed.clear_controls"), listings_path(search_id: @active_search&.id), class: "feed-controls__clear" %>
@@ -135,6 +174,10 @@
                 <dd><%= listing.square_meters || "-" %></dd>
               </div>
               <div>
+                <dt><%= t("feed.price_per_m2") %></dt>
+                <dd><%= format_money(listing.price_per_square_meter_cents, listing.currency) || "-" %></dd>
+              </div>
+              <div>
                 <dt><%= t("feed.expenses") %></dt>
                 <dd><%= format_money(listing.expenses_cents, listing.expenses_currency.presence || listing.currency) || "-" %></dd>
               </div>
@@ -153,6 +196,17 @@
       </article>
         <% end %>
       </section>
+      <% if @total_pages > 1 %>
+        <nav class="feed-pagination" aria-label="<%= t("feed.pagination") %>">
+          <% if @page > 1 %>
+            <%= link_to t("feed.previous_page"), listings_path(@feed_params.merge(search_id: @active_search&.id, page: @page - 1)) %>
+          <% end %>
+          <span><%= t("feed.page_status", page: @page, total: @total_pages) %></span>
+          <% if @page < @total_pages %>
+            <%= link_to t("feed.next_page"), listings_path(@feed_params.merge(search_id: @active_search&.id, page: @page + 1)) %>
+          <% end %>
+        </nav>
+      <% end %>
       <% else %>
         <section class="feed-empty-state" aria-label="<%= t("feed.no_results_label") %>">
           <h2><%= t("feed.no_results_title") %></h2>

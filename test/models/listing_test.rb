@@ -1,6 +1,15 @@
 require "test_helper"
 
 class ListingTest < ActiveSupport::TestCase
+  test "calculates price per square meter only when price and area are known" do
+    listing = Listing.new(price_cents: 12_000_000, square_meters: 60)
+
+    assert_equal 200_000, listing.price_per_square_meter_cents
+
+    listing.square_meters = nil
+    assert_nil listing.price_per_square_meter_cents
+  end
+
   test "display location prefers the resolved neighborhood while preserving raw address" do
     listing = Listing.new(
       source_neighborhood: "Buceo",

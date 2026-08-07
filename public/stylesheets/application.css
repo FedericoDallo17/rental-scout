@@ -277,6 +277,79 @@ button {
 .feed-price-filter__expenses { display: flex; align-items: center; gap: 0.5rem; min-height: 2.7rem; color: var(--text); cursor: pointer; font-size: 0.85rem; font-weight: 700; white-space: nowrap; }
 .feed-price-filter__expenses input { width: 1.15rem; height: 1.15rem; accent-color: var(--text); }
 
+.feed-range-filter {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.feed-range-filter legend {
+  padding: 0 0.35rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.feed-range-filter__inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feed-range-filter__inputs input,
+.feed-range-filter__inputs select {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.7rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.feed-range-filter label,
+.feed-controls__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.feed-controls__checkbox {
+  min-height: 2.7rem;
+}
+
+.feed-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.feed-pagination a,
+.feed-pagination span {
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  font-weight: 800;
+}
+
+.feed-pagination span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .feed-controls__actions {
   display: flex;
   align-items: center;
@@ -642,6 +715,18 @@ button {
 
   .feed-price-filter__range span {
     display: none;
+  }
+
+  .feed-range-filter__inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .feed-range-filter__inputs > span {
+    display: none;
+  }
+
+  .feed-pagination {
+    flex-wrap: wrap;
   }
 }
 

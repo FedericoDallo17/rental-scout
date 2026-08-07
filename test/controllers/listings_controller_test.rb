@@ -290,6 +290,103 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal ["Lower total", "Higher total", "Unknown total"], css_select(".listing-card h2").map { |node| node.text.strip }
   end
 
+  test "feed filters by surface area and can include or exclude unknown values" do
+    user = create_user!(email: "area-filter@example.com")
+    source = ListingSource.create!(name: "Area Source", adapter_key: "area_filter_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "Inside area", canonical_url: "https://example.test/inside-area", location_text: "Pocitos", square_meters: 55, in_scope: true)
+    Listing.create!(listing_source: source, title: "Outside area", canonical_url: "https://example.test/outside-area", location_text: "Pocitos", square_meters: 85, in_scope: true)
+    Listing.create!(listing_source: source, title: "Unknown area", canonical_url: "https://example.test/unknown-area", location_text: "Pocitos", square_meters: nil, in_scope: true)
+    sign_in user
+
+    get listings_path, params: { min_square_meters: "45", max_square_meters: "65", include_unknown_area: "1" }
+
+    assert_includes response.body, "Inside area"
+    assert_includes response.body, "Unknown area"
+    assert_not_includes response.body, "Outside area"
+    assert_select "input[name='min_square_meters'][value='45']"
+    assert_select "input[name='max_square_meters'][value='65']"
+
+    get listings_path, params: { min_square_meters: "45", max_square_meters: "65", include_unknown_area: "0" }
+
+    assert_includes response.body, "Inside area"
+    assert_not_includes response.body, "Unknown area"
+  end
+
+  test "feed filters maximum expenses by currency and keeps unknown values by default" do
+    user = create_user!(email: "expenses-filter@example.com")
+    source = ListingSource.create!(name: "Expenses Source", adapter_key: "expenses_filter_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "Affordable expenses", canonical_url: "https://example.test/affordable-expenses", location_text: "Pocitos", currency: "USD", expenses_cents: 500_000, expenses_currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "High expenses", canonical_url: "https://example.test/high-expenses", location_text: "Pocitos", currency: "USD", expenses_cents: 900_000, expenses_currency: "UYU", in_scope: true)
+    Listing.create!(listing_source: source, title: "Unknown expenses filter", canonical_url: "https://example.test/unknown-expenses-filter", location_text: "Pocitos", currency: "USD", expenses_cents: nil, in_scope: true)
+    sign_in user
+
+    get listings_path, params: { max_expenses: "6000", expenses_currency: "UYU" }
+
+    assert_includes response.body, "Affordable expenses"
+    assert_includes response.body, "Unknown expenses filter"
+    assert_not_includes response.body, "High expenses"
+
+    get listings_path, params: { max_expenses: "6000", expenses_currency: "UYU", include_unknown_expenses: "0" }
+
+    assert_includes response.body, "Affordable expenses"
+    assert_not_includes response.body, "Unknown expenses filter"
+  end
+
+  test "feed sorts price per square meter in SQL with missing values last" do
+    user = create_user!(email: "price-per-area-sort@example.com")
+    source = ListingSource.create!(name: "Area Sort Source", adapter_key: "area_sort_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "Higher per meter", canonical_url: "https://example.test/higher-per-meter", location_text: "Pocitos", price_cents: 10_000_000, currency: "UYU", square_meters: 50, in_scope: true)
+    Listing.create!(listing_source: source, title: "Lower per meter", canonical_url: "https://example.test/lower-per-meter", location_text: "Pocitos", price_cents: 9_000_000, currency: "UYU", square_meters: 90, in_scope: true)
+    Listing.create!(listing_source: source, title: "Unknown per meter", canonical_url: "https://example.test/unknown-per-meter", location_text: "Pocitos", price_cents: 8_000_000, currency: "UYU", square_meters: nil, in_scope: true)
+    sign_in user
+
+    get listings_path, params: { sort: "price_per_m2_low", currency: "UYU" }
+
+    assert_equal ["Lower per meter", "Higher per meter", "Unknown per meter"], css_select(".listing-card h2").map { |node| node.text.strip }
+    assert_select ".listing-card__facts", text: /UYU 1\.000/
+  end
+
+  test "feed exposes property type and parking controls only when data is available" do
+    user = create_user!(email: "metadata-filter@example.com")
+    source = ListingSource.create!(name: "Metadata Source", adapter_key: "metadata_filter_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    Listing.create!(listing_source: source, title: "Apartment with parking", canonical_url: "https://example.test/apartment-parking", location_text: "Pocitos", property_type: "Apartamento", parking_spaces: 1, in_scope: true)
+    Listing.create!(listing_source: source, title: "House without parking", canonical_url: "https://example.test/house-no-parking", location_text: "Pocitos", property_type: "Casa", parking_spaces: 0, in_scope: true)
+    sign_in user
+
+    get listings_path, params: { property_type: "Apartamento", parking_required: "1" }
+
+    assert_select "select[name='property_type'] option[value='Apartamento'][selected='selected']"
+    assert_select "input[name='parking_required'][checked='checked']"
+    assert_includes response.body, "Apartment with parking"
+    assert_not_includes response.body, "House without parking"
+  end
+
+  test "feed paginates SQL results and preserves the total count" do
+    user = create_user!(email: "feed-pagination@example.com")
+    source = ListingSource.create!(name: "Pagination Source", adapter_key: "pagination_source")
+    user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    26.times do |index|
+      Listing.create!(listing_source: source, title: "Paged #{index}", canonical_url: "https://example.test/paged-#{index}", location_text: "Pocitos", in_scope: true, created_at: index.minutes.ago)
+    end
+    sign_in user
+
+    get listings_path
+
+    assert_select ".feed-header__count", text: "26 listings"
+    assert_select ".listing-card", count: 24
+    assert_select ".feed-pagination", text: /Page 1 of 2/
+    assert_select ".feed-pagination a[href='#{listings_path(page: 2)}']", text: "Next"
+
+    get listings_path, params: { page: 2 }
+
+    assert_select ".listing-card", count: 2
+    assert_select ".feed-pagination", text: /Page 2 of 2/
+  end
+
   test "signed in user sees listings from any attached zone and not unresolved records" do
     user = create_user!(email: "zones@example.com")
     sign_in user

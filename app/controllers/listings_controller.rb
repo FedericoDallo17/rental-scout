@@ -1,7 +1,8 @@
 class ListingsController < ApplicationController
-  SORT_OPTIONS = %w[newest price_low price_high total_monthly fit].freeze
+  SORT_OPTIONS = %w[newest price_low price_high total_monthly price_per_m2_low price_per_m2_high fit].freeze
   CURRENCIES = %w[UYU USD].freeze
   COST_BASES = %w[rent total].freeze
+  PER_PAGE = 24
 
   def index
     @searches = current_user.search_preferences.includes(:zones).ordered_for_sidebar
@@ -20,13 +21,29 @@ class ListingsController < ApplicationController
 
     base_scope = Listing.where(id: listing_ids)
     prepare_filter_options(base_scope)
-    @listings = apply_filters(base_scope.includes(:listing_source)).to_a
-    @listing_matches = @listings.index_with do |listing|
-      match_index.search_ids_by_listing_id.fetch(listing.id, []).filter_map { |search_id| searches_by_id[search_id] }
+    filtered_scope = apply_filters(base_scope)
+    @total_listings = filtered_scope.count
+    prepare_pagination
+
+    if @sort == "fit"
+      candidates = filtered_scope.includes(:listing_source).to_a
+      build_listing_metadata(candidates, match_index:, searches_by_id:)
+      @listings = sort_by_fit(candidates).slice((@page - 1) * PER_PAGE, PER_PAGE) || []
+    else
+      @listings = sort_scope(filtered_scope)
+        .includes(:listing_source)
+        .offset((@page - 1) * PER_PAGE)
+        .limit(PER_PAGE)
+        .to_a
+      build_listing_metadata(@listings, match_index:, searches_by_id:)
     end
-    @listing_scores = @listings.index_with { |listing| best_score_for(listing) }
-    @listings = sort_listings(@listings)
-    @feed_params = params.permit(:sort, :source_id, :neighborhood, :currency, :cost_basis, :include_expenses, :min_price, :max_price, :min_bedrooms, :expenses_known).to_h.symbolize_keys
+
+    @feed_params = params.permit(
+      :sort, :source_id, :neighborhood, :currency, :cost_basis, :include_expenses,
+      :min_price, :max_price, :min_bedrooms, :expenses_known, :min_square_meters,
+      :max_square_meters, :include_unknown_area, :max_expenses, :expenses_currency,
+      :include_unknown_expenses, :property_type, :parking_required
+    ).to_h.symbolize_keys
   end
 
   private
@@ -44,6 +61,16 @@ class ListingsController < ApplicationController
     @max_price = non_negative_integer(params[:max_price])
     @min_bedrooms = non_negative_integer(params[:min_bedrooms])
     @expenses_known = params[:expenses_known] == "1"
+    @min_square_meters = non_negative_integer(params[:min_square_meters])
+    @max_square_meters = non_negative_integer(params[:max_square_meters])
+    @include_unknown_area = params[:include_unknown_area].nil? || params[:include_unknown_area] == "1"
+    @max_expenses = non_negative_integer(params[:max_expenses])
+    @expenses_currency = params[:expenses_currency].presence_in(CURRENCIES) || "UYU"
+    @include_unknown_expenses = params[:include_unknown_expenses].nil? || params[:include_unknown_expenses] == "1"
+    @filter_property_types = base_scope.reorder(nil).where.not(property_type: [nil, ""]).distinct.order(:property_type).pluck(:property_type)
+    @selected_property_type = params[:property_type].presence_in(@filter_property_types)
+    @parking_filter_available = base_scope.reorder(nil).where.not(parking_spaces: nil).exists?
+    @parking_required = @parking_filter_available && params[:parking_required] == "1"
     @sort = SORT_OPTIONS.include?(params[:sort]) ? params[:sort] : "newest"
   end
 
@@ -59,7 +86,40 @@ class ListingsController < ApplicationController
       include_expenses: @cost_basis == "total"
     ).call
     scope = scope.where.not(expenses_cents: nil) if @expenses_known
+    scope = apply_area_filter(scope)
+    scope = apply_expenses_filter(scope)
+    scope = scope.where(property_type: @selected_property_type) if @selected_property_type
+    scope = scope.where("parking_spaces > 0") if @parking_required
     scope
+  end
+
+  def apply_area_filter(scope)
+    return scope if @min_square_meters.nil? && @max_square_meters.nil?
+
+    conditions = []
+    values = {}
+    if @min_square_meters
+      conditions << "square_meters >= :min_square_meters"
+      values[:min_square_meters] = @min_square_meters
+    end
+    if @max_square_meters
+      conditions << "square_meters <= :max_square_meters"
+      values[:max_square_meters] = @max_square_meters
+    end
+    predicate = conditions.join(" AND ")
+    predicate = "(#{predicate}) OR square_meters IS NULL" if @include_unknown_area
+    scope.where(predicate, values)
+  end
+
+  def apply_expenses_filter(scope)
+    return scope unless @max_expenses
+
+    predicate = <<~SQL.squish
+      COALESCE(NULLIF(expenses_currency, ''), currency) = :expenses_currency
+      AND expenses_cents <= :max_expenses_cents
+    SQL
+    predicate = "(#{predicate}) OR expenses_cents IS NULL" if @include_unknown_expenses
+    scope.where(predicate, expenses_currency: @expenses_currency, max_expenses_cents: @max_expenses * 100)
   end
 
   def non_negative_integer(value)
@@ -69,35 +129,48 @@ class ListingsController < ApplicationController
     integer if integer && integer >= 0
   end
 
-  def best_score_for(listing)
-    results = @listing_matches.fetch(listing).map { |search| ListingMatchScore.new(listing, search).result }
-    results.max_by { |result| result.score || -1 }
-  end
-
-  def sort_listings(listings)
-    listings.sort_by do |listing|
-      case @sort
-      when "price_low"
-        [listing.currency.to_s, listing.price_cents.nil? ? 1 : 0, listing.price_cents || 0, -listing.created_at.to_f]
-      when "price_high"
-        [listing.currency.to_s, listing.price_cents.nil? ? 1 : 0, -(listing.price_cents || 0), -listing.created_at.to_f]
-      when "total_monthly"
-        total = known_total_monthly_cost(listing)
-        [listing.currency.to_s, total.nil? ? 1 : 0, total || 0, -listing.created_at.to_f]
-      when "fit"
-        [-(@listing_scores.fetch(listing).score || -1), -listing.created_at.to_f]
-      else
-        [-listing.created_at.to_f]
-      end
+  def build_listing_metadata(listings, match_index:, searches_by_id:)
+    @listing_matches = listings.index_with do |listing|
+      match_index.search_ids_by_listing_id.fetch(listing.id, []).filter_map { |search_id| searches_by_id[search_id] }
+    end
+    @listing_scores = listings.index_with do |listing|
+      results = @listing_matches.fetch(listing).map { |search| ListingMatchScore.new(listing, search).result }
+      results.max_by { |result| result.score || -1 }
     end
   end
 
-  def known_total_monthly_cost(listing)
-    return unless listing.price_cents.present? && !listing.expenses_cents.nil?
+  def sort_scope(scope)
+    order = case @sort
+    when "price_low"
+      "currency ASC NULLS LAST, price_cents ASC NULLS LAST, created_at DESC, id DESC"
+    when "price_high"
+      "currency ASC NULLS LAST, price_cents DESC NULLS LAST, created_at DESC, id DESC"
+    when "total_monthly"
+      <<~SQL.squish
+        currency ASC NULLS LAST,
+        CASE WHEN price_cents IS NOT NULL AND expenses_cents IS NOT NULL
+          AND COALESCE(NULLIF(expenses_currency, ''), currency) = currency
+          THEN price_cents + expenses_cents END ASC NULLS LAST,
+        created_at DESC, id DESC
+      SQL
+    when "price_per_m2_low"
+      "currency ASC NULLS LAST, (price_cents::numeric / NULLIF(square_meters, 0)) ASC NULLS LAST, created_at DESC, id DESC"
+    when "price_per_m2_high"
+      "currency ASC NULLS LAST, (price_cents::numeric / NULLIF(square_meters, 0)) DESC NULLS LAST, created_at DESC, id DESC"
+    else
+      "created_at DESC, id DESC"
+    end
+    scope.order(Arel.sql(order))
+  end
 
-    expenses_currency = listing.expenses_currency.presence || listing.currency
-    return unless expenses_currency == listing.currency
+  def sort_by_fit(listings)
+    listings.sort_by { |listing| [-(@listing_scores.fetch(listing).score || -1), -listing.created_at.to_f, -listing.id] }
+  end
 
-    listing.price_cents + listing.expenses_cents
+  def prepare_pagination
+    @total_pages = [(@total_listings.to_f / PER_PAGE).ceil, 1].max
+    requested_page = non_negative_integer(params[:page]).to_i
+    requested_page = 1 if requested_page < 1
+    @page = [requested_page, @total_pages].min
   end
 end

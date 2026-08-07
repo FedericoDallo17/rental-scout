@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_19_130000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_06_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -51,13 +51,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_130000) do
     t.string "expenses_currency"
     t.integer "parking_spaces"
     t.string "property_type"
+    t.index "COALESCE(NULLIF((expenses_currency)::text, ''::text), (currency)::text), expenses_cents", name: "index_listings_feed_expenses", where: "((in_scope = true) AND (expenses_cents IS NOT NULL))"
+    t.index "currency, (((price_cents)::numeric / (NULLIF(square_meters, 0))::numeric))", name: "index_listings_feed_price_per_m2", where: "((in_scope = true) AND (price_cents IS NOT NULL) AND (square_meters > 0))"
     t.index ["coordinates"], name: "index_listings_on_coordinates", using: :gist
+    t.index ["created_at"], name: "index_listings_feed_created_at", order: :desc, where: "(in_scope = true)"
+    t.index ["currency", "price_cents"], name: "index_listings_feed_currency_price", where: "((in_scope = true) AND (price_cents IS NOT NULL))"
     t.index ["in_scope"], name: "index_listings_on_in_scope"
     t.index ["listing_source_id", "canonical_url"], name: "index_listings_on_listing_source_id_and_canonical_url", unique: true
     t.index ["listing_source_id", "external_id"], name: "index_listings_on_listing_source_id_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
     t.index ["listing_source_id"], name: "index_listings_on_listing_source_id"
     t.index ["location_resolution_status"], name: "index_listings_on_location_resolution_status"
     t.index ["scraping_run_id"], name: "index_listings_on_scraping_run_id"
+    t.index ["square_meters"], name: "index_listings_feed_square_meters", where: "((in_scope = true) AND (square_meters > 0))"
   end
 
   create_table "notification_events", force: :cascade do |t|

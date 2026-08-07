@@ -27,6 +27,12 @@ class Listing < ApplicationRecord
     raw_payload_value("source_neighborhood").to_s.split(",").first&.strip
   end
 
+  def price_per_square_meter_cents
+    return unless price_cents.present? && square_meters.to_i.positive?
+
+    price_cents / square_meters
+  end
+
   private
 
   def raw_payload_value(key)
