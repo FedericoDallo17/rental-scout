@@ -114,7 +114,7 @@
         </fieldset>
         <fieldset class="feed-range-filter">
           <legend><%= t("feed.max_expenses") %></legend>
-          <div class="feed-range-filter__inputs">
+          <div class="feed-range-filter__inputs feed-range-filter__inputs--expenses">
             <%= form.select :expenses_currency, [["$", "UYU"], ["U$S", "USD"]], { selected: @expenses_currency }, aria: { label: t("feed.expenses_currency") } %>
             <%= form.number_field :max_expenses, value: @max_expenses, min: 0, step: 500, placeholder: t("feed.max_expenses_short"), aria: { label: t("feed.max_expenses") } %>
           </div>

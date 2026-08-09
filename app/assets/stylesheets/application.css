@@ -301,6 +301,10 @@ button {
   gap: 0.5rem;
 }
 
+.feed-range-filter__inputs--expenses {
+  grid-template-columns: minmax(4.5rem, auto) minmax(0, 1fr);
+}
+
 .feed-range-filter__inputs input,
 .feed-range-filter__inputs select {
   width: 100%;
