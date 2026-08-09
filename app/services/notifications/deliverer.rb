@@ -13,12 +13,14 @@ module Notifications
         return
       end
 
-      @client.deliver(
-        user_key: user.pushover_user_key,
-        title: "New match: #{notification_event.search_preference.name}",
-        message: "#{listing.title} - #{formatted_price(listing)}",
-        url: listing.canonical_url
-      )
+      I18n.with_locale(user.locale) do
+        @client.deliver(
+          user_key: user.pushover_user_key,
+          title: I18n.t("notifications.delivery.title", search: notification_event.search_preference.name),
+          message: I18n.t("notifications.delivery.message", title: listing.title, price: formatted_price(listing)),
+          url: listing.canonical_url
+        )
+      end
       notification_event.update!(status: "sent", sent_at: Time.current, delivery_error: nil)
     rescue StandardError => error
       notification_event.update!(status: "failed", delivery_error: "#{error.class}: #{error.message}")
@@ -27,7 +29,7 @@ module Notifications
     private
 
     def formatted_price(listing)
-      return "price unknown" if listing.price_cents.blank?
+      return I18n.t("notifications.delivery.price_unknown") if listing.price_cents.blank?
 
       MoneyFormatter.call(listing.price_cents, listing.currency)
     end

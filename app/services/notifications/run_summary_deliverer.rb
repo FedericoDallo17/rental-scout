@@ -13,12 +13,14 @@ module Notifications
       end
 
       listing_count = events.map(&:listing_id).uniq.size
-      @client.deliver(
-        user_key: user.pushover_user_key,
-        title: "New Rental Scout matches",
-        message: "#{listing_count} #{'new rental'.pluralize(listing_count)} matched your saved searches.",
-        url: run_url(scraping_run)
-      )
+      I18n.with_locale(user.locale) do
+        @client.deliver(
+          user_key: user.pushover_user_key,
+          title: I18n.t("notifications.summary.title"),
+          message: I18n.t("notifications.summary.message", count: listing_count),
+          url: run_url(scraping_run)
+        )
+      end
       update_events(events, status: "sent", sent_at: Time.current, delivery_error: nil)
     rescue StandardError => error
       update_events(events, status: "failed", delivery_error: "#{error.class}: #{error.message}")

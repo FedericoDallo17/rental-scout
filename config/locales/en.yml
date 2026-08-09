@@ -335,6 +335,15 @@ en:
       queued: "Queued"
       completed_with_failures: "Completed with failures"
   notifications:
+    delivery:
+      title: "New match: %{search}"
+      message: "%{title} - %{price}"
+      price_unknown: "price unknown"
+    summary:
+      title: "New Rental Scout matches"
+      message:
+        one: "%{count} new rental matched your saved searches."
+        other: "%{count} new rentals matched your saved searches."
     account: "Account"
     title: "Phone notifications"
     intro: "Choose whether Rental Scout should alert you when a new listing matches one of your saved searches."

@@ -63,6 +63,19 @@ class Notifications::DelivererTest < ActiveSupport::TestCase
     assert_nil @event.sent_at
   end
 
+  test "delivers listing details in the user's language" do
+    @user.update!(locale: "es")
+    @listing.update!(price_cents: nil)
+    delivered = []
+    client = Object.new
+    client.define_singleton_method(:deliver) { |**kwargs| delivered << kwargs; true }
+
+    Notifications::Deliverer.new(client: client).call(notification_event: @event)
+
+    assert_equal "Nueva coincidencia: Centro rentals", delivered.first[:title]
+    assert_equal "Apto Centro - precio no informado", delivered.first[:message]
+  end
+
   test "marks event skipped when user has no pushover key" do
     @user.update!(pushover_user_key: nil)
     client = Object.new

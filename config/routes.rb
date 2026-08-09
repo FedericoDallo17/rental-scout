@@ -2,7 +2,10 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   devise_for :users
-  root "listings#index"
+  authenticated :user do
+    root "listings#index", as: :authenticated_root
+  end
+  root to: redirect("/users/sign_in")
   resources :listings, only: [:index]
   resources :scraping_runs, only: [:index, :show]
   resources :search_preferences, except: [:index, :show]

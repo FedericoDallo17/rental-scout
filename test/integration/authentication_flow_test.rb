@@ -5,8 +5,9 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     get root_url
     assert_redirected_to new_user_session_path
 
-    get new_user_session_url
+    follow_redirect!
     assert_response :success
+    assert_select ".auth-flash", count: 0
   end
 
   test "sign in page renders the shared auth shell" do
@@ -129,6 +130,9 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     get listings_url
 
     assert_redirected_to new_user_session_path
+
+    follow_redirect!
+    assert_select ".auth-flash", text: "You need to sign in or sign up before continuing."
   end
 
   test "signed in user can access listings" do

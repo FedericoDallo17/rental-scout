@@ -1,11 +1,46 @@
 es:
   errors:
     messages:
+      accepted: "debe ser aceptado"
       blank: "no puede estar vacío"
+      confirmation: "no coincide"
+      empty: "no puede estar vacío"
+      equal_to: "debe ser igual a %{count}"
+      even: "debe ser par"
+      exclusion: "está reservado"
+      greater_than: "debe ser mayor que %{count}"
+      greater_than_or_equal_to: "debe ser mayor o igual que %{count}"
       inclusion: "no es una opción válida"
+      invalid: "no es válido"
+      less_than: "debe ser menor que %{count}"
+      less_than_or_equal_to: "debe ser menor o igual que %{count}"
+      not_a_number: "no es un número"
+      not_an_integer: "debe ser un número entero"
+      odd: "debe ser impar"
+      other_than: "debe ser distinto de %{count}"
+      present: "debe estar vacío"
       required: "es obligatorio"
+      taken: "ya está en uso"
+      too_long: "es demasiado largo (máximo %{count} caracteres)"
+      too_short: "es demasiado corto (mínimo %{count} caracteres)"
+      wrong_length: "no tiene la longitud correcta (%{count} caracteres)"
   activerecord:
+    models:
+      user: "usuario"
+    errors:
+      models:
+        user:
+          attributes:
+            password:
+              too_short: "es demasiado corta (mínimo %{count} caracteres)"
     attributes:
+      user:
+        first_name: "Nombre"
+        last_name: "Apellido"
+        email: "Correo electrónico"
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"
+        locale: "Idioma"
       search_preference:
         name: "Nombre de la búsqueda"
         location_query: "Nota de ubicación"
@@ -348,6 +383,15 @@ es:
       queued: "En cola"
       completed_with_failures: "Finalizada con errores"
   notifications:
+    delivery:
+      title: "Nueva coincidencia: %{search}"
+      message: "%{title} - %{price}"
+      price_unknown: "precio no informado"
+    summary:
+      title: "Nuevas coincidencias en Rental Scout"
+      message:
+        one: "%{count} alquiler nuevo coincidió con tus búsquedas guardadas."
+        other: "%{count} alquileres nuevos coincidieron con tus búsquedas guardadas."
     account: "Cuenta"
     title: "Notificaciones al teléfono"
     intro: "Elegí si querés que Rental Scout te avise cuando una propiedad nueva coincida con alguna de tus búsquedas guardadas."

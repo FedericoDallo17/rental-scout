@@ -14,6 +14,17 @@ class UserTest < ActiveSupport::TestCase
     assert_includes user.errors[:locale], "is not included in the list"
   end
 
+  test "validation errors are translated into Spanish" do
+    user = User.new(email: "invalid", password: "short", locale: "es")
+
+    I18n.with_locale(:es) do
+      user.valid?
+      assert_includes user.errors.full_messages, "Nombre no puede estar vacío"
+      assert_includes user.errors.full_messages, "Apellido no puede estar vacío"
+      assert_includes user.errors.full_messages, "Contraseña es demasiado corta (mínimo 6 caracteres)"
+    end
+  end
+
   test "requires unique email and required names" do
     User.create!(
       first_name: "Jane",
