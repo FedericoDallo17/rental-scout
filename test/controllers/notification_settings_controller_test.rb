@@ -38,14 +38,18 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-web-push-settings][data-vapid-public-key]" do
       assert_select "h2", text: "Browser notifications"
       assert_select "button[data-web-push-toggle]", text: "Enable on this device"
-      assert_select ".notification-settings__ios-guide" do
-        assert_select "h3", text: "Using an iPhone or iPad?"
-        assert_select "li", count: 5
-        assert_select "li", text: /Open Rental Scout in Safari—not Chrome/
-        assert_select "li", text: /Share button.*square with an upward arrow/
-        assert_select "li", text: /Add to Home Screen/
-        assert_select "li", text: /new icon/
-        assert_select "li", text: /Enable on this device/
+      assert_select ".notification-settings__device-guides" do
+        assert_select "h3", text: "Setup instructions by device"
+        assert_select "details[data-device-guide]", count: 4
+        assert_select "details[data-device-guide='ios']" do
+          assert_select "summary", text: "iPhone or iPad"
+          assert_select "li", count: 5
+          assert_select "li", text: /Open Rental Scout in Safari—not Chrome/
+          assert_select "li", text: /Add to Home Screen/
+        end
+        assert_select "details[data-device-guide='android'] summary", text: "Android phone or tablet"
+        assert_select "details[data-device-guide='mac'] summary", text: "Mac"
+        assert_select "details[data-device-guide='windows'] summary", text: "Windows PC"
       end
     end
     assert_select ".notification-settings__status", text: /Phone notifications connected/
@@ -87,10 +91,12 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
       assert_select "li", text: /independiente de Rental Scout/
     end
     assert_select ".notification-settings__status", text: /Conectá las notificaciones al teléfono/
-    assert_select ".notification-settings__ios-guide" do
-      assert_select "h3", text: "¿Usás iPhone o iPad?"
-      assert_select "li", text: /Abrí Rental Scout en Safari, no en Chrome/
-      assert_select "li", text: /Agregar a inicio/
+    assert_select ".notification-settings__device-guides" do
+      assert_select "h3", text: "Instrucciones según tu dispositivo"
+      assert_select "details[data-device-guide]", count: 4
+      assert_select "details[data-device-guide='ios']", text: /Agregar a inicio/
+      assert_select "details[data-device-guide='android'] summary", text: "Teléfono o tablet Android"
+      assert_select "details[data-device-guide='windows'] summary", text: "PC con Windows"
     end
     assert_select ".notification-settings__steps" do
       assert_select "li", count: 3

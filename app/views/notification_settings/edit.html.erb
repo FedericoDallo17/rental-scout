@@ -30,16 +30,19 @@
         <%= t("notifications.web_push.enable") %>
       </button>
       <p role="status" aria-live="polite" data-web-push-status></p>
-      <section class="notification-settings__ios-guide" aria-labelledby="ios-home-screen-title">
-        <h3 id="ios-home-screen-title"><%= t("notifications.web_push.ios_guide.title") %></h3>
-        <p><%= t("notifications.web_push.ios_guide.intro") %></p>
-        <ol>
-          <li><%= t("notifications.web_push.ios_guide.open_safari") %></li>
-          <li><%= t("notifications.web_push.ios_guide.tap_share") %></li>
-          <li><%= t("notifications.web_push.ios_guide.add_home") %></li>
-          <li><%= t("notifications.web_push.ios_guide.open_icon") %></li>
-          <li><%= t("notifications.web_push.ios_guide.enable") %></li>
-        </ol>
+      <section class="notification-settings__device-guides" data-device-guides>
+        <h3><%= t("notifications.web_push.guides_title") %></h3>
+        <% %i[ios android mac windows].each do |device| %>
+          <details class="notification-settings__disclosure" data-device-guide="<%= device %>">
+            <summary><%= t("notifications.web_push.guides.#{device}.title") %></summary>
+            <p><%= t("notifications.web_push.guides.#{device}.intro") %></p>
+            <ol>
+              <% t("notifications.web_push.guides.#{device}.steps").each do |step| %>
+                <li><%= step %></li>
+              <% end %>
+            </ol>
+          </details>
+        <% end %>
       </section>
     </section>
 

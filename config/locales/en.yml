@@ -349,14 +349,39 @@ en:
       denied: "Notifications were blocked. Allow them in your browser settings and try again."
       unsupported: "This browser does not support Web Push notifications."
       error: "We couldn't update notifications on this device. Please try again."
-      ios_guide:
-        title: "Using an iPhone or iPad?"
-        intro: "Apple requires websites to be added to the Home Screen before they can send notifications."
-        open_safari: "Open Rental Scout in Safari—not Chrome."
-        tap_share: "Tap the Share button (the square with an upward arrow) in Safari's toolbar."
-        add_home: "Scroll down, choose “Add to Home Screen,” then tap “Add.”"
-        open_icon: "Return to your Home Screen and open Rental Scout using the new icon."
-        enable: "Open Notification Settings and tap “Enable on this device.”"
+      guides_title: "Setup instructions by device"
+      guides:
+        ios:
+          title: "iPhone or iPad"
+          intro: "Apple requires websites to be added to the Home Screen before they can send notifications."
+          steps:
+            - "Open Rental Scout in Safari—not Chrome."
+            - "Tap the Share button (the square with an upward arrow) in Safari's toolbar."
+            - "Scroll down, choose “Add to Home Screen,” then tap “Add.”"
+            - "Return to your Home Screen and open Rental Scout using the new icon."
+            - "Open Notification Settings and tap “Enable on this device.”"
+        android:
+          title: "Android phone or tablet"
+          intro: "Android can receive notifications directly from Chrome without installing a native app."
+          steps:
+            - "Open Rental Scout in Chrome and sign in."
+            - "Open Notification Settings and tap “Enable on this device.”"
+            - "Choose “Allow” when Chrome asks for notification permission."
+            - "Optional: use Chrome's three-dot menu and choose “Add to Home screen” or “Install app” for easier access."
+        mac:
+          title: "Mac"
+          intro: "Chrome can deliver Rental Scout notifications through macOS even while the website is closed."
+          steps:
+            - "Open Rental Scout in Chrome and sign in."
+            - "Open Notification Settings, click “Enable on this device,” and choose “Allow.”"
+            - "If notifications do not appear, open System Settings → Notifications → Google Chrome and enable Allow Notifications."
+        windows:
+          title: "Windows PC"
+          intro: "Chrome or Edge can deliver Rental Scout notifications through Windows even while the website is closed."
+          steps:
+            - "Open Rental Scout in Chrome or Edge and sign in."
+            - "Open Notification Settings, click “Enable on this device,” and choose “Allow.”"
+            - "If notifications do not appear, open Settings → System → Notifications and make sure notifications are enabled for your browser."
     delivery:
       title: "New match: %{search}"
       message: "%{title} - %{price}"

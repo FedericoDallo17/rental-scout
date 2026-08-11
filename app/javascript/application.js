@@ -9,6 +9,28 @@ const urlBase64ToUint8Array = (value) => {
 
 const csrfToken = () => document.querySelector("meta[name='csrf-token']")?.content
 
+const currentDeviceGuide = () => {
+  const userAgent = navigator.userAgent || ""
+  const platform = navigator.userAgentData?.platform || navigator.platform || ""
+  const isTouchIpad = platform === "MacIntel" && navigator.maxTouchPoints > 1
+
+  if (/iPhone|iPad|iPod/i.test(userAgent) || isTouchIpad) return "ios"
+  if (/Android/i.test(userAgent)) return "android"
+  if (/Windows|Win32|Win64/i.test(`${userAgent} ${platform}`)) return "windows"
+  if (/Macintosh|MacIntel|MacPPC|Mac68K/i.test(`${userAgent} ${platform}`)) return "mac"
+}
+
+const openCurrentDeviceGuide = (settings) => {
+  const device = currentDeviceGuide()
+  if (!device) return
+
+  const guide = settings.querySelector(`[data-device-guide='${device}']`)
+  if (guide) {
+    guide.open = true
+    guide.dataset.detected = "true"
+  }
+}
+
 const saveSubscription = async (settings, subscription) => {
   const response = await fetch(settings.dataset.createUrl, {
     method: "POST",
@@ -35,6 +57,7 @@ const initializeWebPushSettings = async () => {
 
   const button = settings.querySelector("[data-web-push-toggle]")
   const status = settings.querySelector("[data-web-push-status]")
+  openCurrentDeviceGuide(settings)
   if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
     button.disabled = true
     status.textContent = settings.dataset.unsupportedLabel
