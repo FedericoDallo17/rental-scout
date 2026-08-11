@@ -383,6 +383,21 @@ es:
       queued: "En cola"
       completed_with_failures: "Finalizada con errores"
   notifications:
+    option: "Opción de notificación"
+    pushover_title: "Pushover"
+    pushover_copy: "Usá tu cuenta de Pushover para recibir alertas de Rental Scout en cualquier dispositivo conectado a ella."
+    pushover_connected: "Pushover está conectado."
+    pushover_not_connected: "Pushover todavía no está conectado."
+    web_push:
+      title: "Notificaciones del navegador"
+      copy: "Recibí alertas de Rental Scout directamente desde este navegador, incluso cuando el sitio esté cerrado. No necesitás otra aplicación ni cuenta."
+      enable: "Activar en este dispositivo"
+      disable: "Desactivar en este dispositivo"
+      enabled: "Las notificaciones están activadas en este dispositivo."
+      denied: "Las notificaciones están bloqueadas. Permitilas en la configuración del navegador e intentá nuevamente."
+      unsupported: "Este navegador no admite notificaciones Web Push."
+      error: "No pudimos actualizar las notificaciones en este dispositivo. Intentá nuevamente."
+      ios_hint: "En iPhone o iPad, primero agregá Rental Scout a la pantalla de inicio y luego abrilo desde allí para activar las notificaciones."
     delivery:
       title: "Nueva coincidencia: %{search}"
       message: "%{title} - %{price}"
@@ -416,8 +431,9 @@ es:
     get_key: "Obtener mi clave de Pushover"
     ready: "Notificaciones al teléfono conectadas"
     setup_needed: "Conectá las notificaciones al teléfono"
-    configured: "Rental Scout puede enviar alertas de nuevas coincidencias a tus dispositivos con Pushover."
-    not_configured: "Completá los tres pasos para recibir alertas aunque Rental Scout no esté abierto."
+    configured: "Rental Scout puede enviar alertas de nuevas coincidencias al menos a uno de tus dispositivos."
+    not_configured: "Activá las notificaciones del navegador para recibir alertas aunque Rental Scout no esté abierto."
+    pushover_fallback: "Opcional: conectar Pushover como respaldo"
     searches_title: "Búsquedas con notificaciones al teléfono"
     searches_count:
       one: "%{count} búsqueda guardada tiene notificaciones al teléfono activas."

@@ -4,6 +4,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :search_preferences, dependent: :destroy
+  has_many :push_subscriptions, dependent: :destroy
 
   validates :first_name, presence: true
   validates :last_name, presence: true

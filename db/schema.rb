@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_06_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_10_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -81,6 +81,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_06_120000) do
     t.index ["listing_id"], name: "index_notification_events_on_listing_id"
     t.index ["listing_source_id"], name: "index_notification_events_on_listing_source_id"
     t.index ["search_preference_id"], name: "index_notification_events_on_search_preference_id"
+  end
+
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "endpoint", null: false
+    t.string "p256dh", null: false
+    t.string "auth", null: false
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
   end
 
   create_table "scraping_runs", force: :cascade do |t|
@@ -191,6 +203,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_06_120000) do
   add_foreign_key "notification_events", "listing_sources"
   add_foreign_key "notification_events", "listings"
   add_foreign_key "notification_events", "search_preferences"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "scraping_source_runs", "listing_sources"
   add_foreign_key "scraping_source_runs", "scraping_runs"
   add_foreign_key "search_preferences", "users"

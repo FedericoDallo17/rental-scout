@@ -13,6 +13,7 @@ gem "turbo-rails"
 gem "propshaft"
 gem "bootsnap", require: false
 gem "devise"
+gem "web-push", "~> 3.0"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"

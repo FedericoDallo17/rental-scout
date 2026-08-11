@@ -1600,6 +1600,68 @@ button {
   padding: 2rem;
 }
 
+.notification-settings__channels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.notification-settings__channel {
+  min-width: 0;
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  border: 1px solid #c8d5df;
+  border-radius: 0.75rem;
+  background: #f4f8fb;
+}
+
+.notification-settings__channels .notification-settings__channel {
+  margin: 0;
+}
+
+.notification-settings__channel-label {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.notification-settings__channel-state {
+  padding: 0.65rem 0.8rem;
+  border-radius: 12px;
+  background: #fff4df;
+  font-weight: 800;
+}
+
+.notification-settings__channel-state--ready {
+  background: #e5f4e9;
+  color: #245a32;
+}
+
+.notification-settings__web-push h2 {
+  margin-top: 0;
+}
+
+.notification-settings__web-push [role="status"] {
+  min-height: 1.5em;
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.notification-settings__web-push-ios {
+  color: #526170;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .notification-settings__channels {
+    grid-template-columns: 1fr;
+  }
+}
+
 .notification-settings__panel,
 .notification-settings__aside {
   padding: 2rem;

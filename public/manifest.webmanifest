@@ -1,0 +1,8 @@
+{
+  "name": "Rental Scout Lite",
+  "short_name": "Rental Scout",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2ea",
+  "theme_color": "#17324d"
+}

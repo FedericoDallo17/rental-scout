@@ -31,6 +31,14 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     get edit_notification_settings_path
 
     assert_response :success
+    assert_select ".notification-settings__channels .notification-settings__channel", count: 2
+    assert_select ".notification-settings__web-push h2", text: "Browser notifications"
+    assert_select ".notification-settings__pushover h2", text: "Pushover"
+    assert_select ".notification-settings__pushover .notification-settings__channel-state--ready", text: "Pushover is connected."
+    assert_select "[data-web-push-settings][data-vapid-public-key]" do
+      assert_select "h2", text: "Browser notifications"
+      assert_select "button[data-web-push-toggle]", text: "Enable on this device"
+    end
     assert_select ".notification-settings__status", text: /Phone notifications connected/
     assert_select ".notification-settings__explanation" do
       assert_select "h2", text: "What is Pushover?"
@@ -78,6 +86,24 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_select "label", text: "Clave de Pushover"
     assert_select ".notification-settings__troubleshooting", text: /¿No recibís alertas?/
+  end
+
+  test "shows a connected state and test action for a Web Push-only user" do
+    user = create_user!(email: "settings-web-push@example.com")
+    user.push_subscriptions.create!(
+      endpoint: "https://push.example.test/settings", p256dh: "public-key", auth: "auth-secret"
+    )
+    sign_in user
+
+    get edit_notification_settings_path
+
+    assert_response :success
+    assert_select ".notification-settings__status", text: /Phone notifications connected/
+    assert_select "form[action='#{test_delivery_notification_settings_path}'] button", text: "Send test notification"
+    assert_select ".notification-settings__pushover" do
+      assert_select "h2", text: "Pushover"
+      assert_select ".notification-settings__channel-state", text: "Pushover is not connected yet."
+    end
   end
 
   test "updates only the signed in user's key" do

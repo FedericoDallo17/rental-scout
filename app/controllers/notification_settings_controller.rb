@@ -1,6 +1,7 @@
 class NotificationSettingsController < ApplicationController
   def edit
     set_notification_searches
+    @vapid_public_key = Notifications::VapidConfiguration.public_key
   end
 
   def update
@@ -18,13 +19,13 @@ class NotificationSettingsController < ApplicationController
   end
 
   def test_delivery
-    if current_user.pushover_user_key.blank?
+    if current_user.push_subscriptions.none? && current_user.pushover_user_key.blank?
       redirect_to edit_notification_settings_path, alert: t("flash.notification_key_required")
       return
     end
 
-    pushover_client.deliver(
-      user_key: current_user.pushover_user_key,
+    notification_dispatcher.deliver(
+      user: current_user,
       title: t("notifications.test_title"),
       message: t("notifications.test_message"),
       url: listings_url
@@ -53,6 +54,10 @@ class NotificationSettingsController < ApplicationController
 
   def pushover_client
     @pushover_client ||= Notifications::PushoverClient.new
+  end
+
+  def notification_dispatcher
+    @notification_dispatcher ||= Notifications::Dispatcher.new
   end
 
   def set_notification_searches

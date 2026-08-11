@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
+  get "service-worker.js", to: "service_workers#show", defaults: { format: :js }
 
   devise_for :users
   authenticated :user do
@@ -12,6 +13,9 @@ Rails.application.routes.draw do
   resources :search_preferences, except: [:index, :show]
   resource :notification_settings, only: [:edit, :update, :destroy] do
     post :test_delivery
+  end
+  resources :push_subscriptions, only: [:create, :destroy] do
+    delete :current, on: :collection
   end
   resource :language_settings, only: [:update]
 

@@ -11,6 +11,12 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+    def create_push_test_user!(email: "push-test-#{SecureRandom.hex(6)}@example.com")
+      User.create!(
+        first_name: "Push", last_name: "Tester", email:,
+        password: "password123", password_confirmation: "password123"
+      )
+    end
   end
 end
 

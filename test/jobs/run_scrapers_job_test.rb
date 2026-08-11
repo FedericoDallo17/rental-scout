@@ -246,7 +246,7 @@ class RunScrapersJobTest < ActiveJob::TestCase
           assert_equal 1, SeenListing.count
           assert_equal 1, NotificationEvent.where(status: "sent").count
           assert_equal 1, deliveries.size
-          assert_match %r{http://example.com/scraping_runs/\d+}, deliveries.first.fetch(:url)
+          assert_match %r{http://example.com/notification_results\?token=}, deliveries.first.fetch(:url)
 
           perform_enqueued_jobs { RunScrapersJob.perform_later }
 

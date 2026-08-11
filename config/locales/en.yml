@@ -335,6 +335,21 @@ en:
       queued: "Queued"
       completed_with_failures: "Completed with failures"
   notifications:
+    option: "Notification option"
+    pushover_title: "Pushover"
+    pushover_copy: "Use your existing Pushover account to receive Rental Scout alerts on any device connected to it."
+    pushover_connected: "Pushover is connected."
+    pushover_not_connected: "Pushover is not connected yet."
+    web_push:
+      title: "Browser notifications"
+      copy: "Get Rental Scout alerts directly from this browser, even when the site is closed. No separate app or account is required."
+      enable: "Enable on this device"
+      disable: "Disable on this device"
+      enabled: "Browser notifications are enabled on this device."
+      denied: "Notifications were blocked. Allow them in your browser settings and try again."
+      unsupported: "This browser does not support Web Push notifications."
+      error: "We couldn't update notifications on this device. Please try again."
+      ios_hint: "On iPhone or iPad, first add Rental Scout to your Home Screen, then open it from there to enable notifications."
     delivery:
       title: "New match: %{search}"
       message: "%{title} - %{price}"
@@ -368,8 +383,9 @@ en:
     get_key: "Get my Pushover key"
     ready: "Phone notifications connected"
     setup_needed: "Connect phone notifications"
-    configured: "Rental Scout can deliver new-match alerts to your Pushover devices."
-    not_configured: "Complete the three steps below to receive alerts when Rental Scout isn't open."
+    configured: "Rental Scout can send new-match alerts to at least one of your devices."
+    not_configured: "Enable browser notifications to receive alerts even when Rental Scout isn't open."
+    pushover_fallback: "Optional: connect Pushover as a fallback"
     searches_title: "Searches using phone notifications"
     searches_count:
       one: "%{count} saved search has phone notifications enabled."

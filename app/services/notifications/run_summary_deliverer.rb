@@ -1,27 +1,24 @@
 module Notifications
   class RunSummaryDeliverer
-    def initialize(client: PushoverClient.new)
-      @client = client
+    def initialize(client: nil, dispatcher: nil)
+      @dispatcher = dispatcher || Dispatcher.new(pushover_client: client || PushoverClient.new)
     end
 
     def call(user:, events:, scraping_run:)
       return if events.empty?
 
-      if user.pushover_user_key.blank?
-        update_events(events, status: "skipped", delivery_error: "user has no pushover_user_key")
-        return
-      end
-
       listing_count = events.map(&:listing_id).uniq.size
-      I18n.with_locale(user.locale) do
-        @client.deliver(
-          user_key: user.pushover_user_key,
+      result = I18n.with_locale(user.locale) do
+        @dispatcher.deliver(
+          user:,
           title: I18n.t("notifications.summary.title"),
           message: I18n.t("notifications.summary.message", count: listing_count),
           url: results_url(user, scraping_run)
         )
       end
-      update_events(events, status: "sent", sent_at: Time.current, delivery_error: nil)
+      update_events(events, channel: result.channel, status: "sent", sent_at: Time.current, delivery_error: nil)
+    rescue Dispatcher::NoDeliveryChannel => error
+      update_events(events, status: "skipped", delivery_error: error.message)
     rescue StandardError => error
       update_events(events, status: "failed", delivery_error: "#{error.class}: #{error.message}")
     end
