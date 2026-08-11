@@ -387,6 +387,9 @@ es:
     pushover_title: "Pushover"
     pushover_copy: "Usá tu cuenta de Pushover para recibir alertas de Rental Scout en cualquier dispositivo conectado a ella."
     pushover_connected: "Pushover está conectado."
+    pushover_paused: "Pushover está conectado, pero las notificaciones están pausadas. Tu clave sigue guardada."
+    disable_pushover: "Pausar notificaciones de Pushover"
+    enable_pushover: "Reanudar notificaciones de Pushover"
     pushover_not_connected: "Pushover todavía no está conectado."
     web_push:
       title: "Notificaciones del navegador"

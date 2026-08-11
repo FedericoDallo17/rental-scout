@@ -9,4 +9,8 @@ class User < ApplicationRecord
   validates :first_name, presence: true
   validates :last_name, presence: true
   validates :locale, inclusion: { in: SUPPORTED_LOCALES }
+
+  def pushover_active?
+    pushover_enabled? && pushover_user_key.present?
+  end
 end

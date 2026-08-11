@@ -4,7 +4,7 @@
     <h1><%= t("notifications.title") %></h1>
     <p class="notification-settings__intro"><%= t("notifications.intro") %></p>
 
-    <% notifications_ready = current_user.push_subscriptions.exists? || current_user.pushover_user_key.present? %>
+    <% notifications_ready = current_user.push_subscriptions.exists? || current_user.pushover_active? %>
     <div class="notification-settings__status notification-settings__status--<%= notifications_ready ? "ready" : "missing" %>">
       <strong><%= notifications_ready ? t("notifications.ready") : t("notifications.setup_needed") %></strong>
       <span><%= notifications_ready ? t("notifications.configured") : t("notifications.not_configured") %></span>
@@ -52,9 +52,16 @@
       <p><%= t("notifications.pushover_copy") %></p>
 
       <% if current_user.pushover_user_key.present? %>
-        <p class="notification-settings__channel-state notification-settings__channel-state--ready">
-          <%= t("notifications.pushover_connected") %>
+        <p class="notification-settings__channel-state <%= "notification-settings__channel-state--ready" if current_user.pushover_enabled? %>">
+          <%= current_user.pushover_enabled? ? t("notifications.pushover_connected") : t("notifications.pushover_paused") %>
         </p>
+        <%= button_to(
+          current_user.pushover_enabled? ? t("notifications.disable_pushover") : t("notifications.enable_pushover"),
+          notification_settings_path,
+          method: :patch,
+          params: { user: { pushover_enabled: !current_user.pushover_enabled? } },
+          class: current_user.pushover_enabled? ? "notification-settings__remove-button" : "notification-settings__submit"
+        ) %>
         <details class="notification-settings__disclosure">
           <summary><%= t("notifications.replace_key") %></summary>
           <%= form_with url: notification_settings_path, method: :patch, scope: :user, class: "notification-settings__form" do |form| %>

@@ -8,8 +8,9 @@ module Notifications
       user = notification_event.search_preference&.user
       listing = notification_event.listing
 
-      if user&.pushover_user_key.blank?
-        notification_event.update!(status: "skipped", delivery_error: "user has no pushover_user_key")
+      unless user&.pushover_active?
+        reason = user&.pushover_user_key.present? ? "Pushover delivery is paused" : "user has no pushover_user_key"
+        notification_event.update!(status: "skipped", delivery_error: reason)
         return
       end
 

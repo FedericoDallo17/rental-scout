@@ -58,4 +58,38 @@ class NotifyNewListingsJobTest < ActiveJob::TestCase
   ensure
     Notifications::PushoverClient.define_singleton_method(:new, original_new)
   end
+
+  test "delivers a listing notification to the browser instead of a run summary" do
+    source = ListingSource.create!(name: "Browser Job Source", adapter_key: "browser_job_source")
+    run = ScrapingRun.create!(status: "succeeded", started_at: 1.minute.ago, finished_at: Time.current)
+    user = create_push_test_user!
+    user.push_subscriptions.create!(
+      endpoint: "https://push.example.com/#{SecureRandom.hex(8)}", p256dh: "public-key", auth: "auth-secret"
+    )
+    search = user.search_preferences.create!(name: "Centro", location_query: "centro", notifications_enabled: true)
+    SearchZone.where(search_preference: search).delete_all
+    Listing.create!(
+      listing_source: source, scraping_run: run, title: "Apto Browser", in_scope: true,
+      canonical_url: "https://example.com/browser-job", external_id: "browser-job",
+      location_text: "Centro"
+    )
+    NotificationEvent.where(listing: Listing.where(scraping_run: run)).delete_all
+    deliveries = []
+    client = Object.new
+    client.define_singleton_method(:deliver) do |**attributes|
+      deliveries << attributes
+      Notifications::WebPushClient::DeliveryResult.new(delivered_count: 1, failed_count: 0)
+    end
+    original_new = Notifications::WebPushClient.method(:new)
+    Notifications::WebPushClient.define_singleton_method(:new) { client }
+
+    NotifyNewListingsJob.perform_now(run.id)
+
+    assert_equal 1, deliveries.size
+    assert_equal "https://example.com/browser-job", deliveries.first[:url]
+    assert_match "Apto Browser", deliveries.first[:message]
+    assert_equal 1, NotificationEvent.where(status: "sent", channel: "web_push").count
+  ensure
+    Notifications::WebPushClient.define_singleton_method(:new, original_new)
+  end
 end

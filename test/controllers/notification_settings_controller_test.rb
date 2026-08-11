@@ -245,6 +245,25 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "keep-this-key", user.reload.pushover_user_key
   end
 
+  test "pauses and resumes Pushover without removing the key" do
+    user = create_user!(email: "settings-pause@example.com", pushover_user_key: "keep-this-key")
+    sign_in user
+
+    patch notification_settings_path, params: { user: { pushover_enabled: "false" } }
+
+    assert_not user.reload.pushover_enabled?
+    assert_equal "keep-this-key", user.pushover_user_key
+
+    get edit_notification_settings_path
+    assert_select ".notification-settings__pushover", text: /notifications are paused/
+    assert_select "form[action='#{notification_settings_path}'] button", text: "Resume Pushover notifications"
+
+    patch notification_settings_path, params: { user: { pushover_enabled: "true" } }
+
+    assert user.reload.pushover_enabled?
+    assert_equal "keep-this-key", user.pushover_user_key
+  end
+
   test "explicit removal clears the configured key" do
     user = create_user!(email: "settings-remove@example.com", pushover_user_key: "remove-this-key")
     sign_in user

@@ -37,4 +37,21 @@ class Notifications::DispatcherTest < ActiveSupport::TestCase
     assert_equal "pushover", result.channel
     assert_equal "fallback-key", deliveries.first.fetch(:user_key)
   end
+
+  test "does not fall back to Pushover when it is paused" do
+    user = create_push_test_user!
+    user.update!(pushover_user_key: "saved-key", pushover_enabled: false)
+    push_client = Object.new
+    push_client.define_singleton_method(:deliver) do |**|
+      Notifications::WebPushClient::DeliveryResult.new(delivered_count: 0, failed_count: 0)
+    end
+    pushover_client = Object.new
+    pushover_client.define_singleton_method(:deliver) { |**| flunk "Pushover should not be called" }
+
+    assert_raises(Notifications::Dispatcher::NoDeliveryChannel) do
+      Notifications::Dispatcher.new(web_push_client: push_client, pushover_client:).deliver(
+        user:, title: "Title", message: "Body", url: "https://example.test"
+      )
+    end
+  end
 end

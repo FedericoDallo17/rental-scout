@@ -14,7 +14,7 @@ module Notifications
         return Result.new(channel: "web_push", delivered_count: web_push_result.delivered_count)
       end
 
-      if user.pushover_user_key.present?
+      if user.pushover_active?
         @pushover_client.deliver(user_key: user.pushover_user_key, title:, message:, url:)
         return Result.new(channel: "pushover", delivered_count: 1)
       end

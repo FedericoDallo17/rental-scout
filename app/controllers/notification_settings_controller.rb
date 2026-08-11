@@ -5,9 +5,17 @@ class NotificationSettingsController < ApplicationController
   end
 
   def update
+    updates = {}
     if submitted_key.present?
       pushover_client.validate_user_key!(user_key: submitted_key)
-      current_user.update!(pushover_user_key: submitted_key)
+      updates[:pushover_user_key] = submitted_key
+      updates[:pushover_enabled] = true
+    elsif settings_params.key?(:pushover_enabled)
+      updates[:pushover_enabled] = ActiveModel::Type::Boolean.new.cast(settings_params[:pushover_enabled])
+    end
+
+    if updates.any?
+      current_user.update!(updates)
       redirect_to edit_notification_settings_path, notice: t("flash.notification_saved")
     else
       redirect_to edit_notification_settings_path, notice: t("flash.notification_unchanged")
@@ -19,7 +27,7 @@ class NotificationSettingsController < ApplicationController
   end
 
   def test_delivery
-    if current_user.push_subscriptions.none? && current_user.pushover_user_key.blank?
+    if current_user.push_subscriptions.none? && !current_user.pushover_active?
       redirect_to edit_notification_settings_path, alert: t("flash.notification_key_required")
       return
     end
@@ -45,7 +53,7 @@ class NotificationSettingsController < ApplicationController
   private
 
   def settings_params
-    @settings_params ||= params.require(:user).permit(:pushover_user_key)
+    @settings_params ||= params.require(:user).permit(:pushover_user_key, :pushover_enabled)
   end
 
   def submitted_key
