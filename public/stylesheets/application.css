@@ -1651,9 +1651,31 @@ button {
   font-weight: 600;
 }
 
-.notification-settings__web-push-ios {
+.notification-settings__ios-guide {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #c8d5df;
   color: #526170;
   font-size: 0.9rem;
+}
+
+.notification-settings__ios-guide h3 {
+  margin: 0 0 0.4rem;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.notification-settings__ios-guide p {
+  margin: 0 0 0.65rem;
+}
+
+.notification-settings__ios-guide ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.notification-settings__ios-guide li + li {
+  margin-top: 0.4rem;
 }
 
 @media (max-width: 900px) {

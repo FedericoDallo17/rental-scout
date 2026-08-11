@@ -47,6 +47,20 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-search-notification-warning][hidden]"
   end
 
+  test "new search recognizes a browser push subscription as connected" do
+    user = create_user!(email: "search-form-web-push@example.com")
+    user.push_subscriptions.create!(
+      endpoint: "https://push.example.test/search-form", p256dh: "public-key", auth: "auth-secret"
+    )
+    sign_in user
+
+    get new_search_preference_path
+
+    assert_response :success
+    assert_select "[data-phone-notifications-configured='true']"
+    assert_select "[data-search-notification-warning][hidden]"
+  end
+
   test "signed in user creates saved search with zones" do
     user = create_user!(email: "create-search@example.com")
     zone = create_zone("Pocitos", "pocitos")

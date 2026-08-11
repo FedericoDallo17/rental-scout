@@ -38,6 +38,15 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-web-push-settings][data-vapid-public-key]" do
       assert_select "h2", text: "Browser notifications"
       assert_select "button[data-web-push-toggle]", text: "Enable on this device"
+      assert_select ".notification-settings__ios-guide" do
+        assert_select "h3", text: "Using an iPhone or iPad?"
+        assert_select "li", count: 5
+        assert_select "li", text: /Open Rental Scout in Safari—not Chrome/
+        assert_select "li", text: /Share button.*square with an upward arrow/
+        assert_select "li", text: /Add to Home Screen/
+        assert_select "li", text: /new icon/
+        assert_select "li", text: /Enable on this device/
+      end
     end
     assert_select ".notification-settings__status", text: /Phone notifications connected/
     assert_select ".notification-settings__explanation" do
@@ -78,6 +87,11 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
       assert_select "li", text: /independiente de Rental Scout/
     end
     assert_select ".notification-settings__status", text: /Conectá las notificaciones al teléfono/
+    assert_select ".notification-settings__ios-guide" do
+      assert_select "h3", text: "¿Usás iPhone o iPad?"
+      assert_select "li", text: /Abrí Rental Scout en Safari, no en Chrome/
+      assert_select "li", text: /Agregar a inicio/
+    end
     assert_select ".notification-settings__steps" do
       assert_select "li", count: 3
       assert_select "strong", text: "Instalá Pushover"

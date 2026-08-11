@@ -397,7 +397,14 @@ es:
       denied: "Las notificaciones están bloqueadas. Permitilas en la configuración del navegador e intentá nuevamente."
       unsupported: "Este navegador no admite notificaciones Web Push."
       error: "No pudimos actualizar las notificaciones en este dispositivo. Intentá nuevamente."
-      ios_hint: "En iPhone o iPad, primero agregá Rental Scout a la pantalla de inicio y luego abrilo desde allí para activar las notificaciones."
+      ios_guide:
+        title: "¿Usás iPhone o iPad?"
+        intro: "Apple requiere que agregues el sitio a la pantalla de inicio antes de poder recibir notificaciones."
+        open_safari: "Abrí Rental Scout en Safari, no en Chrome."
+        tap_share: "Tocá el botón Compartir (el cuadrado con una flecha hacia arriba) en la barra de Safari."
+        add_home: "Deslizá hacia abajo, elegí “Agregar a inicio” y luego tocá “Agregar”."
+        open_icon: "Volvé a la pantalla de inicio y abrí Rental Scout desde el nuevo ícono."
+        enable: "Abrí la configuración de notificaciones y tocá “Activar en este dispositivo”."
     delivery:
       title: "Nueva coincidencia: %{search}"
       message: "%{title} - %{price}"

@@ -1,4 +1,4 @@
-<div class="search-form-shell" data-search-preview-root data-phone-notifications-configured="<%= current_user.pushover_user_key.present? %>">
+<div class="search-form-shell" data-search-preview-root data-phone-notifications-configured="<%= current_user.pushover_user_key.present? || current_user.push_subscriptions.exists? %>">
   <%= form_with model: search_preference, class: "search-form search-form-panel" do |form| %>
     <% if search_preference.errors.any? %>
       <div class="form-errors">
@@ -72,7 +72,7 @@
     </label>
     <p class="search-form__notification-warning"
       data-search-notification-warning
-      <%= "hidden" unless search_preference.notifications_enabled? && current_user.pushover_user_key.blank? %>>
+      <%= "hidden" unless search_preference.notifications_enabled? && current_user.pushover_user_key.blank? && current_user.push_subscriptions.none? %>>
       <%= t("searches.notification_setup_warning") %>
       <%= link_to t("searches.connect_phone_notifications"), edit_notification_settings_path %>
     </p>

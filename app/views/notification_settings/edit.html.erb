@@ -30,7 +30,17 @@
         <%= t("notifications.web_push.enable") %>
       </button>
       <p role="status" aria-live="polite" data-web-push-status></p>
-      <p class="notification-settings__web-push-ios"><%= t("notifications.web_push.ios_hint") %></p>
+      <section class="notification-settings__ios-guide" aria-labelledby="ios-home-screen-title">
+        <h3 id="ios-home-screen-title"><%= t("notifications.web_push.ios_guide.title") %></h3>
+        <p><%= t("notifications.web_push.ios_guide.intro") %></p>
+        <ol>
+          <li><%= t("notifications.web_push.ios_guide.open_safari") %></li>
+          <li><%= t("notifications.web_push.ios_guide.tap_share") %></li>
+          <li><%= t("notifications.web_push.ios_guide.add_home") %></li>
+          <li><%= t("notifications.web_push.ios_guide.open_icon") %></li>
+          <li><%= t("notifications.web_push.ios_guide.enable") %></li>
+        </ol>
+      </section>
     </section>
 
     <section class="notification-settings__channel notification-settings__pushover">

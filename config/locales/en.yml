@@ -349,7 +349,14 @@ en:
       denied: "Notifications were blocked. Allow them in your browser settings and try again."
       unsupported: "This browser does not support Web Push notifications."
       error: "We couldn't update notifications on this device. Please try again."
-      ios_hint: "On iPhone or iPad, first add Rental Scout to your Home Screen, then open it from there to enable notifications."
+      ios_guide:
+        title: "Using an iPhone or iPad?"
+        intro: "Apple requires websites to be added to the Home Screen before they can send notifications."
+        open_safari: "Open Rental Scout in Safari—not Chrome."
+        tap_share: "Tap the Share button (the square with an upward arrow) in Safari's toolbar."
+        add_home: "Scroll down, choose “Add to Home Screen,” then tap “Add.”"
+        open_icon: "Return to your Home Screen and open Rental Scout using the new icon."
+        enable: "Open Notification Settings and tap “Enable on this device.”"
     delivery:
       title: "New match: %{search}"
       message: "%{title} - %{price}"
