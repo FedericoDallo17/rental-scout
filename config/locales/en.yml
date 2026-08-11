@@ -344,6 +344,14 @@ en:
       message:
         one: "%{count} new rental matched your saved searches."
         other: "%{count} new rentals matched your saved searches."
+    results:
+      eyebrow: "Rental Scout notification"
+      title: "Your new matches"
+      intro:
+        one: "One new property matched your saved searches."
+        other: "%{count} new properties matched your saved searches."
+      open_listing: "Open property"
+      expiry: "For your privacy, this notification link expires after seven days."
     account: "Account"
     title: "Phone notifications"
     intro: "Choose whether Rental Scout should alert you when a new listing matches one of your saved searches."

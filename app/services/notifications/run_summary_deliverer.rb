@@ -18,7 +18,7 @@ module Notifications
           user_key: user.pushover_user_key,
           title: I18n.t("notifications.summary.title"),
           message: I18n.t("notifications.summary.message", count: listing_count),
-          url: run_url(scraping_run)
+          url: results_url(user, scraping_run)
         )
       end
       update_events(events, status: "sent", sent_at: Time.current, delivery_error: nil)
@@ -28,9 +28,14 @@ module Notifications
 
     private
 
-    def run_url(scraping_run)
+    def results_url(user, scraping_run)
       options = Rails.application.config.action_mailer.default_url_options || {}
-      Rails.application.routes.url_helpers.scraping_run_url(scraping_run, **options)
+      token = Rails.application.message_verifier(:notification_results).generate(
+        { user_id: user.id, scraping_run_id: scraping_run.id, locale: user.locale },
+        expires_in: 7.days,
+        purpose: :notification_results
+      )
+      Rails.application.routes.url_helpers.notification_results_url(token:, **options)
     end
 
     def update_events(events, attributes)

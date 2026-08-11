@@ -392,6 +392,14 @@ es:
       message:
         one: "%{count} alquiler nuevo coincidió con tus búsquedas guardadas."
         other: "%{count} alquileres nuevos coincidieron con tus búsquedas guardadas."
+    results:
+      eyebrow: "Notificación de Rental Scout"
+      title: "Tus nuevas coincidencias"
+      intro:
+        one: "Una propiedad nueva coincidió con tus búsquedas guardadas."
+        other: "%{count} propiedades nuevas coincidieron con tus búsquedas guardadas."
+      open_listing: "Abrir propiedad"
+      expiry: "Para proteger tu privacidad, este enlace vence después de siete días."
     account: "Cuenta"
     title: "Notificaciones al teléfono"
     intro: "Elegí si querés que Rental Scout te avise cuando una propiedad nueva coincida con alguna de tus búsquedas guardadas."

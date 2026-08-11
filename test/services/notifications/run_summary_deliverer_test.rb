@@ -28,5 +28,11 @@ class Notifications::RunSummaryDelivererTest < ActiveSupport::TestCase
 
     assert_equal "Nuevas coincidencias en Rental Scout", delivered.first[:title]
     assert_equal "2 alquileres nuevos coincidieron con tus búsquedas guardadas.", delivered.first[:message]
+    uri = URI.parse(delivered.first[:url])
+    assert_equal "/notification_results", uri.path
+    payload = Rails.application.message_verifier(:notification_results).verified(
+      Rack::Utils.parse_query(uri.query).fetch("token"), purpose: :notification_results
+    )
+    assert_equal({ "user_id" => user.id, "scraping_run_id" => run.id, "locale" => "es" }, payload)
   end
 end

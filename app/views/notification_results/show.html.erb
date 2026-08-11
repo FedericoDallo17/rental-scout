@@ -1,0 +1,18 @@
+<div class="auth-header">
+  <p class="notification-settings__eyebrow"><%= t("notifications.results.eyebrow") %></p>
+  <h1 class="auth-title"><%= t("notifications.results.title") %></h1>
+  <p class="auth-copy"><%= t("notifications.results.intro", count: @listings.size) %></p>
+</div>
+
+<div class="notification-results">
+  <% @listings.each do |listing| %>
+    <article class="notification-results__listing">
+      <h2><%= listing.title %></h2>
+      <p><%= MoneyFormatter.call(listing.price_cents, listing.currency) if listing.price_cents.present? %></p>
+      <%= link_to t("notifications.results.open_listing"), listing.canonical_url,
+        target: "_blank", rel: "noopener noreferrer", class: "auth-submit" %>
+    </article>
+  <% end %>
+</div>
+
+<p class="auth-copy"><%= t("notifications.results.expiry") %></p>
