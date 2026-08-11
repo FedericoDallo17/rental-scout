@@ -84,8 +84,8 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "¿Qué tan confiable es la ubicación?"
 
     get edit_notification_settings_path
-    assert_includes response.body, "Notificaciones al teléfono"
-    assert_includes response.body, "Tu clave permanece privada"
+    assert_includes response.body, "Notificaciones"
+    assert_includes response.body, "Los datos de tus notificaciones permanecen privados"
   end
 
   private

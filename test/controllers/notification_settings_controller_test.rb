@@ -52,7 +52,7 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
         assert_select "details[data-device-guide='windows'] summary", text: "Windows PC"
       end
     end
-    assert_select ".notification-settings__status", text: /Phone notifications connected/
+    assert_select ".notification-settings__status", text: /Notifications connected/
     assert_select ".notification-settings__explanation" do
       assert_select "h2", text: "What is Pushover?"
       assert_select "p", text: /independent notification service/
@@ -63,7 +63,7 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_select ".notification-settings__searches" do
       assert_select "a[href='#{edit_search_preference_path(search)}']", text: "Pocitos"
-      assert_select "p", text: "1 saved search has phone notifications enabled."
+      assert_select "p", text: "1 saved search has notifications enabled."
     end
     assert_select "form[action='#{test_delivery_notification_settings_path}'] button", text: "Send test notification"
     assert_select "details summary", text: "Replace Pushover key"
@@ -90,7 +90,7 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
       assert_select "li", text: /Necesitás la aplicación de Pushover/
       assert_select "li", text: /independiente de Rental Scout/
     end
-    assert_select ".notification-settings__status", text: /Conectá las notificaciones al teléfono/
+    assert_select ".notification-settings__status", text: /Configurá las notificaciones/
     assert_select ".notification-settings__device-guides" do
       assert_select "h3", text: "Instrucciones según tu dispositivo"
       assert_select "details[data-device-guide]", count: 4
@@ -118,7 +118,7 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     get edit_notification_settings_path
 
     assert_response :success
-    assert_select ".notification-settings__status", text: /Phone notifications connected/
+    assert_select ".notification-settings__status", text: /Notifications connected/
     assert_select "form[action='#{test_delivery_notification_settings_path}'] button", text: "Send test notification"
     assert_select ".notification-settings__pushover" do
       assert_select "h2", text: "Pushover"
