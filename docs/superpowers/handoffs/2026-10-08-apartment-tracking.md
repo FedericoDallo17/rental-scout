@@ -1,7 +1,7 @@
 # Apartment tracking and saved-search area — implementation handoff
 
 Branch: feat/apartment-tracking. Worktree: /Users/fededallo/Desktop/rental-scout-tracking.
-User approved the new table and saved-search area migration on 2026-10-08.
+User approved the new table and saved-search area migration on 2026-10-08. Implementation commit `7f9eae3` is integrated in local `main`; both local test and development databases migrated successfully. Temporary QA data and server were removed.
 
 ## Delivered
 Private favorites; independent editable contact/visit/rejection dates; today buttons; paginated My apartments with status filters; snapshots retained after inventory purge; stable source identity reused after reingestion; current feed filters preserved when saving tracking. Saved-search min/max m² apply to feed matches and notification fan-out. English and Spanish labels, date formats and live search-area preview included.

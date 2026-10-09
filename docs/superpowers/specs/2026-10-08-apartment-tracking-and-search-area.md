@@ -28,4 +28,4 @@ Al crear o editar una búsqueda se podrá indicar superficie mínima y máxima e
 
 ## Estado
 
-Migraciones aprobadas por el usuario el 2026-10-08. Implementado en la rama `feat/apartment-tracking`. La migración fue aplicada únicamente a la base local de pruebas. No se modificó producción.
+Migraciones aprobadas por el usuario el 2026-10-08. Implementado en `feat/apartment-tracking` e integrado en `main` local (commit `7f9eae3`). La migración fue aplicada a las bases locales de pruebas y desarrollo. No se modificó producción.
