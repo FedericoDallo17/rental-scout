@@ -9,6 +9,9 @@ class SearchPreference < ApplicationRecord
 
   validates :name, :location_query, presence: true
   validates :price_currency, inclusion: { in: PRICE_CURRENCIES }
+  validates :min_square_meters, :max_square_meters,
+    numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
+  validate :ordered_area_range
 
   scope :ordered_for_sidebar, -> { order(:created_at, :id) }
 
@@ -29,6 +32,12 @@ class SearchPreference < ApplicationRecord
   end
 
   private
+
+  def ordered_area_range
+    if min_square_meters.present? && max_square_meters.present? && min_square_meters > max_square_meters
+      errors.add(:max_square_meters, :greater_than_or_equal_to, count: min_square_meters)
+    end
+  end
 
   def cents_to_units(cents)
     return if cents.blank?

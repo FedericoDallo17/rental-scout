@@ -1,0 +1,30 @@
+en:
+  date:
+    formats:
+      tracking: "%Y-%m-%d"
+  tracking:
+    title: "My apartments"
+    intro: "Save favorites and keep track of contacts, visits and rejections."
+    filters: "Apartment status"
+    favorite: "Favorite"
+    history: "Contact, visit and rejection"
+    date_hint: "Choose a date to mark it. Clear the date to remove the mark."
+    contacted_on: "Contacted on"
+    visited_on: "Visited on"
+    rejected_on: "Rejected on"
+    save: "Save tracking"
+    saved: "Tracking saved."
+    archived: "This listing has left the inventory. Your details and the original link are preserved."
+    empty: "No apartments with this status."
+    empty_copy: "Save a favorite or record a contact, visit or rejection from the feed."
+    search_area_hint: "Area limits exclude listings without reported square meters."
+    any_area: "Any surface area"
+    mark_contacted_on: "Contacted today"
+    mark_visited_on: "Visited today"
+    mark_rejected_on: "Rejected today"
+    statuses:
+      all: "All"
+      favorites: "Favorites"
+      contacted: "Contacted"
+      visited: "Visited"
+      rejected: "Rejected"

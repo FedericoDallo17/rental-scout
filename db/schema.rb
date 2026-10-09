@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_10_130000) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -23,6 +23,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_130000) do
     t.datetime "updated_at", null: false
     t.bigint "third_party_calls_count", default: 0, null: false
     t.index ["adapter_key"], name: "index_listing_sources_on_adapter_key", unique: true
+  end
+
+  create_table "listing_tracks", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "listing_id"
+    t.string "source_key", null: false
+    t.string "source_identity", null: false
+    t.boolean "favorite", default: false, null: false
+    t.date "contacted_on"
+    t.date "visited_on"
+    t.date "rejected_on"
+    t.jsonb "snapshot", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["listing_id"], name: "index_listing_tracks_on_listing_id"
+    t.index ["user_id", "source_key", "source_identity"], name: "index_listing_tracks_on_user_and_identity", unique: true
+    t.index ["user_id"], name: "index_listing_tracks_on_user_id"
   end
 
   create_table "listings", force: :cascade do |t|
@@ -135,7 +152,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_130000) do
     t.bigint "user_id", null: false
     t.string "price_currency", default: "UYU", null: false
     t.boolean "include_expenses", default: false, null: false
+    t.integer "min_square_meters"
+    t.integer "max_square_meters"
     t.index ["user_id"], name: "index_search_preferences_on_user_id"
+    t.check_constraint "(min_square_meters IS NULL OR min_square_meters >= 0) AND (max_square_meters IS NULL OR max_square_meters >= 0) AND (min_square_meters IS NULL OR max_square_meters IS NULL OR min_square_meters <= max_square_meters)", name: "search_preferences_area_range"
   end
 
   create_table "search_zones", force: :cascade do |t|
@@ -199,6 +219,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_130000) do
     t.index ["source_key", "source_feature_id"], name: "index_zones_on_source_key_and_source_feature_id", unique: true, where: "((source_key IS NOT NULL) AND (source_feature_id IS NOT NULL))"
   end
 
+  add_foreign_key "listing_tracks", "listings", on_delete: :nullify
+  add_foreign_key "listing_tracks", "users"
   add_foreign_key "listings", "listing_sources"
   add_foreign_key "listings", "scraping_runs"
   add_foreign_key "notification_events", "listing_sources"

@@ -1,18 +1,19 @@
 # Status
 
-Last updated: 2026-07-19. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
+Last updated: 2026-10-09. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
 Freshness-first MVP lifecycle and inventory-health observability complete
 
 ## Current Task
-Ticket 036 inventory-health observability complete
+Apartment tracking and saved-search surface area implemented and validated
 
 ## Status
 Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
+- User-approved apartment tracking: private favorites, editable contact/visit/rejection dates, quick today actions, paginated status filters, purge-safe snapshots and stable reingestion identity. Saved searches now persist validated min/max m², used by feed matching and notification fan-out (10-09).
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
 - Scraper domain ADR (007)
 - Devise auth + user-owned saved searches, shared listing inventory (07-03..07-04)
@@ -56,7 +57,7 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 036 follow-up: current-scrape progress now broadcasts over Turbo Streams with cross-process Cable delivery; a slower page refresh remains as a disconnect fallback (07-19)
 
 ## Doing
-- No roadmap ticket is currently in flight.
+- No roadmap ticket is currently in flight. Apartment tracking is implemented; production deployment remains pending.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.

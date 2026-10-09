@@ -145,7 +145,7 @@
       <% if @listings.any? %>
       <section class="listings-grid" aria-label="<%= t("feed.listings_label") %>">
         <% @listings.each do |listing| %>
-      <article class="listing-card">
+      <article class="listing-card listing-card--tracked">
         <%= link_to listing.canonical_url, class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
           <div class="listing-card__body">
             <% match_score = @listing_scores.fetch(listing) %>
@@ -193,6 +193,7 @@
             <p class="listing-card__url"><%= listing.canonical_url %></p>
           </div>
         <% end %>
+        <%= render "listing_tracks/form", track: @listing_tracks[listing.id] || current_user.listing_tracks.build, listing: listing, return_to: "feed" %>
       </article>
         <% end %>
       </section>

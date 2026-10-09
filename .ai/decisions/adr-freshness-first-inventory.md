@@ -36,9 +36,7 @@ Users who want to browse the full market should use the source sites directly.
 
 ## Provisional Areas
 - The 7-day window — revisit with real usage data.
-- If a "save/favorite listing" feature is ever built, the purge must spare saved
-  listings (today no such feature exists; "time to save it" currently means time to
-  act on it off-platform).
+- Superseded on 2026-10-09 by `adr-personal-apartment-tracking.md`: private snapshots preserve favorites/history while shared inventory still purges after seven days.
 
 ## Consequences
 - The database stays small (~1 week of Montevideo rental publications) and the feed is

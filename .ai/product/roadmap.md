@@ -3,6 +3,7 @@
 Last updated: 2026-07-19. Phases A/B and most unplanned auth/geo work are done; this reflects reality (see docs/superpowers/reports/2026-07-06-state-of-the-project.md).
 
 ## Done
+- Apartment tracking and saved-search area: user-approved favorites, contact/visit/rejection dates, retained snapshots, personal status filters and persisted min/max m² applied to matches and alerts (2026-10-09).
 - Discovery, look feel, MVP scope (stub docs only)
 - Mock source adapter, portal listing surface
 - Deduplication + seen-listing tracking

@@ -4,6 +4,7 @@ class Listing < ApplicationRecord
 
   has_many :notification_events, dependent: :restrict_with_exception
   has_many :seen_listings, dependent: :nullify
+  has_many :listing_tracks, dependent: :nullify
 
   validates :title, :canonical_url, presence: true
   validates :canonical_url, uniqueness: { scope: :listing_source_id }
@@ -54,6 +55,8 @@ class Listing < ApplicationRecord
       min_price_cents: search_preference.min_price_cents,
       max_price_cents: search_preference.max_price_cents,
       min_bedrooms: search_preference.min_bedrooms,
+      min_square_meters: search_preference.min_square_meters,
+      max_square_meters: search_preference.max_square_meters,
       include_expenses: search_preference.include_expenses?
     ).call
     listings.recent_first

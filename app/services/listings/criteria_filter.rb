@@ -1,12 +1,15 @@
 module Listings
   class CriteriaFilter
-    def initialize(scope, currency: nil, min_price_cents: nil, max_price_cents: nil, min_bedrooms: nil, include_expenses: false)
+    def initialize(scope, currency: nil, min_price_cents: nil, max_price_cents: nil, min_bedrooms: nil, include_expenses: false, min_square_meters: nil, max_square_meters: nil, include_unknown_area: false)
       @scope = scope
       @currency = currency
       @min_price_cents = min_price_cents
       @max_price_cents = max_price_cents
       @min_bedrooms = min_bedrooms
       @include_expenses = include_expenses
+      @min_square_meters = min_square_meters
+      @max_square_meters = max_square_meters
+      @include_unknown_area = include_unknown_area
     end
 
     def call
@@ -14,12 +17,30 @@ module Listings
       relation = relation.where(currency:) if currency.present?
       relation = apply_price(relation)
       relation = relation.where("bedrooms >= ?", min_bedrooms) if min_bedrooms.present?
-      relation
+      apply_area(relation)
     end
 
     private
 
     attr_reader :scope, :currency, :min_price_cents, :max_price_cents, :min_bedrooms, :include_expenses
+
+    def apply_area(relation)
+      return relation if @min_square_meters.nil? && @max_square_meters.nil?
+
+      conditions = []
+      values = {}
+      if @min_square_meters
+        conditions << "square_meters >= :min"
+        values[:min] = @min_square_meters
+      end
+      if @max_square_meters
+        conditions << "square_meters <= :max"
+        values[:max] = @max_square_meters
+      end
+      predicate = conditions.join(" AND ")
+      predicate = "(#{predicate}) OR square_meters IS NULL" if @include_unknown_area
+      relation.where(predicate, values)
+    end
 
     def apply_price(relation)
       return relation if min_price_cents.blank? && max_price_cents.blank?

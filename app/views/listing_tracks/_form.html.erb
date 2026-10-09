@@ -1,0 +1,48 @@
+<%= form_with model: track, class: "listing-tracking" do |form| %>
+  <% track_dom_id = track.persisted? ? "saved_#{track.id}" : "listing_#{local_assigns[:listing]&.id || 'new'}" %>
+  <% if track.errors.any? %>
+    <div class="form-errors" role="alert">
+      <ul><% track.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul>
+    </div>
+  <% end %>
+  <%= hidden_field_tag :listing_id, listing.id, id: nil if local_assigns[:listing] %>
+  <%= hidden_field_tag :return_to, local_assigns[:return_to], id: nil %>
+  <%= hidden_field_tag :search_id, @active_search&.id, id: nil %>
+  <%= hidden_field_tag :page, @page, id: nil %>
+  <%= hidden_field_tag :status, @status, id: nil %>
+  <% (@feed_params || {}).each do |key, value| %>
+    <%= hidden_field_tag "feed_params[#{key}]", value, id: nil %>
+  <% end %>
+  <label class="listing-tracking__favorite">
+    <%= form.check_box :favorite, id: "track_#{track_dom_id}_favorite" %>
+    <span><%= t("tracking.favorite") %></span>
+  </label>
+  <details class="listing-tracking__history" <%= "open" if track.errors.any? %>>
+    <summary><%= t("tracking.history") %></summary>
+    <p class="listing-tracking__hint"><%= t("tracking.date_hint") %></p>
+    <% ListingTrack::DATE_FIELDS.each do |field| %>
+      <% field_id = "track_#{track_dom_id}_#{field}" %>
+      <div class="listing-tracking__date">
+        <%= form.label field, t("tracking.#{field}"), for: field_id %>
+        <%= form.date_field field, id: field_id %>
+      </div>
+    <% end %>
+  </details>
+  <div class="listing-tracking__quick-actions">
+    <% ListingTrack::DATE_FIELDS.each do |field| %>
+      <% unless track.public_send(field) %>
+        <%= form.button t("tracking.mark_#{field}"), type: :submit, name: "listing_track[#{field}]", value: Date.current.iso8601 %>
+      <% end %>
+    <% end %>
+  </div>
+  <% if track.contacted_on || track.visited_on || track.rejected_on %>
+    <ul class="listing-tracking__dates">
+      <% ListingTrack::DATE_FIELDS.each do |field| %>
+        <% if track.public_send(field) %>
+          <li><%= t("tracking.#{field}") %>: <time datetime="<%= track.public_send(field).iso8601 %>"><%= l(track.public_send(field), format: :tracking) %></time></li>
+        <% end %>
+      <% end %>
+    </ul>
+  <% end %>
+  <%= form.submit t("tracking.save"), class: "feed-controls__submit" %>
+<% end %>

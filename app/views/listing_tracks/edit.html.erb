@@ -1,0 +1,5 @@
+<main class="tracking-page">
+  <h1><%= @track.snapshot.fetch("title") %></h1>
+  <%= render "form", track: @track %>
+  <%= link_to t("tracking.title"), listing_tracks_path %>
+</main>

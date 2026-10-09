@@ -1,0 +1,47 @@
+<main class="tracking-page">
+  <header class="feed-header">
+    <div>
+      <h1><%= t("tracking.title") %></h1>
+      <p><%= t("tracking.intro") %></p>
+    </div>
+    <%= link_to t("runs.feed"), listings_path, class: "feed-controls__clear" %>
+  </header>
+  <nav class="tracking-filters" aria-label="<%= t("tracking.filters") %>">
+    <% ListingTracksController::FILTERS.each do |status| %>
+      <%= link_to t("tracking.statuses.#{status}"), listing_tracks_path(status: status), class: ["tracking-filter", ("tracking-filter--active" if @status == status)], aria: { current: ("page" if @status == status) } %>
+    <% end %>
+  </nav>
+  <% if @tracks.any? %>
+    <section class="listings-grid" aria-label="<%= t("tracking.title") %>">
+      <% @tracks.each do |track| %>
+        <% snapshot = track.snapshot %>
+        <article class="listing-card listing-card--tracked">
+          <%= link_to snapshot.fetch("canonical_url"), class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
+            <div class="listing-card__body">
+              <p class="listing-card__price"><%= format_money(snapshot["price_cents"], snapshot["currency"]) %></p>
+              <h2><%= snapshot.fetch("title") %></h2>
+              <p class="listing-card__location"><%= snapshot["location"] %></p>
+              <dl class="listing-card__facts">
+                <div><dt><%= t("feed.bedrooms") %></dt><dd><%= snapshot["bedrooms"] || "-" %></dd></div>
+                <div><dt>m²</dt><dd><%= snapshot["square_meters"] || "-" %></dd></div>
+                <div><dt><%= t("feed.expenses") %></dt><dd><%= format_money(snapshot["expenses_cents"], snapshot["expenses_currency"].presence || snapshot["currency"]) || "-" %></dd></div>
+                <div><dt><%= t("feed.source") %></dt><dd><%= snapshot["source_name"] %></dd></div>
+              </dl>
+              <% unless track.listing_id %><p><%= t("tracking.archived") %></p><% end %>
+            </div>
+          <% end %>
+          <%= render "form", track: track %>
+        </article>
+      <% end %>
+    </section>
+    <% if @total_pages > 1 %>
+      <nav class="feed-pagination" aria-label="<%= t("feed.pagination") %>">
+        <%= link_to t("feed.previous_page"), listing_tracks_path(status: @status, page: @page - 1) if @page > 1 %>
+        <span><%= t("feed.page_status", page: @page, total: @total_pages) %></span>
+        <%= link_to t("feed.next_page"), listing_tracks_path(status: @status, page: @page + 1) if @page < @total_pages %>
+      </nav>
+    <% end %>
+  <% else %>
+    <section class="feed-empty-state"><h2><%= t("tracking.empty") %></h2><p><%= t("tracking.empty_copy") %></p></section>
+  <% end %>
+</main>

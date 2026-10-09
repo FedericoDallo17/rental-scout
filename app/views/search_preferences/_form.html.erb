@@ -55,6 +55,16 @@
       </label>
     </fieldset>
 
+    <fieldset class="feed-range-filter search-form__area-filter">
+      <legend><%= t("feed.surface_area") %> (m²)</legend>
+      <div class="feed-range-filter__inputs">
+        <%= form.number_field :min_square_meters, min: 0, step: 1, placeholder: t("feed.min_area_short"), aria: { label: t("feed.min_area") } %>
+        <span aria-hidden="true">–</span>
+        <%= form.number_field :max_square_meters, min: 0, step: 1, placeholder: t("feed.max_area_short"), aria: { label: t("feed.max_area") } %>
+      </div>
+      <p><%= t("tracking.search_area_hint") %></p>
+    </fieldset>
+
     <fieldset class="search-form__zones">
       <legend><%= t("searches.neighborhoods") %></legend>
       <% zones.each do |zone| %>
@@ -95,6 +105,7 @@
       <span data-search-preview-zones><%= t("count.zone", count: search_preference.zones.size) %></span>
       <span data-search-preview-bedrooms><%= t("feed.any_bedrooms") %></span>
       <span data-search-preview-price><%= t("searches.any_price") %></span>
+      <span data-search-preview-area><%= t("tracking.any_area") %></span>
       <span data-search-preview-notifications><%= search_preference.notifications_enabled? ? t("searches.notifications_on") : t("searches.notifications_off") %></span>
     </div>
   </aside>
@@ -112,6 +123,7 @@
     const zones = root.querySelector("[data-search-preview-zones]");
     const bedrooms = root.querySelector("[data-search-preview-bedrooms]");
     const price = root.querySelector("[data-search-preview-price]");
+    const area = root.querySelector("[data-search-preview-area]");
     const notifications = root.querySelector("[data-search-preview-notifications]");
     const notificationWarning = root.querySelector("[data-search-notification-warning]");
 
@@ -134,6 +146,9 @@
       price.textContent = includesExpenses && (min || max) ? `${range} · ${<%= t("searches.expenses_included_short").to_json.html_safe %>}` : range;
 
       const notify = form.querySelector("[name='search_preference[notifications_enabled]'][type='checkbox']").checked;
+      const minArea = form.querySelector("[name='search_preference[min_square_meters]']").value;
+      const maxArea = form.querySelector("[name='search_preference[max_square_meters]']").value;
+      area.textContent = minArea && maxArea ? `${minArea}–${maxArea} m²` : minArea ? `≥ ${minArea} m²` : maxArea ? `≤ ${maxArea} m²` : <%= t("tracking.any_area").to_json.html_safe %>;
       notifications.textContent = notify ? facts.dataset.notificationsOn : facts.dataset.notificationsOff;
       notificationWarning.hidden = !notify || root.dataset.phoneNotificationsConfigured === "true";
     };

@@ -2372,3 +2372,28 @@ button {
     grid-column: auto;
   }
 }
+
+/* Personal apartment tracking */
+.listing-card--tracked { display: flex; flex-direction: column; }
+.listing-card--tracked .listing-card__link { height: auto; flex: 1; }
+.listing-card--tracked .listing-card__body { height: auto; }
+.tracking-page { max-width: 1440px; margin: 0 auto; padding: 32px 24px; }
+.tracking-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
+.tracking-filter { padding: 10px 16px; border: 1px solid #bccbd5; border-radius: 8px; color: #17324d; text-decoration: none; }
+.tracking-filter--active { background: #17324d; color: white; border-color: #17324d; }
+.listing-tracking { padding: 16px 20px; border-top: 1px solid #dce4ea; display: grid; gap: 12px; }
+.listing-tracking__favorite { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.listing-tracking__favorite input { width: 18px; height: 18px; }
+.listing-tracking__history summary { cursor: pointer; padding: 8px 0; color: #17324d; }
+.listing-tracking__hint { font-size: 0.85rem; color: #425b70; margin: 8px 0; }
+.listing-tracking__date { display: grid; gap: 4px; margin: 10px 0; }
+.listing-tracking__date input { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px; border: 1px solid #bccbd5; border-radius: 6px; font: inherit; color: #17324d; background: white; }
+.listing-tracking__dates { margin: 0; padding-left: 18px; font-size: 0.85rem; line-height: 1.6; }
+.listing-tracking .feed-controls__submit { justify-self: start; cursor: pointer; padding: 10px 16px; border: 0; }
+.search-form__area-filter { margin: 24px 0; }
+.search-form__area-filter p { font-size: 0.85rem; color: #425b70; }
+@media (max-width: 600px) { .tracking-page { padding: 20px 16px; } }
+
+.listing-tracking__quick-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.listing-tracking__quick-actions button { padding: 8px 10px; border: 1px solid #bccbd5; border-radius: 6px; background: white; color: #17324d; font: inherit; font-size: 0.85rem; cursor: pointer; }
+.listing-tracking button:focus-visible, .tracking-filter:focus-visible { outline: 3px solid #356da0; outline-offset: 3px; }

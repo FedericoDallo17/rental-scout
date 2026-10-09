@@ -28,6 +28,7 @@
           <% end %>
 
         <div class="app-user">
+          <%= link_to t("tracking.title"), listing_tracks_path, class: "app-nav__link" %>
           <%= link_to t("nav.runs"), scraping_runs_path, class: "app-nav__link" %>
           <% if current_user.admin? %>
             <%= link_to t("nav.admin"), admin_root_path, class: "app-nav__link" %>

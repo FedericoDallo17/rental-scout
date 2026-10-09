@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   has_many :search_preferences, dependent: :destroy
   has_many :push_subscriptions, dependent: :destroy
+  has_many :listing_tracks, dependent: :destroy
 
   validates :first_name, presence: true
   validates :last_name, presence: true

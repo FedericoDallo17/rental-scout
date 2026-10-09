@@ -1,0 +1,30 @@
+es:
+  date:
+    formats:
+      tracking: "%d/%m/%Y"
+  tracking:
+    title: "Mis apartamentos"
+    intro: "Guardá favoritos y llevá el registro de tus contactos, visitas y rechazos."
+    filters: "Estado de tus apartamentos"
+    favorite: "Favorito"
+    history: "Contacto, visita y rechazo"
+    date_hint: "Elegí una fecha para marcarlo. Borrala para quitar la marca."
+    contacted_on: "Contactado el"
+    visited_on: "Visitado el"
+    rejected_on: "Rechazado el"
+    save: "Guardar seguimiento"
+    saved: "Seguimiento guardado."
+    archived: "Este aviso ya no está en el inventario. Conservamos tus datos y el enlace original."
+    empty: "No hay apartamentos en este estado."
+    empty_copy: "Guardá un favorito o registrá un contacto, visita o rechazo desde el listado."
+    search_area_hint: "Con un límite de superficie, se excluyen avisos que no informan sus m²."
+    any_area: "Cualquier superficie"
+    mark_contacted_on: "Contacté hoy"
+    mark_visited_on: "Visité hoy"
+    mark_rejected_on: "Rechacé hoy"
+    statuses:
+      all: "Todos"
+      favorites: "Favoritos"
+      contacted: "Contactados"
+      visited: "Visitados"
+      rejected: "Rechazados"

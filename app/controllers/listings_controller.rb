@@ -3,6 +3,9 @@ class ListingsController < ApplicationController
   CURRENCIES = %w[UYU USD].freeze
   COST_BASES = %w[rent total].freeze
   PER_PAGE = 24
+  FILTER_PARAMS = %i[sort source_id neighborhood currency cost_basis include_expenses
+    min_price max_price min_bedrooms expenses_known min_square_meters max_square_meters
+    include_unknown_area max_expenses expenses_currency include_unknown_expenses property_type parking_required].freeze
 
   def index
     @searches = current_user.search_preferences.includes(:zones).ordered_for_sidebar
@@ -38,12 +41,13 @@ class ListingsController < ApplicationController
       build_listing_metadata(@listings, match_index:, searches_by_id:)
     end
 
-    @feed_params = params.permit(
-      :sort, :source_id, :neighborhood, :currency, :cost_basis, :include_expenses,
-      :min_price, :max_price, :min_bedrooms, :expenses_known, :min_square_meters,
-      :max_square_meters, :include_unknown_area, :max_expenses, :expenses_currency,
-      :include_unknown_expenses, :property_type, :parking_required
-    ).to_h.symbolize_keys
+    identities = @listings.to_h { |listing| [listing.id, ListingTrack.identity_for(listing)] }
+    tracks_by_identity = current_user.listing_tracks.where(
+      source_key: identities.values.map { |identity| identity[:source_key] },
+      source_identity: identities.values.map { |identity| identity[:source_identity] }
+    ).index_by { |track| [track.source_key, track.source_identity] }
+    @listing_tracks = identities.transform_values { |identity| tracks_by_identity[[identity[:source_key], identity[:source_identity]]] }
+    @feed_params = params.permit(*FILTER_PARAMS).to_h.symbolize_keys
   end
 
   private
@@ -83,32 +87,16 @@ class ListingsController < ApplicationController
       min_price_cents: @min_price&.*(100),
       max_price_cents: @max_price&.*(100),
       min_bedrooms: @min_bedrooms,
+      min_square_meters: @min_square_meters,
+      max_square_meters: @max_square_meters,
+      include_unknown_area: @include_unknown_area,
       include_expenses: @cost_basis == "total"
     ).call
     scope = scope.where.not(expenses_cents: nil) if @expenses_known
-    scope = apply_area_filter(scope)
     scope = apply_expenses_filter(scope)
     scope = scope.where(property_type: @selected_property_type) if @selected_property_type
     scope = scope.where("parking_spaces > 0") if @parking_required
     scope
-  end
-
-  def apply_area_filter(scope)
-    return scope if @min_square_meters.nil? && @max_square_meters.nil?
-
-    conditions = []
-    values = {}
-    if @min_square_meters
-      conditions << "square_meters >= :min_square_meters"
-      values[:min_square_meters] = @min_square_meters
-    end
-    if @max_square_meters
-      conditions << "square_meters <= :max_square_meters"
-      values[:max_square_meters] = @max_square_meters
-    end
-    predicate = conditions.join(" AND ")
-    predicate = "(#{predicate}) OR square_meters IS NULL" if @include_unknown_area
-    scope.where(predicate, values)
   end
 
   def apply_expenses_filter(scope)
