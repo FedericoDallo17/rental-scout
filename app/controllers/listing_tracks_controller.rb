@@ -49,7 +49,21 @@ class ListingTracksController < ApplicationController
   private
 
   def save_track(track)
-    if track.update(track_params)
+    saved = track.update(track_params)
+    if request.format.turbo_stream?
+      @status = params[:status].presence_in(FILTERS) || "all"
+      @page = params[:page]
+      @feed_params = params.fetch(:feed_params, ActionController::Parameters.new).permit(*ListingsController::FILTER_PARAMS).to_h
+      @active_search = current_user.search_preferences.find_by(id: params[:search_id])
+      listing = params[:return_to] == "feed" ? track.listing : nil
+      target = listing ? "listing_tracking_#{listing.id}" : "saved_tracking_#{track.id}"
+      stream = if saved && !listing && !visible_in_status?(track)
+        turbo_stream.remove("tracked_apartment_#{track.id}")
+      else
+        turbo_stream.replace(target, partial: "listing_tracks/form", locals: { track: track, listing: listing, return_to: params[:return_to], saved: saved })
+      end
+      render turbo_stream: stream, status: saved ? :ok : :unprocessable_entity
+    elsif saved
       if params[:return_to] == "feed"
         filters = params.fetch(:feed_params, ActionController::Parameters.new).permit(*ListingsController::FILTER_PARAMS).to_h
         redirect_to listings_path(filters.merge(search_id: params[:search_id], page: params[:page])), notice: t("tracking.saved"), status: :see_other
@@ -59,6 +73,14 @@ class ListingTracksController < ApplicationController
     else
       @track = track
       render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def visible_in_status?(track)
+    case @status
+    when "favorites" then track.favorite?
+    when "contacted", "visited", "rejected" then track.public_send("#{@status}_on").present?
+    else track.favorite? || ListingTrack::DATE_FIELDS.any? { |field| track.public_send(field).present? }
     end
   end
 

@@ -135,4 +135,37 @@ class ListingTrackingFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_user_session_path
     assert_equal 0, ListingTrack.count
   end
+
+  test "turbo creation updates only the feed tracking controls and retains context" do
+    search = @user.search_preferences.create!(name: "Pocitos", location_query: "Pocitos")
+    post listing_tracks_path, params: { listing_id: @listing.id, return_to: "feed", search_id: search.id, page: "2", feed_params: { sort: "price_high" }, listing_track: { favorite: "1", contacted_on: "2026-10-01" } }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :success
+    assert_select "turbo-stream[action='replace'][target='listing_tracking_#{@listing.id}']"
+    assert_select "input[name='search_id'][value='#{search.id}']"
+    assert_select "input[name='page'][value='2']"
+    assert_select "input[name='feed_params[sort]'][value='price_high']"
+    assert_select "button[name='listing_track[contacted_on]'][value='']", text: "Unmark contacted"
+    assert_select "[role='status']", text: "Tracking saved."
+  end
+
+  test "turbo unmark removes a card from contacted filter but retains other history" do
+    post listing_tracks_path, params: { listing_id: @listing.id, listing_track: { favorite: "1", contacted_on: "2026-10-01", visited_on: "2026-10-02" } }
+    track = @user.listing_tracks.sole
+    patch listing_track_path(track), params: { status: "contacted", listing_track: { contacted_on: "" } }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :success
+    assert_select "turbo-stream[action='remove'][target='tracked_apartment_#{track.id}']"
+    assert_nil track.reload.contacted_on
+    assert track.favorite?
+    assert_equal Date.new(2026, 10, 2), track.visited_on
+  end
+
+  test "turbo validation renders errors inline without changing saved dates" do
+    post listing_tracks_path, params: { listing_id: @listing.id, listing_track: { contacted_on: "2026-10-01" } }
+    track = @user.listing_tracks.sole
+    patch listing_track_path(track), params: { listing_track: { contacted_on: "invalid" } }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :unprocessable_entity
+    assert_select "turbo-stream[action='replace'][target='saved_tracking_#{track.id}']"
+    assert_select "[role='alert']"
+    assert_equal Date.new(2026, 10, 1), track.reload.contacted_on
+  end
 end

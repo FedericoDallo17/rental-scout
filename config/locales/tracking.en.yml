@@ -22,6 +22,9 @@ en:
     mark_contacted_on: "Contacted today"
     mark_visited_on: "Visited today"
     mark_rejected_on: "Rejected today"
+    clear_contacted_on: "Unmark contacted"
+    clear_visited_on: "Unmark visited"
+    clear_rejected_on: "Unmark rejected"
     statuses:
       all: "All"
       favorites: "Favorites"

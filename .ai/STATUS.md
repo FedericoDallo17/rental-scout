@@ -1,6 +1,6 @@
 # Status
 
-Last updated: 2026-10-09. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
+Last updated: 2026-10-10. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
@@ -57,7 +57,7 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 036 follow-up: current-scrape progress now broadcasts over Turbo Streams with cross-process Cable delivery; a slower page refresh remains as a disconnect fallback (07-19)
 
 ## Doing
-- No roadmap ticket is currently in flight. Apartment tracking is implemented; production deployment remains pending.
+- Apartment tracking deployed on 10-10. Follow-up explicit unmark actions and inline Turbo updates implemented and tested; this follow-up is pending production rollout.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.

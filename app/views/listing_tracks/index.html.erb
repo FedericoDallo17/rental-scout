@@ -15,7 +15,7 @@
     <section class="listings-grid" aria-label="<%= t("tracking.title") %>">
       <% @tracks.each do |track| %>
         <% snapshot = track.snapshot %>
-        <article class="listing-card listing-card--tracked">
+        <article id="tracked_apartment_<%= track.id %>" class="listing-card listing-card--tracked">
           <%= link_to snapshot.fetch("canonical_url"), class: "listing-card__link", target: "_blank", rel: "noopener noreferrer" do %>
             <div class="listing-card__body">
               <p class="listing-card__price"><%= format_money(snapshot["price_cents"], snapshot["currency"]) %></p>
@@ -33,6 +33,7 @@
           <%= render "form", track: track %>
         </article>
       <% end %>
+      <section class="feed-empty-state tracking-empty-state"><h2><%= t("tracking.empty") %></h2><p><%= t("tracking.empty_copy") %></p></section>
     </section>
     <% if @total_pages > 1 %>
       <nav class="feed-pagination" aria-label="<%= t("feed.pagination") %>">

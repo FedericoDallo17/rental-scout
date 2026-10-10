@@ -1,3 +1,6 @@
+<% tracking_target = local_assigns[:listing] ? "listing_tracking_#{listing.id}" : "saved_tracking_#{track.id}" %>
+<div id="<%= tracking_target %>">
+<% if local_assigns[:saved] %><p class="listing-tracking__notice" role="status"><%= t("tracking.saved") %></p><% end %>
 <%= form_with model: track, class: "listing-tracking" do |form| %>
   <% track_dom_id = track.persisted? ? "saved_#{track.id}" : "listing_#{local_assigns[:listing]&.id || 'new'}" %>
   <% if track.errors.any? %>
@@ -32,6 +35,8 @@
     <% ListingTrack::DATE_FIELDS.each do |field| %>
       <% unless track.public_send(field) %>
         <%= form.button t("tracking.mark_#{field}"), type: :submit, name: "listing_track[#{field}]", value: Date.current.iso8601 %>
+      <% else %>
+        <%= form.button t("tracking.clear_#{field}"), type: :submit, name: "listing_track[#{field}]", value: "" %>
       <% end %>
     <% end %>
   </div>
@@ -46,3 +51,4 @@
   <% end %>
   <%= form.submit t("tracking.save"), class: "feed-controls__submit" %>
 <% end %>
+</div>
