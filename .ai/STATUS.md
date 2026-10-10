@@ -57,7 +57,7 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 036 follow-up: current-scrape progress now broadcasts over Turbo Streams with cross-process Cable delivery; a slower page refresh remains as a disconnect fallback (07-19)
 
 ## Doing
-- Apartment tracking deployed on 10-10. Follow-up explicit unmark actions and inline Turbo updates implemented and tested; this follow-up is pending production rollout.
+- Apartment tracking and inline correction follow-up deployed on 10-10. Production QA passed with the dedicated account; public health HTTP 200.
 
 ## Blockers
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
