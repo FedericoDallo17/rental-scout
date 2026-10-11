@@ -1,22 +1,39 @@
 # Rental Scout Lite
 
-Rental Scout Lite is a small Rails pilot project used to test an AI-driven product development workflow around a real product idea: an apartment scout that can scrape multiple rental sources hourly, rank listings, and notify the user about new matching apartments.
+Rental Scout Lite is a Rails 8 rental search app for finding new Montevideo listings before they disappear into separate property sites. It brings listings from four sources into one feed, matches them against saved searches, and alerts users to new matches.
 
-The goal is not only to build a rental search portal, but to validate a repeatable loop for AI-assisted product discovery, look and feel definition, roadmap planning, implementation, review, documentation, and context management.
+**[Try the interactive tour](https://homes.dallo.dev/tour)** — a five-step English/Spanish walkthrough with fictional listings. It needs no account and does not run scrapers, access live inventory, save changes, or send notifications.
 
-The AI workflow lives in the `.ai/` folder.
+## What it does
 
-Initial workflow:
+- **Finds fresh rentals:** Solid Queue runs hourly acquisition from InfoCasas, Remax, Imperium, and Housi. A weekly reconciliation checks older inventory; daily jobs clean up stale listings and backfill missing coordinates.
+- **Builds a shared feed:** Source adapters normalize listings; intake handles source-local and cross-source duplicates before storing them in PostgreSQL/PostGIS.
+- **Matches private searches:** Users can save neighborhood zones and price, currency, bedroom, and area preferences. PostGIS zone checks and deterministic scoring explain why a listing matches.
+- **Tracks apartments:** Favorites and contact, visit, or rejection notes stay private to each user, including when old inventory is removed.
+- **Sends new-match alerts:** Grouped browser Web Push and optional Pushover delivery use persisted keys to avoid duplicate notifications.
+- **Shows operational health:** Run history, per-source results, request counts, and location-quality metrics make ingestion problems visible.
 
-Discovery -> Look & Feel -> MVP Scope -> Orchestration -> Coding -> Review -> Knowledge Curation
+The interface supports English and Spanish. The live app uses separate Rails web and Solid Queue job containers, deployed with Docker and Kamal to a Hetzner server. PostgreSQL/PostGIS, HTTPS, and backup tooling are part of that deployment.
+
+## Why I built it
+
+I first used a small notification-only scraper for my own apartment search. When a friend needed the same thing, I rebuilt it as this Rails product with persistent searches, a dashboard, matching, alerts, and operational tools. It is designed for that small real-world need rather than user acquisition.
+
+## Run locally
+
+The project uses the Ruby version in `.ruby-version` and PostgreSQL with PostGIS.
+
+```sh
+bin/setup
+bin/rails server
+```
+
+Run `bin/jobs` in a second terminal for scheduled and background work. The test suite is `bin/rails test`. Local seeds provide example data; the public tour is also available without setup.
+
+## Development process
+
+The project also exercises an AI-assisted development workflow. Planning, review, decisions, and status notes live in [`.ai/`](.ai/); the [workflow guide](.ai/WORKFLOW.md) explains the loop. The application and its production behavior are the primary artifact; the workflow is a separate experiment documented alongside it.
 
 ## Future work
 
-- Revisit an interactive zone map for the search form after the core search experience is settled.
-
-## Portfolio tour
-
-Share `/tour` on the deployed app with recruiters. No account is required. The
-English/Spanish walkthrough uses fictional rentals and browser-only interactions;
-it does not access inventory, persist tracking, run scrapers, or send notifications.
-The sign-in page also links to the tour.
+- Revisit an interactive zone map for the search form.
