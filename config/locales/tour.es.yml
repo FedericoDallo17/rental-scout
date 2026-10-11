@@ -1,0 +1,68 @@
+es:
+  tour:
+    page_title: Recorrido interactivo
+    nav: Recorrido
+    invitation: "¿Querés explorar el proyecto? No necesitás una cuenta."
+    start: Explorar el recorrido
+    open_app: Abrir la app
+    sample_label: "Demo del portfolio · Avisos ficticios"
+    title: Encontrá un alquiler antes de que pase desapercibido.
+    intro: "Explorá cómo Rental Scout Lite reúne alquileres recientes de Montevideo y te ayuda a seguir los que te interesan. Unos dos minutos, sin registro."
+    steps_label: Pasos del recorrido
+    boundary: "Todos los ejemplos son ficticios. Los cambios duran solo en esta página; no se envían mensajes."
+    back: Anterior
+    next: Siguiente
+    restart: Reiniciar recorrido
+    progress: "Paso %{current} de %{total}"
+    steps:
+      search:
+        title: Guardá tu búsqueda
+        copy: "Elegí barrios, dormitorios, superficie y presupuesto una vez. La app mantiene tus búsquedas privadas y las usa para encontrar nuevos resultados. Probá cambiar este presupuesto de ejemplo."
+      match:
+        title: Mirá las coincidencias
+        copy: "Estos ejemplos respetan el presupuesto que elegiste. La app combina tus búsquedas, explica la afinidad y permite ordenar por novedad, precio o costo mensual. Los presupuestos en UYU y USD se comparan por separado."
+      track:
+        title: Seguí tus favoritos
+        copy: "Guardá un apartamento y probá cambiar su estado. La app registra fechas de contacto, visita y descarte, y conserva una copia aunque el aviso salga del inventario reciente."
+      alerts:
+        title: Enterate de las novedades
+        copy: "Después de una búsqueda de avisos, las nuevas coincidencias se agrupan en una notificación personal. Probá una vista previa; la app permite notificaciones del navegador y Pushover cuando están configurados."
+      health:
+        title: Conocé cómo funciona
+        copy: "Los avisos recientes son útiles cuando su origen y ubicación son confiables. La app muestra el historial de ejecuciones y permite a administradores revisar proveedores y la salud del inventario."
+    search_name: Mi próximo apartamento
+    one_bedroom: Al menos 1
+    budget: Alquiler mensual máximo (UYU)
+    budget_hint: "Mové el control y abrí el siguiente paso para ver los ejemplos que coinciden."
+    match_count: "%{count} apartamentos de ejemplo coinciden con este presupuesto."
+    listings:
+      pocitos: Apartamento luminoso cerca de la rambla
+      buceo: Un dormitorio con balcón
+      cordon: Apartamento amplio en Cordón
+    match_reason: "Coincide con los barrios, dormitorios, superficie y presupuesto en UYU del ejemplo."
+    save: Guardar apartamento
+    saved: Guardado en favoritos
+    tracking_status: Seguimiento
+    statuses:
+      considering: En evaluación
+      contacted: Contactado
+      visited: Visitado
+      rejected: Descartado
+    tracking_feedback: "Seguimiento de ejemplo actualizado: %{status}."
+    no_matches: "Todavía no hay coincidencias. Volvé y aumentá el presupuesto."
+    alert_heading: Un aviso personal después de cada búsqueda
+    alert_copy: "Las nuevas coincidencias enlazan a tus resultados. Volver a encontrar el mismo aviso no genera otra notificación de novedad."
+    preview_alert: Ver notificación de ejemplo
+    alert_message: "2 nuevos alquileres coinciden con Mi próximo apartamento. Abrí tus resultados para revisarlos."
+    alert_sample: "Solo una vista previa. No se envió nada."
+    health_heading: Cómo mantenemos útil el inventario
+    health:
+      freshness: "La búsqueda cada hora prioriza avisos recientes; una revisión semanal verifica el inventario anterior."
+      dedup: "Los avisos duplicados confirmados comparten una entrada entre proveedores."
+      location: "Las coordenadas se verifican con los límites de barrios de Montevideo; cuando faltan, se usa la ubicación del proveedor."
+      tracking: "El historial privado de apartamentos se conserva cuando se elimina inventario antiguo."
+    technical_heading: Notas técnicas para evaluar el proyecto
+    technical_copy: "Desarrollado con Rails 8, PostgreSQL/PostGIS, Turbo y Solid Queue. Los adaptadores normalizan alquileres en un inventario compartido; las búsquedas privadas determinan coincidencias y notificaciones agrupadas. El producto admite inglés y español. Este recorrido usa datos independientes y nunca ejecuta scrapers."
+    finish_copy: "Ese es el flujo principal. Creá tu cuenta para usar búsquedas reales y seguir apartamentos."
+    create_account: Crear una cuenta
+    no_script: "Se muestra el recorrido completo. Activá JavaScript para probar los controles de ejemplo."

@@ -46,6 +46,8 @@
     </header>
 
     <% if @searches.any? %>
+      <details class="feed-filter-disclosure" data-responsive-disclosure open>
+        <summary><span><%= t("design.filters") %></span><span class="feed-filter-disclosure__hint"><%= t("design.refine") %></span><span class="feed-filter-disclosure__chevron" aria-hidden="true"></span></summary>
       <%= form_with url: listings_path, method: :get, class: "feed-controls" do |form| %>
         <%= hidden_field_tag :search_id, @active_search.id if @active_search %>
         <div class="feed-controls__field">
@@ -90,15 +92,18 @@
             <%= label_tag :currency_usd, "U$S" %>
           </div>
           <div class="feed-price-filter__range">
-            <%= form.number_field :min_price, value: @min_price, min: 0, step: 1000, placeholder: t("feed.min_price_short"), aria: { label: t("feed.min_price") } %>
+            <%= form.number_field :min_price, value: @min_price, inputmode: "numeric", min: 0, step: 1000, placeholder: t("feed.min_price_short"), aria: { label: t("feed.min_price") } %>
             <span aria-hidden="true">–</span>
-            <%= form.number_field :max_price, value: @max_price, min: 0, step: 1000, placeholder: t("feed.max_price_short"), aria: { label: t("feed.max_price") } %>
+            <%= form.number_field :max_price, value: @max_price, inputmode: "numeric", min: 0, step: 1000, placeholder: t("feed.max_price_short"), aria: { label: t("feed.max_price") } %>
           </div>
           <label class="feed-price-filter__expenses">
             <%= check_box_tag :include_expenses, "1", @cost_basis == "total" %>
             <span><%= t("feed.include_expenses") %></span>
           </label>
         </fieldset>
+        <details class="feed-advanced-filters" <%= "open" if @feed_params.except(:sort, :source_id, :neighborhood, :min_bedrooms, :currency, :min_price, :max_price, :include_expenses, :cost_basis).values.any?(&:present?) %>>
+          <summary><%= t("design.more_filters") %><span aria-hidden="true">+</span></summary>
+          <div class="feed-advanced-filters__grid">
         <fieldset class="feed-range-filter">
           <legend><%= t("feed.surface_area") %></legend>
           <div class="feed-range-filter__inputs">
@@ -136,11 +141,14 @@
             <span><%= t("feed.parking_required") %></span>
           </label>
         <% end %>
+          </div>
+        </details>
         <div class="feed-controls__actions">
           <%= form.submit t("feed.apply_controls"), class: "feed-controls__submit" %>
           <%= link_to t("feed.clear_controls"), listings_path(search_id: @active_search&.id), class: "feed-controls__clear" %>
         </div>
       <% end %>
+      </details>
 
       <% if @listings.any? %>
       <section class="listings-grid" aria-label="<%= t("feed.listings_label") %>">

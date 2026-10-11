@@ -13,3 +13,10 @@ Discovery -> Look & Feel -> MVP Scope -> Orchestration -> Coding -> Review -> Kn
 ## Future work
 
 - Revisit an interactive zone map for the search form after the core search experience is settled.
+
+## Portfolio tour
+
+Share `/tour` on the deployed app with recruiters. No account is required. The
+English/Spanish walkthrough uses fictional rentals and browser-only interactions;
+it does not access inventory, persist tracking, run scrapers, or send notifications.
+The sign-in page also links to the tour.

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "tour", to: "tours#show", as: :tour
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker.js", to: "service_workers#show", defaults: { format: :js }
 

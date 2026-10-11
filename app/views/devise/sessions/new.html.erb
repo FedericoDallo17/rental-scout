@@ -25,3 +25,8 @@
 <% end %>
 
 <%= render "devise/shared/links" %>
+
+<div class="tour-invitation">
+  <p><%= t("tour.invitation") %></p>
+  <%= link_to t("tour.start"), tour_path, class: "tour-button" %>
+</div>

@@ -1,6 +1,30 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
 
+// Native disclosures remain usable without JavaScript. Start compact on phones,
+// and restore desktop controls when crossing the responsive breakpoint.
+const phoneLayout = window.matchMedia("(max-width: 720px)")
+const updateResponsiveDisclosures = () => {
+  document.querySelectorAll("[data-responsive-disclosure]").forEach((disclosure) => {
+    disclosure.open = !phoneLayout.matches
+  })
+}
+phoneLayout.addEventListener("change", updateResponsiveDisclosures)
+document.addEventListener("turbo:load", updateResponsiveDisclosures)
+document.addEventListener("click", (event) => {
+  if (!phoneLayout.matches) return
+  const menu = document.querySelector(".app-account-menu[open]")
+  if (menu && !menu.contains(event.target)) menu.open = false
+})
+document.addEventListener("keydown", (event) => {
+  if (!phoneLayout.matches || event.key !== "Escape") return
+  const menu = document.querySelector(".app-account-menu[open]")
+  if (menu) {
+    menu.open = false
+    menu.querySelector("summary").focus()
+  }
+})
+
 const urlBase64ToUint8Array = (value) => {
   const padding = "=".repeat((4 - value.length % 4) % 4)
   const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/")
@@ -108,3 +132,90 @@ const initializeWebPushSettings = async () => {
 }
 
 document.addEventListener("turbo:load", () => initializeWebPushSettings().catch(console.error))
+
+const initializePortfolioTour = () => {
+  const tour = document.querySelector("[data-portfolio-tour]")
+  if (!tour || tour.dataset.initialized === "true") return
+  tour.dataset.initialized = "true"
+  const panels = [...tour.querySelectorAll("[data-tour-panel]")]
+  const links = [...tour.querySelectorAll("[data-tour-step]")]
+  const back = tour.querySelector("[data-tour-back]")
+  const next = tour.querySelector("[data-tour-next]")
+  const nextLabel = next.textContent
+  const progress = tour.querySelector("[data-tour-progress]")
+  let current = Math.max(0, panels.findIndex((panel) => `#${panel.id}` === location.hash))
+
+  const show = (index, focus = true) => {
+    current = index
+    panels.forEach((panel, i) => { panel.hidden = i !== current })
+    links.forEach((link, i) => {
+      if (i === current) link.setAttribute("aria-current", "step")
+      else link.removeAttribute("aria-current")
+    })
+    back.disabled = current === 0
+    next.textContent = current === panels.length - 1 ? next.dataset.finishLabel : nextLabel
+    progress.textContent = progress.dataset.template.replace("{current}", current + 1)
+    if (focus) {
+      history.replaceState(null, "", `#${panels[current].id}`)
+      panels[current].focus({ preventScroll: true })
+      panels[current].scrollIntoView({ block: "nearest" })
+    }
+  }
+  links.forEach((link, i) => link.addEventListener("click", (event) => {
+    event.preventDefault()
+    show(i)
+  }))
+  back.addEventListener("click", () => show(Math.max(0, current - 1)))
+  next.addEventListener("click", () => {
+    if (current === panels.length - 1) {
+      budget.value = budget.defaultValue
+      filter()
+      tour.querySelectorAll("[data-tour-favorite]").forEach((button) => {
+        button.setAttribute("aria-pressed", "false")
+        button.textContent = button.dataset.saveLabel
+      })
+      tour.querySelectorAll("[data-tour-tracking]").forEach((select) => { select.selectedIndex = 0 })
+      tour.querySelector("[data-tour-tracking-feedback]").textContent = ""
+      tour.querySelector("[data-tour-notification]").hidden = true
+    }
+    show((current + 1) % panels.length)
+  })
+  tour.querySelector("[data-tour-navigation]").hidden = false
+  show(current, false)
+
+  const budget = tour.querySelector("[data-tour-budget]")
+  const count = tour.querySelector("[data-tour-match-count]")
+  const filter = () => {
+    const cards = [...tour.querySelectorAll('[data-filterable="true"]')]
+    cards.forEach((card) => { card.hidden = Number(card.dataset.price) > Number(budget.value) })
+    const matches = cards.filter((card) => !card.hidden).length
+    count.textContent = count.dataset.template.replace("{count}", matches)
+    tour.querySelector("[data-tour-budget-value]").textContent = `UYU ${Number(budget.value).toLocaleString(document.documentElement.lang)}`
+    tour.querySelector("[data-tour-empty]").hidden = matches > 0
+  }
+  budget.addEventListener("input", filter)
+  filter()
+  tour.querySelectorAll("[data-tour-favorite]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const saved = button.getAttribute("aria-pressed") !== "true"
+      button.setAttribute("aria-pressed", String(saved))
+      button.textContent = saved ? button.dataset.savedLabel : button.dataset.saveLabel
+    })
+  })
+  tour.querySelectorAll("[data-tour-tracking]").forEach((select) => {
+    select.addEventListener("change", () => {
+      const feedback = tour.querySelector("[data-tour-tracking-feedback]")
+      feedback.textContent = feedback.dataset.template.replace("{status}", select.value)
+    })
+  })
+  tour.querySelector("[data-tour-alert]").addEventListener("click", () => {
+    tour.querySelector("[data-tour-notification]").hidden = false
+  })
+}
+
+document.addEventListener("turbo:load", initializePortfolioTour)
+// Turbo restores cached HTML without its event listeners; rebuild the tour on return.
+document.addEventListener("turbo:before-cache", () => {
+  const tour = document.querySelector("[data-portfolio-tour]")
+  if (tour) delete tour.dataset.initialized
+})

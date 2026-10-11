@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= t("tour.page_title") %> | Rental Scout Lite</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="app-body tour-body">
+    <header class="app-header">
+      <nav class="app-nav" aria-label="<%= t("nav.account") %>">
+        <%= link_to tour_path, class: "app-nav__brand" do %>
+          <span class="app-nav__mark">RSL</span><span>Rental Scout Lite</span>
+        <% end %>
+        <div class="tour-header-actions">
+          <%= render "layouts/language_switcher" %>
+          <%= link_to t("tour.open_app"), user_signed_in? ? authenticated_root_path : new_user_session_path, class: "app-nav__link" %>
+        </div>
+      </nav>
+    </header>
+    <%= yield %>
+  </body>
+</html>

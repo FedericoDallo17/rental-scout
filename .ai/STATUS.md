@@ -13,6 +13,7 @@ Apartment tracking and saved-search surface area implemented and validated
 Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
+- Public recruiter tour at `/tour`: bilingual five-step walkthrough with fictional rentals, budget filtering, ephemeral favorites/progress, notification preview, and technical notes; sign-in and account navigation entry points (10-10).
 - User-approved apartment tracking: private favorites, editable contact/visit/rejection dates, quick today actions, paginated status filters, purge-safe snapshots and stable reingestion identity. Saved searches now persist validated min/max m², used by feed matching and notification fan-out (10-09).
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
 - Scraper domain ADR (007)
@@ -57,6 +58,7 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 036 follow-up: current-scrape progress now broadcasts over Turbo Streams with cross-process Cable delivery; a slower page refresh remains as a disconnect fallback (07-19)
 
 ## Doing
+- Portfolio tour and responsive visual redesign implemented locally; 308 Rails tests passed. Browser QA verified sorting, favorite persistence, shortlist navigation, and mobile notification settings. Not deployed.
 - Apartment tracking and inline correction follow-up deployed on 10-10. Production QA passed with the dedicated account; public health HTTP 200.
 
 ## Blockers

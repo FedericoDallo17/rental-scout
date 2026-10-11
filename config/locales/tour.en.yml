@@ -1,0 +1,68 @@
+en:
+  tour:
+    page_title: Interactive tour
+    nav: Tour
+    invitation: "Here to explore the project? No account needed."
+    start: Take the tour
+    open_app: Open the app
+    sample_label: "Portfolio demo · Fictional listings"
+    title: Find a rental before it gets buried.
+    intro: "Explore how Rental Scout Lite brings fresh Montevideo rentals into one search, then helps you keep track of the ones worth pursuing. About two minutes; no signup."
+    steps_label: Tour steps
+    boundary: "All examples are fictional. Changes last only on this page; no messages are sent."
+    back: Back
+    next: Next
+    restart: Restart tour
+    progress: "Step %{current} of %{total}"
+    steps:
+      search:
+        title: Save your search
+        copy: "Pick neighborhoods, bedrooms, area, and a budget once. The real app keeps your saved searches private and uses them to find new matches. Try changing this sample budget."
+      match:
+        title: See what matches
+        copy: "These examples follow the budget you just set. In the app, the feed combines your saved searches, explains preference fit, and lets you sort by freshness, price, or monthly cost. UYU and USD budgets stay separate."
+      track:
+        title: Keep a shortlist
+        copy: "Save an apartment and try changing its status. The real app records contact, visit, and rejection dates, and retains a snapshot even after a listing leaves the fresh inventory."
+      alerts:
+        title: Catch new arrivals
+        copy: "After an acquisition run, new matches are grouped into a personal notification. Preview an example here; the real app supports browser push and Pushover once configured."
+      health:
+        title: Look behind the feed
+        copy: "Fresh listings are only useful when their source and location are trustworthy. The app also provides run history, while administrators can inspect provider results and inventory health."
+    search_name: My next apartment
+    one_bedroom: At least 1
+    budget: Maximum monthly rent (UYU)
+    budget_hint: "Move the slider, then open the next step to see matching examples."
+    match_count: "%{count} sample apartments match this budget."
+    listings:
+      pocitos: Bright apartment near the coast
+      buceo: One bedroom with a balcony
+      cordon: Spacious apartment in Cordón
+    match_reason: "Matches the sample neighborhoods, bedroom count, area, and UYU budget."
+    save: Save apartment
+    saved: Saved to shortlist
+    tracking_status: Progress
+    statuses:
+      considering: Considering
+      contacted: Contacted
+      visited: Visited
+      rejected: Rejected
+    tracking_feedback: "Sample progress updated: %{status}."
+    no_matches: "No examples match yet. Go back and increase the budget."
+    alert_heading: A personal heads-up, after the search runs
+    alert_copy: "New matches link back to your results. Repeated acquisition of the same listing does not create another new-listing notification."
+    preview_alert: Preview sample notification
+    alert_message: "2 new rentals match My next apartment. Open your results to review them."
+    alert_sample: "Sample preview only. Nothing was sent."
+    health_heading: How the inventory stays useful
+    health:
+      freshness: "Hourly acquisition focuses on recent listings; a weekly reconciliation checks older inventory."
+      dedup: "Confirmed syndicated listings share one inventory entry across sources."
+      location: "Coordinates are checked against Montevideo neighborhood boundaries, with provider-location fallbacks when necessary."
+      tracking: "Private apartment history remains available when old inventory is removed."
+    technical_heading: Technical notes for reviewers
+    technical_copy: "Built with Rails 8, PostgreSQL/PostGIS, Turbo, and Solid Queue. Provider adapters normalize rentals into shared inventory; user-owned searches drive matching and grouped notifications. English and Spanish are supported throughout the product. This tour uses independent sample data and never runs scrapers."
+    finish_copy: "That’s the main workflow. Create your own account to use real searches and apartment tracking."
+    create_account: Create an account
+    no_script: "The full tour is shown below. Enable JavaScript to try the sample controls."

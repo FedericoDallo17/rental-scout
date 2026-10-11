@@ -42,6 +42,9 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Scraped Apartments"
     assert_select "a[href='#{edit_notification_settings_path}']", text: "Notifications"
+    assert_select "details.app-account-menu summary", text: /Menu/
+    assert_select "nav.mobile-navigation a[href='#{listings_path}'][aria-current='page']", text: /Explore/
+    assert_select "nav.mobile-navigation a[href='#{listing_tracks_path}']", text: /Saved/
   end
 
   test "signed in root defaults to the aggregate saved search feed" do
@@ -55,9 +58,25 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Centro"
+    assert_select "details.feed-filter-disclosure summary", text: /Filters & sort/
+    assert_select "details.feed-filter-disclosure form[action='#{listings_path}'][method='get']"
     assert_select ".feed-header__context", text: /All saved-search matches/
     assert_select ".feed-header__refresh-cue", text: /Updated automatically/
     assert_select "nav.search-sidebar__nav a.search-link.search-link--active", count: 0
+  end
+
+  test "optional filters stay discoverable and expand when a requirement is applied" do
+    user = create_user!(email: "optional-filters@example.com")
+    sign_in user
+    user.search_preferences.create!(name: "Centro", location_query: "Centro")
+
+    get listings_path
+    assert_select "details.feed-advanced-filters:not([open]) summary", text: /More filters/
+    assert_select "details.feed-advanced-filters input[name='min_square_meters']"
+
+    get listings_path(min_square_meters: 40)
+    assert_response :success
+    assert_select "details.feed-advanced-filters[open] input[name='min_square_meters'][value='40']"
   end
 
   test "signed in sidebar renders hybrid search workbench cards with counts" do

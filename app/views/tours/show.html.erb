@@ -1,0 +1,108 @@
+<main class="tour-shell" data-portfolio-tour>
+  <header class="tour-intro">
+    <p class="tour-sample-label"><%= t("tour.sample_label") %></p>
+    <h1><%= t("tour.title") %></h1>
+    <p><%= t("tour.intro") %></p>
+  </header>
+
+  <div class="tour-workbench">
+    <aside class="tour-guide">
+      <h2><%= t("tour.page_title") %></h2>
+      <nav aria-label="<%= t("tour.steps_label") %>">
+        <% %w[search match track alerts health].each_with_index do |step, index| %>
+          <%= link_to "#{index + 1}. #{t("tour.steps.#{step}.title")}", "#tour-#{step}", data: { tour_step: index } %>
+        <% end %>
+      </nav>
+      <p><%= t("tour.boundary") %></p>
+      <div class="tour-navigation" hidden data-tour-navigation>
+        <button type="button" class="tour-button tour-button--secondary" data-tour-back><%= t("tour.back") %></button>
+        <button type="button" class="tour-button" data-tour-next data-finish-label="<%= t("tour.restart") %>"><%= t("tour.next") %></button>
+      </div>
+      <p class="tour-progress" aria-live="polite" data-tour-progress data-template="<%= t("tour.progress", current: "{current}", total: 5) %>"></p>
+    </aside>
+
+    <div class="tour-panels">
+      <% %w[search match track alerts health].each do |step| %>
+        <section id="tour-<%= step %>" class="tour-panel" data-tour-panel tabindex="-1" aria-labelledby="tour-<%= step %>-title">
+          <h2 id="tour-<%= step %>-title"><%= t("tour.steps.#{step}.title") %></h2>
+          <p class="tour-panel-copy"><%= t("tour.steps.#{step}.copy") %></p>
+
+          <% case step %>
+          <% when "search" %>
+            <div class="tour-search-preview">
+              <h3><%= t("tour.search_name") %></h3>
+              <dl class="tour-facts">
+                <div><dt><%= t("feed.neighborhood") %></dt><dd>Pocitos, Buceo, Cordón</dd></div>
+                <div><dt><%= t("feed.bedrooms") %></dt><dd><%= t("tour.one_bedroom") %></dd></div>
+                <div><dt><%= t("feed.surface_area") %></dt><dd>40–65 m²</dd></div>
+                <div><dt><%= t("feed.currency") %></dt><dd>UYU</dd></div>
+              </dl>
+              <label for="tour-budget"><%= t("tour.budget") %></label>
+              <input id="tour-budget" type="range" min="26000" max="40000" step="1000" value="34000" data-tour-budget aria-describedby="tour-budget-hint">
+              <output for="tour-budget" data-tour-budget-value>UYU 34,000</output>
+              <p id="tour-budget-hint"><%= t("tour.budget_hint") %></p>
+              <p role="status" data-tour-match-count data-template="<%= t("tour.match_count", count: "{count}") %>"></p>
+            </div>
+          <% when "match", "track" %>
+            <div class="tour-listings">
+              <% @examples.each do |example| %>
+                <article class="tour-listing" data-tour-listing data-price="<%= example[:price] %>" data-filterable="<%= step == "match" %>">
+                  <div class="tour-listing-heading"><h3><%= t("tour.listings.#{example[:key]}") %></h3><span><%= example[:neighborhood] %></span></div>
+                  <p class="tour-price">UYU <%= number_with_delimiter(example[:price]) %></p>
+                  <dl class="tour-facts">
+                    <div><dt><%= t("feed.bedrooms") %></dt><dd>1</dd></div>
+                    <div><dt>m²</dt><dd><%= example[:area] %></dd></div>
+                    <div><dt><%= t("feed.source") %></dt><dd><%= example[:source] %></dd></div>
+                  </dl>
+                  <% if step == "match" %>
+                    <p><%= t("tour.match_reason") %></p>
+                  <% else %>
+                    <button type="button" class="tour-button tour-button--secondary" data-tour-favorite aria-pressed="false" data-save-label="<%= t("tour.save") %>" data-saved-label="<%= t("tour.saved") %>"><%= t("tour.save") %></button>
+                    <label class="tour-status-label"><%= t("tour.tracking_status") %>
+                      <select data-tour-tracking>
+                        <% %w[considering contacted visited rejected].each do |status| %>
+                          <option><%= t("tour.statuses.#{status}") %></option>
+                        <% end %>
+                      </select>
+                    </label>
+                  <% end %>
+                </article>
+              <% end %>
+            </div>
+            <% if step == "match" %>
+              <p data-tour-empty hidden><%= t("tour.no_matches") %></p>
+            <% else %>
+              <p role="status" data-tour-tracking-feedback data-template="<%= t("tour.tracking_feedback", status: "{status}") %>"></p>
+            <% end %>
+          <% when "alerts" %>
+            <div class="tour-alert-preview">
+              <h3><%= t("tour.alert_heading") %></h3>
+              <p><%= t("tour.alert_copy") %></p>
+              <button type="button" class="tour-button" data-tour-alert><%= t("tour.preview_alert") %></button>
+              <div class="tour-notification" role="status" data-tour-notification hidden>
+                <strong>Rental Scout Lite</strong>
+                <p><%= t("tour.alert_message") %></p>
+                <small><%= t("tour.alert_sample") %></small>
+              </div>
+            </div>
+          <% when "health" %>
+            <div class="tour-health">
+              <h3><%= t("tour.health_heading") %></h3>
+              <ul>
+                <li><%= t("tour.health.freshness") %></li>
+                <li><%= t("tour.health.dedup") %></li>
+                <li><%= t("tour.health.location") %></li>
+                <li><%= t("tour.health.tracking") %></li>
+              </ul>
+              <details><summary><%= t("tour.technical_heading") %></summary><p><%= t("tour.technical_copy") %></p></details>
+              <p><%= t("tour.finish_copy") %></p>
+              <%= link_to t("tour.create_account"), new_user_registration_path, class: "tour-button" %>
+              <%= link_to t("tour.open_app"), user_signed_in? ? authenticated_root_path : new_user_session_path, class: "tour-end-link" %>
+            </div>
+          <% end %>
+        </section>
+      <% end %>
+      <noscript><p><%= t("tour.no_script") %></p></noscript>
+    </div>
+  </div>
+</main>
