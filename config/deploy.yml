@@ -11,7 +11,7 @@ servers:
     cmd: bin/jobs
 
 proxy:
-  host: homes.dallo.dev
+  host: timbre.dallo.dev
   ssl: true
   app_port: 3000
   healthcheck:
@@ -39,7 +39,7 @@ env:
     RAILS_ASSUME_SSL: "true"
     RAILS_FORCE_SSL: "true"
     APP_PROTOCOL: https
-    APP_HOST: homes.dallo.dev
+    APP_HOST: timbre.dallo.dev
     MAIL_FROM: notifications@example.com
     DB_HOST: rental-scout-lite-db
     DB_PORT: "5432"

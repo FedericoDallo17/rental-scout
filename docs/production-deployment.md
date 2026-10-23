@@ -1,8 +1,15 @@
 # Automatic production deployment
 
 Production is the Coolify service `roryn8zi32hwqly5lyqguuin` on
-`167.233.115.254`, serving <https://homes.dallo.dev>. Coolify manages the
+`167.233.115.254`, serving <https://timbre.dallo.dev>. Coolify manages the
 existing `web`, `job`, and PostGIS containers, networks, secrets, and volumes.
+
+`homes.dallo.dev` permanently redirects to `https://timbre.dallo.dev`, preserving
+the path and query string. Both domains use proxied A records in Cloudflare.
+The canonical domain and `APP_HOST` are saved in Coolify. The old-domain
+redirect is a Traefik file-provider configuration: install
+`config/proxy/homes-redirect.yml` at
+`/data/coolify/proxy/dynamic/rental-scout-homes-redirect.yaml` on the server.
 
 Every push to `main` runs `.github/workflows/deploy.yml`:
 

@@ -30,7 +30,7 @@ healthy() {
   for attempt in $(seq 1 60); do
     if docker exec "web-$service" curl --fail --silent --output /dev/null http://127.0.0.1:3000/up &&
        [[ "$(docker inspect -f '{{.State.Running}} {{.RestartCount}}' "job-$service")" == 'true 0' ]] &&
-       curl --fail --silent --output /dev/null https://homes.dallo.dev/up; then
+       curl --fail --silent --output /dev/null https://timbre.dallo.dev/up; then
       return 0
     fi
     sleep 5

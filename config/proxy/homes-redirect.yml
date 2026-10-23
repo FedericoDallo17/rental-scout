@@ -1,0 +1,22 @@
+http:
+  routers:
+    rental-scout-homes-http:
+      rule: Host(`homes.dallo.dev`)
+      entryPoints: [http]
+      priority: 10000
+      middlewares: [rental-scout-homes-canonical]
+      service: noop@internal
+    rental-scout-homes-https:
+      rule: Host(`homes.dallo.dev`)
+      entryPoints: [https]
+      priority: 10000
+      middlewares: [rental-scout-homes-canonical]
+      service: noop@internal
+      tls:
+        certResolver: letsencrypt
+  middlewares:
+    rental-scout-homes-canonical:
+      redirectRegex:
+        regex: '^https?://homes\.dallo\.dev(.*)'
+        replacement: 'https://timbre.dallo.dev${1}'
+        permanent: true

@@ -2,7 +2,7 @@
 
 Timbre is a Rails 8 property search app for finding new Montevideo rentals and homes for sale before they disappear into separate property sites. It brings listings from four sources into one feed, matches them against saved searches, and alerts users to new matches.
 
-**[Try the interactive tour](https://homes.dallo.dev/tour)** — a five-step English/Spanish walkthrough with fictional listings. It needs no account and does not run scrapers, access live inventory, save changes, or send notifications.
+**[Try the interactive tour](https://timbre.dallo.dev/tour)** — a five-step English/Spanish walkthrough with fictional listings. It needs no account and does not run scrapers, access live inventory, save changes, or send notifications.
 
 ## What it does
 
