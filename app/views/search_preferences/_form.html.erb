@@ -22,6 +22,11 @@
         <%= form.text_field :location_query %>
       </div>
 
+      <div class="search-form__field">
+        <%= form.label :operation_type, t("searches.operation_type") %>
+        <%= form.select :operation_type, SearchPreference::OPERATION_TYPES.map { |type| [t("searches.operation_types.#{type}"), type] } %>
+      </div>
+
     </div>
 
     <div class="search-form__field search-form__bedrooms">

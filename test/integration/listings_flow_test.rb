@@ -166,7 +166,7 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     assert_select "nav.search-sidebar__nav a.search-link", count: 2
     assert_select "nav.search-sidebar__nav a.search-link.search-link--active[href='#{listings_path}']", count: 1
     assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__name", text: "Pocitos"
-    assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__meta", text: "Pocitos"
+    assert_select "nav.search-sidebar__nav a.search-link.search-link--active .search-link__meta", text: "Pocitos · Rentals"
     assert_select ".feed-header h1", text: "Scraped Apartments"
     assert_select ".feed-header__context", text: /Browsing Pocitos/
     assert_select ".feed-header__count", text: "2 listings"

@@ -44,6 +44,7 @@ class Listing < ApplicationRecord
     return recent_first unless search_preference
 
     listings = in_scope_inventory
+    listings = listings.where(operation_type: search_preference.operation_type)
     listings = if search_has_zones?(search_preference)
       listings.where(id: matching_zone_ids(search_preference.zones.to_a))
     else

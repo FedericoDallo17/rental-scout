@@ -48,6 +48,7 @@ class SearchPreferencesController < ApplicationController
     params.require(:search_preference).permit(
       :name,
       :location_query,
+      :operation_type,
       :min_price,
       :max_price,
       :price_currency,

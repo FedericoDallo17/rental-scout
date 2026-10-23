@@ -275,12 +275,16 @@ es:
     good_detail_coverage: "Buena cobertura de información"
     basic_details: "Información básica"
   searches:
-    eyebrow: "Búsqueda guardada"
+    eyebrow: "Búsqueda"
     new_title: "Nueva búsqueda"
     edit_title: "Editar búsqueda"
     save_error: "No se pudo guardar la búsqueda"
     name: "Nombre de la búsqueda"
     location: "Nota de ubicación"
+    operation_type: "Busco"
+    operation_types:
+      alquiler: "Alquiler"
+      venta: "Venta"
     price_currency: "Moneda del precio"
     min_price: "Precio mínimo"
     max_price: "Precio máximo"

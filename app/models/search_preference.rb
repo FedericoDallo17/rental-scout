@@ -1,5 +1,6 @@
 class SearchPreference < ApplicationRecord
   PRICE_CURRENCIES = %w[UYU USD].freeze
+  OPERATION_TYPES = %w[alquiler venta].freeze
 
   belongs_to :user
 
@@ -9,6 +10,7 @@ class SearchPreference < ApplicationRecord
 
   validates :name, :location_query, presence: true
   validates :price_currency, inclusion: { in: PRICE_CURRENCIES }
+  validates :operation_type, inclusion: { in: OPERATION_TYPES }
   validates :min_square_meters, :max_square_meters,
     numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validate :ordered_area_range

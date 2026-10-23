@@ -31,10 +31,13 @@ module Scraping
       tracker = Sources::ThirdPartyCallTracker.new(listing_source:, source_run:)
       adapter = Sources::AdapterRegistry.resolve(listing_source)
       adapter.on_request = tracker if adapter.respond_to?(:on_request=)
-      listings = adapter.fetch_listings(
-        known_external_ids:,
-        reconciliation:
-      )
+      listings = if supports_operation_types?(adapter)
+        SearchPreference::OPERATION_TYPES.flat_map do |operation_type|
+          adapter.fetch_listings(known_external_ids:, reconciliation:, operation_type:)
+        end
+      else
+        adapter.fetch_listings(known_external_ids:, reconciliation:)
+      end
       created_count = 0
 
       listings.each do |attributes|
@@ -53,6 +56,12 @@ module Scraping
       run.increment!(:listings_created_count, created_count)
     rescue StandardError => error
       source_run&.update!(status: "failed", finished_at: Time.current, error_message: error.message)
+    end
+
+    def supports_operation_types?(adapter)
+      adapter.method(:fetch_listings).parameters.any? do |kind, name|
+        name == :operation_type || kind == :keyrest
+      end
     end
   end
 end

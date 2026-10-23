@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_08_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -68,6 +68,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_08_120000) do
     t.string "expenses_currency"
     t.integer "parking_spaces"
     t.string "property_type"
+    t.string "operation_type", default: "alquiler", null: false
     t.index "COALESCE(NULLIF((expenses_currency)::text, ''::text), (currency)::text), expenses_cents", name: "index_listings_feed_expenses", where: "((in_scope = true) AND (expenses_cents IS NOT NULL))"
     t.index "currency, (((price_cents)::numeric / (NULLIF(square_meters, 0))::numeric))", name: "index_listings_feed_price_per_m2", where: "((in_scope = true) AND (price_cents IS NOT NULL) AND (square_meters > 0))"
     t.index ["coordinates"], name: "index_listings_on_coordinates", using: :gist
@@ -78,6 +79,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_08_120000) do
     t.index ["listing_source_id", "external_id"], name: "index_listings_on_listing_source_id_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
     t.index ["listing_source_id"], name: "index_listings_on_listing_source_id"
     t.index ["location_resolution_status"], name: "index_listings_on_location_resolution_status"
+    t.index ["operation_type"], name: "index_listings_on_operation_type"
     t.index ["scraping_run_id"], name: "index_listings_on_scraping_run_id"
     t.index ["square_meters"], name: "index_listings_feed_square_meters", where: "((in_scope = true) AND (square_meters > 0))"
   end
@@ -154,6 +156,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_08_120000) do
     t.boolean "include_expenses", default: false, null: false
     t.integer "min_square_meters"
     t.integer "max_square_meters"
+    t.string "operation_type", default: "alquiler", null: false
+    t.index ["operation_type"], name: "index_search_preferences_on_operation_type"
     t.index ["user_id"], name: "index_search_preferences_on_user_id"
     t.check_constraint "(min_square_meters IS NULL OR min_square_meters >= 0) AND (max_square_meters IS NULL OR max_square_meters >= 0) AND (min_square_meters IS NULL OR max_square_meters IS NULL OR min_square_meters <= max_square_meters)", name: "search_preferences_area_range"
   end

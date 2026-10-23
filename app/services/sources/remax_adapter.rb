@@ -22,13 +22,13 @@ module Sources
       @on_request = on_request
     end
 
-    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false, operation_type: "alquiler")
       listings = []
       page_signatures = Set.new
       page_limit = reconciliation ? RECONCILIATION_PAGE_LIMIT : RECENT_PAGE_LIMIT
 
       page_limit.times do |page|
-        page_entries = entries(page:)
+        page_entries = entries(page:, operation_type:)
         break if page_entries.empty?
 
         page_ids = page_entries.filter_map { |entry| entry["id"]&.to_s }
@@ -36,7 +36,7 @@ module Sources
         break if page_signatures.include?(signature)
 
         page_signatures << signature
-        listings.concat(page_entries.filter_map { |entry| normalized_listing(entry) })
+        listings.concat(page_entries.filter_map { |entry| normalized_listing(entry, operation_type:) })
         break if !reconciliation && page_ids.intersect?(known_external_ids.to_a)
       end
 
@@ -47,16 +47,16 @@ module Sources
 
     private
 
-    def entries(page:)
-      payload(page:).dig("data", "data") || []
+    def entries(page:, operation_type:)
+      payload(page:, operation_type:).dig("data", "data") || []
     end
 
-    def payload(page:)
-      JSON.parse(http_response(page:).body)
+    def payload(page:, operation_type:)
+      JSON.parse(http_response(page:, operation_type:).body)
     end
 
-    def http_response(page:)
-      uri = request_uri(page:)
+    def http_response(page:, operation_type:)
+      uri = request_uri(page:, operation_type:)
       Net::HTTP.start(
         uri.host,
         uri.port,
@@ -71,15 +71,16 @@ module Sources
       end
     end
 
-    def request_uri(page:)
+    def request_uri(page:, operation_type:)
       uri = ENDPOINT_URI.dup
       pairs = URI.decode_www_form(uri.query)
-      pairs.map! { |key, value| key == "page" ? [key, page.to_s] : [key, value] }
+      pairs = pairs.reject { |key, _| operation_type == "venta" && key == "pricein" }
+      pairs.map! { |key, value| key == "page" ? [key, page.to_s] : key == "in" && value.start_with?("operationId:") ? [key, "operationId:#{operation_type == "venta" ? 1 : 2}"] : [key, value] }
       uri.query = URI.encode_www_form(pairs)
       uri
     end
 
-    def normalized_listing(entry)
+    def normalized_listing(entry, operation_type:)
       longitude, latitude = entry.dig("location", "coordinates")
       label = entry["geoLabel"].presence
       return unless label
@@ -99,7 +100,7 @@ module Sources
         location_text: [neighborhood, city].uniq.join(", "),
         source_neighborhood: neighborhood,
         source_city: city,
-        operation_type: operation_type(entry.dig("operation", "value")),
+        operation_type: normalized_operation_type(entry.dig("operation", "value")) || operation_type,
         bedrooms: integer_or_nil(entry["bedrooms"]),
         square_meters: integer_or_nil(entry["dimensionCovered"]),
         expenses_cents: normalize_price(entry["expensesPrice"]),
@@ -122,8 +123,12 @@ module Sources
       [label, "Montevideo"].compact_blank.join(", ")
     end
 
-    def operation_type(value)
-      value == "rent" ? "alquiler" : value
+    def normalized_operation_type(value)
+      case value
+      when "rent" then "alquiler"
+      when "sale" then "venta"
+      else value.presence
+      end
     end
 
     def normalize_price(value)

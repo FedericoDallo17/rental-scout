@@ -6,7 +6,7 @@ module Sources
   class HousiAdapter
     attr_writer :on_request
 
-    SEARCH_URI = URI("https://www.housi.com.uy/Buscar?operation=2&ptypes=2&locations=51720&min-roofed=30&min-price=&max-price=65000&currency=UYU&o=2,2&1=1")
+    SEARCH_URI = URI("https://www.housi.com.uy/Buscar?ptypes=2&locations=51720&min-roofed=30&min-price=&max-price=65000&currency=UYU&o=2,2&1=1")
     FRONTEND_BASE_URL = "https://www.housi.com.uy"
     OPEN_TIMEOUT_SECONDS = 5
     READ_TIMEOUT_SECONDS = 15
@@ -20,32 +20,35 @@ module Sources
       @on_request = on_request
     end
 
-    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
-      cards.map { |card| normalized_listing(card) }.compact
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false, operation_type: "alquiler")
+      cards(operation_type:).map { |card| normalized_listing(card, operation_type:) }.compact
     end
 
     private
 
-    def cards
-      Nokogiri::HTML(http_response.body).css("#propiedades [prop-id]")
+    def cards(operation_type:)
+      Nokogiri::HTML(http_response(operation_type:).body).css("#propiedades [prop-id]")
     end
 
-    def http_response
+    def http_response(operation_type:)
+      uri = SEARCH_URI.dup
+      params = URI.decode_www_form(uri.query).reject { |key, _| operation_type == "venta" && %w[max-price currency].include?(key) }
+      uri.query = URI.encode_www_form(params + [["operation", operation_type == "venta" ? "1" : "2"]])
       Net::HTTP.start(
-        SEARCH_URI.host,
-        SEARCH_URI.port,
+        uri.host,
+        uri.port,
         use_ssl: true,
         open_timeout: OPEN_TIMEOUT_SECONDS,
         read_timeout: READ_TIMEOUT_SECONDS
       ) do |http|
-        request = Net::HTTP::Get.new(SEARCH_URI)
+        request = Net::HTTP::Get.new(uri)
         HEADERS.each { |header, value| request[header] = value }
         @on_request&.call
         http.request(request)
       end
     end
 
-    def normalized_listing(card)
+    def normalized_listing(card, operation_type:)
       href = card.at_css("a.item")&.[]("href")
       return if href.blank?
 
@@ -63,7 +66,7 @@ module Sources
         location_text: [address, neighborhood, "Montevideo"].compact_blank.join(", "),
         source_neighborhood: neighborhood,
         source_city: "Montevideo",
-        operation_type: "alquiler",
+        operation_type:,
         bedrooms: bedrooms(title),
         square_meters: square_meters(card),
         expenses_cents: nil,

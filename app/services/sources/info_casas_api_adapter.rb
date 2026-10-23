@@ -65,15 +65,15 @@ module Sources
       @on_request = on_request
     end
 
-    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false, operation_type: "alquiler")
       page = 1
       listings = []
 
       loop do
-        entries = payload(page, reconciliation:).dig(0, :data, :searchFast, :data)
+        entries = payload(page, reconciliation:, operation_type:).dig(0, :data, :searchFast, :data)
         raise UnexpectedResponseError, "missing searchFast data on page #{page}" unless entries.is_a?(Array)
 
-        listings.concat(entries.map { |entry| normalized_listing(entry) })
+        listings.concat(entries.map { |entry| normalized_listing(entry, requested_operation_type: operation_type) })
         break if entries.size < RESULTS_PER_PAGE || page >= MAX_PAGES
 
         page += 1
@@ -93,7 +93,7 @@ module Sources
 
     private
 
-    def normalized_listing(entry)
+    def normalized_listing(entry, requested_operation_type: "alquiler")
       location_name = location_text(entry)
       title_neighborhood = explicit_title_neighborhood(entry[:title])
       neighborhood = title_neighborhood || entry[:neighborhood].presence || location_name
@@ -111,7 +111,7 @@ module Sources
         location_text: location_name,
         source_neighborhood: neighborhood,
         source_city: entry[:estate].presence || source_city(location_name),
-        operation_type: operation_type_from_id(entry[:operation_type_id]) || operation_type(entry[:link]),
+        operation_type: operation_type_from_id(entry[:operation_type_id]) || operation_type(entry[:link]) || requested_operation_type,
         bedrooms: integer_or_nil(entry[:bedrooms]),
         square_meters: integer_or_nil(entry[:area] || entry[:m2]),
         latitude: entry[:lat] || entry.dig(:location, :lat),
@@ -119,11 +119,11 @@ module Sources
       }
     end
 
-    def payload(page, reconciliation: false)
-      JSON.parse(http_response(page, reconciliation:).body, symbolize_names: true)
+    def payload(page, reconciliation: false, operation_type: "alquiler")
+      JSON.parse(http_response(page, reconciliation:, operation_type:).body, symbolize_names: true)
     end
 
-    def http_response(page, reconciliation: false)
+    def http_response(page, reconciliation: false, operation_type: "alquiler")
       Net::HTTP.start(
         ENDPOINT_URI.host,
         ENDPOINT_URI.port,
@@ -135,7 +135,7 @@ module Sources
         LEGACY_HEADERS.each do |header, value|
           request[header] = value
         end
-        request.body = request_body(page:, reconciliation:)
+        request.body = request_body(page:, reconciliation:, operation_type:)
         @on_request&.call
         http.request(request)
       end
@@ -178,13 +178,13 @@ module Sources
       html.scan(/<script[^>]+type="application\/ld\+json"[^>]*>(.*?)<\/script>/m).flatten
     end
 
-    def request_body(page: 1, reconciliation: false)
+    def request_body(page: 1, reconciliation: false, operation_type: "alquiler")
       JSON.generate([
         {
           operationName: "ResultsGird_v2",
           variables: {
             rows: RESULTS_PER_PAGE,
-            params: legacy_search_params(page:, reconciliation:),
+            params: legacy_search_params(page:, reconciliation:, operation_type:),
             page: page,
             source: 0
           },
@@ -193,18 +193,18 @@ module Sources
         {
           operationName: "searchUrl",
           variables: {
-            params: legacy_search_params(page:, reconciliation:)
+            params: legacy_search_params(page:, reconciliation:, operation_type:)
           },
           query: SEARCH_URL_QUERY
         }
       ])
     end
 
-    def legacy_search_params(page: 1, reconciliation: false)
+    def legacy_search_params(page: 1, reconciliation: false, operation_type: "alquiler")
       {
         page: page,
         order: 2,
-        operation_type_id: 2,
+        operation_type_id: operation_type == "venta" ? 1 : 2,
         property_type_id: [1, 2],
         currencyID: nil,
         m2Currency: 2,

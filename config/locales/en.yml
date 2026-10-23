@@ -233,6 +233,10 @@ en:
     save_error: "Search could not be saved"
     name: "Search name"
     location: "Location note"
+    operation_type: "Looking for"
+    operation_types:
+      alquiler: "Rentals"
+      venta: "For sale"
     price_currency: "Price currency"
     min_price: "Min price"
     max_price: "Max price"

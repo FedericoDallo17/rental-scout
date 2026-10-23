@@ -18,7 +18,7 @@ module Sources
       "house" => "Casa"
     }.freeze
 
-    QUERY = { limit: 12, operation: "rent" }.freeze
+    OPERATION_VALUES = { "alquiler" => "rent", "venta" => "sale" }.freeze
 
     HEADERS = {
       "accept" => "application/json, text/plain, */*",
@@ -29,13 +29,14 @@ module Sources
       @on_request = on_request
     end
 
-    def fetch_listings(known_external_ids: Set.new, reconciliation: false)
+    def fetch_listings(known_external_ids: Set.new, reconciliation: false, operation_type: "alquiler")
+      operation = OPERATION_VALUES.fetch(operation_type)
       listings = []
       page_signatures = Set.new
       page_limit = reconciliation ? RECONCILIATION_PAGE_LIMIT : RECENT_PAGE_LIMIT
 
       page_limit.times do |page|
-        page_properties = properties(page:)
+        page_properties = properties(page:, operation:)
         break if page_properties.empty?
 
         page_ids = page_properties.filter_map { |property| property["propertyId"]&.to_s }
@@ -44,7 +45,7 @@ module Sources
 
         page_signatures << signature
         listings.concat(page_properties.filter_map do |property|
-          normalized_listing(property)
+          normalized_listing(property, operation_type:)
         rescue KeyError, TypeError
           nil
         end)
@@ -58,16 +59,16 @@ module Sources
 
     private
 
-    def properties(page:)
-      payload(page:)["data"] || []
+    def properties(page:, operation:)
+      payload(page:, operation:)["data"] || []
     end
 
-    def payload(page:)
-      JSON.parse(http_response(page:).body)
+    def payload(page:, operation:)
+      JSON.parse(http_response(page:, operation:).body)
     end
 
-    def http_response(page:)
-      uri = request_uri(page:)
+    def http_response(page:, operation:)
+      uri = request_uri(page:, operation:)
       Net::HTTP.start(
         uri.host,
         uri.port,
@@ -82,13 +83,13 @@ module Sources
       end
     end
 
-    def request_uri(page:)
+    def request_uri(page:, operation:)
       uri = ENDPOINT_URI.dup
-      uri.query = URI.encode_www_form(QUERY.merge(page: page + 1))
+      uri.query = URI.encode_www_form(limit: 12, operation:, page: page + 1)
       uri
     end
 
-    def normalized_listing(property)
+    def normalized_listing(property, operation_type:)
       return unless residential?(property)
       features = property["features"] || {}
       pricing = property["pricing"] || {}
@@ -100,12 +101,12 @@ module Sources
         title: property["title"],
         canonical_url: "#{FRONTEND_BASE_URL}/propiedades/#{property.fetch("propertyId")}",
         description: plain_description(property["description"]),
-        price_cents: normalize_price(pricing["rentPrice"]),
+        price_cents: normalize_price(pricing[operation_type == "venta" ? "salePrice" : "rentPrice"]),
         currency: pricing["currency"],
         location_text: location["address"].presence || [location["city"], location["state"]].compact_blank.uniq.join(", "),
         source_neighborhood: neighborhood(location),
         source_city: location["state"].presence || location["city"].presence,
-        operation_type: "alquiler",
+        operation_type:,
         bedrooms: integer_or_nil(features["bedrooms"]),
         square_meters: integer_or_nil(features["totalArea"] || features["coveredArea"]),
         expenses_cents: normalize_price(pricing["monthlyExpenses"]),

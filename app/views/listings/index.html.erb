@@ -11,7 +11,7 @@
           <% search_path = search == @active_search ? listings_path(@feed_params) : listings_path(@feed_params.merge(search_id: search.id)) %>
           <%= link_to search_path, class: ["search-link", ("search-link--active" if search == @active_search)] do %>
             <span class="search-link__name"><%= search.name %></span>
-          <span class="search-link__meta"><%= search.location_query %></span>
+          <span class="search-link__meta"><%= [search.location_query, t("searches.operation_types.#{search.operation_type}")].join(" · ") %></span>
           <span class="search-link__count"><%= t("count.listing", count: @search_counts.fetch(search, 0)) %></span>
         <% end %>
           <%= link_to edit_search_preference_path(search),

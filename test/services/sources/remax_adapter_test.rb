@@ -99,9 +99,36 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
     end
   end
 
+  test "preserves rental metadata when a sale query returns a rental" do
+    stub_net_http_start(response_body: remax_response_body) do
+      assert_equal "alquiler", Sources::RemaxAdapter.new.fetch_listings(operation_type: "venta").first[:operation_type]
+    end
+  end
+
+  test "normalizes explicit sale metadata independently of the requested operation" do
+    stub_net_http_start(response_body: remax_response_body(operation_value: "sale")) do
+      assert_equal "venta", Sources::RemaxAdapter.new.fetch_listings.first[:operation_type]
+    end
+  end
+
+  test "uses the requested operation only when provider metadata is absent" do
+    stub_net_http_start(response_body: remax_response_body(operation_value: nil)) do
+      assert_equal "venta", Sources::RemaxAdapter.new.fetch_listings(operation_type: "venta").first[:operation_type]
+    end
+  end
+
+  test "keeps unsupported explicit operation metadata out of scope" do
+    stub_net_http_start(response_body: remax_response_body(operation_value: "seasonal")) do
+      attributes = Sources::RemaxAdapter.new.fetch_listings.first
+      result = Scraping::ListingScopeValidator.new.call(attributes:)
+      assert_equal "seasonal", attributes[:operation_type]
+      assert_not result[:in_scope]
+    end
+  end
+
   private
 
-  def remax_response_body(geo_label: "Pocitos, Pocitos, Montevideo", id: 30206)
+  def remax_response_body(geo_label: "Pocitos, Pocitos, Montevideo", id: 30206, operation_value: "rent")
     JSON.generate(
       data: {
         data: [
@@ -113,7 +140,7 @@ class Sources::RemaxAdapterTest < ActiveSupport::TestCase
             expensesPrice: 5_000,
             expensesCurrency: { value: "UYU" },
             currency: { value: "UYU" },
-            operation: { value: "rent" },
+            operation: { value: operation_value },
             type: { value: "departamento_estandar" },
             bedrooms: 1,
             dimensionCovered: 42,
