@@ -151,13 +151,8 @@ function initializeScene(root) {
   window.addEventListener("pagehide", onPageHide)
   activeScenes.add(dispose)
   motionPreferenceChanged()
-  // One quiet introduction per tab. Forms remain usable throughout; no sound.
-  try {
-    if (!manual && !reduced.matches && !sessionStorage.getItem("timbre-intro-seen")) {
-      sessionStorage.setItem("timbre-intro-seen", "true")
-      play()
-    }
-  } catch { /* Storage blocked: the static logo and explicit replay still work. */ }
+  // Play on every visit. Forms remain usable throughout; no sound.
+  if (!manual && !reduced.matches) play()
 }
 
 document.addEventListener("turbo:load", () => {
