@@ -13,7 +13,7 @@ Timbre is a Rails 8 property search app for finding new Montevideo rentals and h
 - **Sends new-match alerts:** Grouped browser Web Push and optional Pushover delivery use persisted keys to avoid duplicate notifications.
 - **Shows operational health:** Run history, per-source results, request counts, and location-quality metrics make ingestion problems visible.
 
-The interface supports English and Spanish. The live app uses separate Rails web and Solid Queue job containers, deployed with Docker and Kamal to a Hetzner server. PostgreSQL/PostGIS, HTTPS, and backup tooling are part of that deployment.
+The interface supports English and Spanish. The live app uses separate Rails web and Solid Queue job containers, managed by Coolify on a Hetzner server. Every push to `main` builds and deploys an immutable Docker image through GitHub Actions, with health checks and automatic image rollback. See [production deployment](docs/production-deployment.md) for operations and setup details.
 
 ## Why I built it
 

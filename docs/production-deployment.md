@@ -1,4 +1,79 @@
-# Production deployment on one Hetzner VM
+# Automatic production deployment
+
+Production is the Coolify service `roryn8zi32hwqly5lyqguuin` on
+`167.233.115.254`, serving <https://homes.dallo.dev>. Coolify manages the
+existing `web`, `job`, and PostGIS containers, networks, secrets, and volumes.
+
+Every push to `main` runs `.github/workflows/deploy.yml`:
+
+1. Build the production Dockerfile for `linux/amd64` and push
+   `ghcr.io/federicodallo17/rental-scout-lite:<commit SHA>` using the workflow's
+   temporary `GITHUB_TOKEN` with package write permission.
+2. Connect using a dedicated SSH key restricted to `script/deploy-production`.
+   It accepts only a 40-character commit SHA; shell access and forwarding are disabled.
+3. Pull the image, update both application image references in Coolify and its
+   generated Compose configuration, and recreate only `web` and `job`.
+4. Verify internal and public `/up` endpoints and that the job container stays
+   running without restarts. Restore the previous image if deployment fails.
+
+The database container is not recreated. Rails' entrypoint runs `db:prepare`;
+image rollback does not undo database migrations, so use backwards-compatible
+migrations. Deploys are serialized in Actions and by a server lock. The build
+must succeed before deployment starts. Runs are visible under the repository's
+**Actions → Deploy production**; `workflow_dispatch` can redeploy a selected ref.
+
+## GitHub integration
+
+The reusable GitHub App `coolify-federicodallo17` is installed for all current
+and future repositories in `FedericoDallo17` and connected to Coolify. It has
+read access and webhooks, with previews and Actions runner management disabled.
+It is available for additional repository-based Coolify applications. This
+existing Compose service deploys through the Actions workflow above.
+
+## Server bootstrap and credentials
+
+The installed helpers are root-owned:
+
+- `/usr/local/lib/rental-scout/deploy-production` from `script/deploy-production`
+- `/usr/local/lib/rental-scout/deploy-production.php` from `script/deploy-production.php`
+
+After changing either helper, install it on the server before using the new
+version. The PHP helper uses the existing Coolify application's bootstrap and
+models; verify it after upgrading Coolify.
+
+Repository Actions secrets:
+
+- `DEPLOY_SSH_KEY`: dedicated Ed25519 private key.
+- `DEPLOY_KNOWN_HOSTS`: host key copied from the operator's already-trusted
+  `known_hosts`; the runner enforces strict host key checking.
+
+The corresponding public key in `deploy`'s `authorized_keys` uses:
+
+```text
+restrict,command="sudo -n /usr/local/lib/rental-scout/deploy-production \"$SSH_ORIGINAL_COMMAND\"" ssh-ed25519 <public key>
+```
+
+Rails and database secrets remain on the server. No Coolify API token or
+registry PAT is stored in Actions. The server's existing registry login pulls
+the image. GitHub Actions must have write access to the GHCR package.
+
+## Manual recovery
+
+Inspect the failed Actions run, then deploy a known-good immutable image:
+
+```sh
+ssh deploy@167.233.115.254 'sudo /usr/local/lib/rental-scout/deploy-production FULL_40_CHARACTER_COMMIT_SHA'
+```
+
+Coolify's service page reflects the last deployed image for both roles.
+Normal deploys do not restart the database or change volumes.
+
+---
+
+# Original Kamal bootstrap reference
+
+The following describes the original setup. Current production uses the
+Coolify/Actions deployment above; `config/deploy.yml` is retained as a reference.
 
 This deployment runs the Rails web process, one Solid Queue worker, and
 PostgreSQL/PostGIS on a single host. It is intended for the initial low-traffic

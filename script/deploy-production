@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Installed root-owned at /usr/local/lib/rental-scout/deploy-production.
+# The CI SSH key can invoke only this command, with one immutable image SHA.
+set -euo pipefail
+
+sha="${SSH_ORIGINAL_COMMAND:-${1:-}}"
+if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+  echo 'Expected a full Git commit SHA.' >&2
+  exit 2
+fi
+
+exec 9>/var/lock/rental-scout-deploy.lock
+flock -w 900 9
+
+service=roryn8zi32hwqly5lyqguuin
+image="ghcr.io/federicodallo17/rental-scout-lite:$sha"
+workdir="/data/coolify/services/$service"
+helper=/usr/local/lib/rental-scout/deploy-production.php
+
+compose() {
+  docker compose --project-directory "$workdir" -f "$workdir/docker-compose.yml" \
+    --project-name "$service" "$@"
+}
+
+configure() {
+  docker exec -i coolify php /dev/stdin "$1" < "$helper"
+}
+
+healthy() {
+  for attempt in $(seq 1 60); do
+    if docker exec "web-$service" curl --fail --silent --output /dev/null http://127.0.0.1:3000/up &&
+       [[ "$(docker inspect -f '{{.State.Running}} {{.RestartCount}}' "job-$service")" == 'true 0' ]] &&
+       curl --fail --silent --output /dev/null https://homes.dallo.dev/up; then
+      return 0
+    fi
+    sleep 5
+  done
+  return 1
+}
+
+# Pull before changing the running service. Never recreate the database.
+docker pull "$image"
+previous="$(docker inspect -f '{{.Config.Image}}' "web-$service")"
+[[ "$previous" =~ ^ghcr.io/federicodallo17/rental-scout-lite:[0-9a-f]{40}$ ]]
+
+rollback() {
+  trap - ERR
+  echo 'Deployment failed; restoring the previous web and job image.' >&2
+  configure "$previous"
+  compose up -d --no-deps web job
+  exit 1
+}
+trap rollback ERR
+configure "$image"
+compose up -d --no-deps web job
+healthy
+# Check again after the worker has had time to start.
+sleep 10
+healthy
+trap - ERR
+echo "Production healthy at $sha (web and job)."
