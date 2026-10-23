@@ -40,7 +40,7 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "es", cookies[:locale]
     follow_redirect!
     assert_select "html[lang='es']"
-    assert_includes response.body, "Búsquedas guardadas"
+    assert_select "[data-onboarding-welcome] a", text: "Armar mi primera búsqueda"
     assert_includes response.body, "Cerrar sesión"
     assert_includes response.body, "Idioma actualizado."
   end
@@ -57,7 +57,7 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
     sign_in english_user
     get listings_path
     assert_select "html[lang='en']"
-    assert_includes response.body, "Saved searches"
+    assert_select "[data-onboarding-welcome] a", text: "Set up my first search"
     assert_equal "en", english_user.locale
   end
 
@@ -76,7 +76,7 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
     sign_in user
 
     get new_search_preference_path
-    assert_includes response.body, "Nueva búsqueda"
+    assert_select "form[data-onboarding]"
     assert_includes response.body, "Barrios"
 
     get admin_root_path
@@ -84,7 +84,7 @@ class LanguageSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "¿Qué tan confiable es la ubicación?"
 
     get edit_notification_settings_path
-    assert_includes response.body, "Notificaciones"
+    assert_includes response.body, "Avisos"
     assert_includes response.body, "Los datos de tus notificaciones permanecen privados"
   end
 

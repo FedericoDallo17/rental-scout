@@ -44,7 +44,7 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
         assert_select "details[data-device-guide='ios']" do
           assert_select "summary", text: "iPhone or iPad"
           assert_select "li", count: 5
-          assert_select "li", text: /Open Rental Scout in Safari—not Chrome/
+          assert_select "li", text: /Open Timbre in Safari—not Chrome/
           assert_select "li", text: /Add to Home Screen/
         end
         assert_select "details[data-device-guide='android'] summary", text: "Android phone or tablet"
@@ -57,9 +57,9 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
       assert_select "h2", text: "What is Pushover?"
       assert_select "p", text: /independent notification service/
       assert_select "h3", text: "Why do we use Pushover?"
-      assert_select "p", text: /even when Rental Scout isn't open/
+      assert_select "p", text: /even when Timbre isn't open/
       assert_select "li", text: /Pushover app and a Pushover account/
-      assert_select "li", text: /separate from Rental Scout/
+      assert_select "li", text: /separate from Timbre/
     end
     assert_select ".notification-settings__searches" do
       assert_select "a[href='#{edit_search_preference_path(search)}']", text: "Pocitos"
@@ -86,9 +86,9 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
       assert_select "h2", text: "¿Qué es Pushover?"
       assert_select "p", text: /servicio independiente de notificaciones/
       assert_select "h3", text: "¿Por qué usamos Pushover?"
-      assert_select "p", text: /incluso cuando Rental Scout no está abierto/
+      assert_select "p", text: /incluso cuando Timbre no está abierto/
       assert_select "li", text: /Necesitás la aplicación de Pushover/
-      assert_select "li", text: /independiente de Rental Scout/
+      assert_select "li", text: /independiente de Timbre/
     end
     assert_select ".notification-settings__status", text: /Configurá las notificaciones/
     assert_select ".notification-settings__device-guides" do
@@ -124,6 +124,23 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
       assert_select "h2", text: "Pushover"
       assert_select ".notification-settings__channel-state", text: "Pushover is not connected yet."
     end
+  end
+
+  test "activation comes first and secondary setup and help start collapsed" do
+    sign_in create_user!(email: "settings-hierarchy@example.test")
+    get edit_notification_settings_path
+
+    assert_response :success
+    document = Nokogiri::HTML(response.body)
+    panel = document.at_css(".notification-settings__panel")
+    assert panel.at_css("[data-web-push-toggle]")
+    assert_operator response.body.index("data-web-push-toggle"), :<, response.body.index("notification-settings__status")
+    assert_select "details[data-notification-help]", minimum: 2
+    assert_select "details[data-notification-help][open]", count: 0
+    assert_select "details.notification-settings__pushover:not([open])"
+    assert_select ".notification-settings__aside", count: 0
+    assert_select "details[data-notification-help] .notification-settings__troubleshooting"
+    assert_select "details[data-notification-help] [data-device-guide]", count: 4
   end
 
   test "updates only the signed in user's key" do
@@ -191,7 +208,7 @@ class NotificationSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Test sent—check your phone.", flash[:notice]
     assert_equal 1, deliveries.size
     assert_equal "saved-key", deliveries.first.fetch(:user_key)
-    assert_equal "Rental Scout test", deliveries.first.fetch(:title)
+    assert_equal "Timbre test", deliveries.first.fetch(:title)
     assert_equal listings_url, deliveries.first.fetch(:url)
   end
 

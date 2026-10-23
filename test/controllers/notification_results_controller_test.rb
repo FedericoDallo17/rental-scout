@@ -45,7 +45,7 @@ class NotificationResultsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "html[lang='es']"
-    assert_select "h1", text: "Tus nuevas coincidencias"
+    assert_select "h1", text: "Lugares que pueden ser para vos"
     assert_select "a[href='#{@listing.canonical_url}']", text: "Abrir propiedad"
   end
 

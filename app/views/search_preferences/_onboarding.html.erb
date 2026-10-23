@@ -1,0 +1,123 @@
+<% bedroom_options = [[t("feed.any_bedrooms"), ""], [t("feed.bedroom_options.studio_plus"), 0], [t("feed.bedroom_options.one_plus"), 1], [t("feed.bedroom_options.two_plus"), 2], [t("feed.bedroom_options.three_plus"), 3], [t("feed.bedroom_options.four_plus"), 4]] %>
+<% budget_range = if search_preference.min_price.present? && search_preference.max_price.present?
+  "#{number_with_delimiter(search_preference.min_price)} – #{number_with_delimiter(search_preference.max_price)}"
+elsif search_preference.max_price.present?
+  "≤ #{number_with_delimiter(search_preference.max_price)}"
+elsif search_preference.min_price.present?
+  "≥ #{number_with_delimiter(search_preference.min_price)}"
+end %>
+<% budget_summary = budget_range ? "#{search_preference.price_currency} #{budget_range}" : t("onboarding.no_limit") %>
+<% budget_summary += " · #{t('searches.expenses_included_short')}" if budget_range && search_preference.include_expenses? %>
+<main class="onboarding-page">
+  <header class="onboarding-header">
+    <%= link_to t("onboarding.back_home"), listings_path, class: "onboarding-text-link" %>
+    <h1><%= t("onboarding.title") %></h1>
+    <p><%= t("onboarding.intro") %></p>
+  </header>
+  <div class="onboarding-layout">
+    <%= form_with model: search_preference, class: "onboarding-form search-form", data: { onboarding: true } do |form| %>
+      <%= hidden_field_tag :onboarding, "1" %>
+      <% if search_preference.errors.any? %>
+        <div class="form-errors" role="alert" tabindex="-1" data-onboarding-errors>
+          <h2><%= t("searches.save_error") %></h2>
+          <ul><% search_preference.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul>
+        </div>
+      <% end %>
+      <ol class="onboarding-progress" aria-label="<%= t("onboarding.progress") %>">
+        <% %w[where preferences alerts].each_with_index do |step, index| %>
+          <li data-onboarding-progress><span aria-hidden="true"><%= index + 1 %></span><%= t("onboarding.steps.#{step}") %></li>
+        <% end %>
+      </ol>
+
+      <section data-onboarding-panel aria-labelledby="onboarding-where">
+        <h2 id="onboarding-where" tabindex="-1"><%= t("onboarding.where_title") %></h2>
+        <p class="onboarding-description"><%= t("onboarding.where_copy") %></p>
+        <div class="onboarding-zone-filter" data-onboarding-zone-filter hidden>
+          <label for="onboarding-zone-query"><%= t("onboarding.find_neighborhood") %></label>
+          <input id="onboarding-zone-query" type="search" autocomplete="off" placeholder="<%= t("onboarding.neighborhood_example") %>" data-onboarding-zone-query>
+        </div>
+        <fieldset class="onboarding-zones">
+          <legend class="onboarding-sr-only"><%= t("searches.neighborhoods") %></legend>
+          <% zones.each do |zone| %>
+            <label data-onboarding-zone>
+              <%= check_box_tag "search_preference[zone_ids][]", zone.id, search_preference.zone_ids.include?(zone.id), id: "onboarding-zone-#{zone.id}" %>
+              <span><%= zone.name %></span>
+            </label>
+          <% end %>
+          <%= hidden_field_tag "search_preference[zone_ids][]", "" %>
+        </fieldset>
+        <p class="onboarding-note" data-onboarding-no-zones hidden><%= t("onboarding.no_neighborhoods") %></p>
+        <p class="onboarding-note"><%= t("onboarding.zone_fallback") %></p>
+        <%= form.hidden_field :location_query %>
+        <div class="search-form__field">
+          <%= form.label :operation_type, t("onboarding.operation") %>
+          <%= form.select :operation_type, SearchPreference::OPERATION_TYPES.map { |type| [t("searches.operation_types.#{type}"), type] } %>
+        </div>
+      </section>
+
+      <section data-onboarding-panel aria-labelledby="onboarding-preferences">
+        <h2 id="onboarding-preferences" tabindex="-1"><%= t("onboarding.preferences_title") %></h2>
+        <p class="onboarding-description"><%= t("onboarding.preferences_copy") %></p>
+        <fieldset class="onboarding-budget">
+          <legend><%= t("onboarding.budget") %></legend>
+          <div class="onboarding-fields">
+            <div class="search-form__field">
+              <%= form.label :price_currency, t("feed.currency") %>
+              <%= form.select :price_currency, [[t("onboarding.uyu"), "UYU"], [t("onboarding.usd"), "USD"]] %>
+            </div>
+            <div class="search-form__field">
+              <%= form.label :max_price, t("onboarding.max_budget") %>
+              <%= form.number_field :max_price, min: 0, step: 1, inputmode: "numeric", placeholder: t("onboarding.no_limit") %>
+            </div>
+          </div>
+          <label class="onboarding-checkbox"><%= form.check_box :include_expenses %><span><%= t("feed.include_expenses") %></span></label>
+          <p class="onboarding-note"><%= t("onboarding.expenses_hint") %></p>
+        </fieldset>
+        <div class="search-form__field">
+          <%= form.label :min_bedrooms, t("feed.bedrooms") %>
+          <%= form.select :min_bedrooms, bedroom_options %>
+        </div>
+        <details class="onboarding-extra" <%= "open" if search_preference.min_price.present? || search_preference.min_square_meters.present? || search_preference.max_square_meters.present? %>>
+          <summary><%= t("onboarding.more_preferences") %></summary>
+          <div class="onboarding-fields">
+            <div class="search-form__field"><%= form.label :min_price, t("feed.min_price") %><%= form.number_field :min_price, min: 0, step: 1, inputmode: "numeric" %></div>
+            <div class="search-form__field"><%= form.label :min_square_meters, t("feed.min_area") %><%= form.number_field :min_square_meters, min: 0, step: 1, inputmode: "numeric" %></div>
+            <div class="search-form__field"><%= form.label :max_square_meters, t("feed.max_area") %><%= form.number_field :max_square_meters, min: 0, step: 1, inputmode: "numeric" %></div>
+          </div>
+        </details>
+      </section>
+
+      <section data-onboarding-panel aria-labelledby="onboarding-alerts">
+        <h2 id="onboarding-alerts" tabindex="-1"><%= t("onboarding.alerts_title") %></h2>
+        <p class="onboarding-description"><%= t("onboarding.alerts_copy") %></p>
+        <div class="search-form__field">
+          <%= form.label :name, t("searches.name") %>
+          <%= form.text_field :name, required: true, maxlength: 100 %>
+        </div>
+        <label class="onboarding-checkbox onboarding-alert-choice">
+          <%= form.check_box :notifications_enabled %>
+          <span><strong><%= t("onboarding.notify") %></strong><small><%= t("onboarding.notify_copy") %></small></span>
+        </label>
+        <p class="onboarding-note"><%= t("onboarding.permission_note") %></p>
+        <p class="onboarding-note"><%= t("onboarding.edit_later") %></p>
+      </section>
+
+      <div class="onboarding-actions">
+        <button type="button" class="onboarding-back onboarding-text-link" data-onboarding-back hidden><%= t("onboarding.back") %></button>
+        <button type="button" class="onboarding-primary" data-onboarding-next hidden><%= t("onboarding.next") %></button>
+        <%= form.submit t("onboarding.save"), class: "onboarding-primary", data: { onboarding_submit: true } %>
+      </div>
+    <% end %>
+    <aside class="onboarding-summary" aria-label="<%= t("onboarding.summary") %>" data-onboarding-summary>
+      <img src="/branding/timbre-simbolo-verde.svg" alt="" width="48" height="48">
+      <h2><%= t("onboarding.summary") %></h2>
+      <dl>
+        <div><dt><%= t("searches.neighborhoods") %></dt><dd data-onboarding-summary-zones data-empty="<%= t("onboarding.fallback_short") %>"><%= search_preference.zones.map(&:name).presence&.join(", ") || t("onboarding.fallback_short") %></dd></div>
+        <div><dt><%= t("searches.operation_type") %></dt><dd data-onboarding-summary-operation><%= t("searches.operation_types.#{search_preference.operation_type}") %></dd></div>
+        <div><dt><%= t("onboarding.budget") %></dt><dd data-onboarding-summary-budget data-empty="<%= t("onboarding.no_limit") %>" data-expenses="<%= t("searches.expenses_included_short") %>"><%= budget_summary %></dd></div>
+        <div><dt><%= t("feed.bedrooms") %></dt><dd data-onboarding-summary-bedrooms><%= bedroom_options.find { |_, value| value.to_s == search_preference.min_bedrooms.to_s }&.first %></dd></div>
+      </dl>
+      <p><%= t("onboarding.summary_note") %></p>
+    </aside>
+  </div>
+</main>

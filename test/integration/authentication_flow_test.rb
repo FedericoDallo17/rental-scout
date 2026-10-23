@@ -18,7 +18,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_select "header nav", count: 0
     assert_select ".auth-shell", count: 1
     assert_select ".auth-card", count: 1
-    assert_select ".auth-brand", text: "Rental Scout Lite"
+    assert_select ".auth-brand img[alt='Timbre']"
     assert_select ".auth-header", count: 1
     assert_select ".auth-title", text: "Sign in"
     assert_select ".auth-copy", text: /Sign in to continue/

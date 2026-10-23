@@ -40,10 +40,10 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
     get root_url
 
     assert_response :success
-    assert_includes response.body, "Scraped Apartments"
-    assert_select "a[href='#{edit_notification_settings_path}']", text: "Notifications"
+    assert_select "[data-onboarding-welcome]"
+    assert_select "a[href='#{edit_notification_settings_path}']", text: "Alerts"
     assert_select "details.app-account-menu summary", text: /Menu/
-    assert_select "nav.mobile-navigation a[href='#{listings_path}'][aria-current='page']", text: /Explore/
+    assert_select "nav.mobile-navigation a[href='#{listings_path}'][aria-current='page']", text: /Results/
     assert_select "nav.mobile-navigation a[href='#{listing_tracks_path}']", text: /Saved/
   end
 
@@ -112,8 +112,8 @@ class ListingsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".feed-header__context", count: 0
-    assert_select ".feed-header__count", text: "0 listings"
-    assert_select ".feed-empty-state", text: /Save your first search to start a feed tailored to you/
+    assert_select ".feed-header__count", count: 0
+    assert_select "[data-onboarding-welcome] a", text: "Set up my first search"
     assert_select "section.listings-grid article.listing-card", count: 0
     assert_no_match "Centro Loft", response.body
   end

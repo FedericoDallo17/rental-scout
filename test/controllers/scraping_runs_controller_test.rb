@@ -172,7 +172,7 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
     get scraping_runs_path
 
     assert_response :success
-    assert_select "#location-quality-heading"
+    assert_select "#location-quality-heading", count: 0
     assert_select "a[href='#{scraping_run_path(own_run)}']", text: "View these listings"
     assert_includes response.body, "2 matches"
     assert_not_includes response.body, "Run ##{other_run.id}"
@@ -220,7 +220,7 @@ class ScrapingRunsControllerTest < ActionDispatch::IntegrationTest
 
     get listings_path
     assert_response :success
-    assert_select "a[href='#{scraping_runs_path}']", text: "Runs"
+    assert_select "a[href='#{scraping_runs_path}']", text: "Chimes"
     assert_select "a[href='#{admin_root_path}']", count: 0
 
     get admin_root_path

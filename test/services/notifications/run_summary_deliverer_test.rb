@@ -26,8 +26,8 @@ class Notifications::RunSummaryDelivererTest < ActiveSupport::TestCase
     client.define_singleton_method(:deliver) { |**kwargs| delivered << kwargs; true }
     Notifications::RunSummaryDeliverer.new(client: client).call(user: user, events: events, scraping_run: run)
 
-    assert_equal "Nuevas coincidencias en Rental Scout", delivered.first[:title]
-    assert_equal "2 alquileres nuevos coincidieron con tus búsquedas guardadas.", delivered.first[:message]
+    assert_equal "Sonó un timbre", delivered.first[:title]
+    assert_equal "Aparecieron 2 propiedades nuevas para tus búsquedas.", delivered.first[:message]
     uri = URI.parse(delivered.first[:url])
     assert_equal "/notification_results", uri.path
     payload = Rails.application.message_verifier(:notification_results).verified(

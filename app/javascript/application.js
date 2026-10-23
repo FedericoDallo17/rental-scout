@@ -1,5 +1,7 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
+import "timbre_brand"
+import "onboarding"
 
 // Native disclosures remain usable without JavaScript. Start compact on phones,
 // and restore desktop controls when crossing the responsive breakpoint.
@@ -133,6 +135,70 @@ const initializeWebPushSettings = async () => {
 
 document.addEventListener("turbo:load", () => initializeWebPushSettings().catch(console.error))
 
+let disposeTourEntrance = () => {}
+let disposeTourHash = () => {}
+
+const initializeTourEntrance = (tour) => {
+  const entrance = document.querySelector("[data-tour-entrance]")
+  const header = document.querySelector("[data-tour-header]")
+  const scene = entrance?.querySelector("[data-timbre-motion]")
+  if (!scene || location.hash.startsWith("#tour-") || tour.dataset.entered === "true") return
+
+  const enter = entrance.querySelector("[data-tour-enter]")
+  const skip = entrance.querySelector("[data-tour-skip]")
+  const hint = entrance.querySelector("[data-tour-entrance-hint]")
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)")
+  let leaving = false
+  let exitAnimation
+  let fallback
+  entrance.hidden = false
+  tour.hidden = true
+  header.hidden = true
+
+  const reveal = (focus = true) => {
+    clearTimeout(fallback)
+    exitAnimation?.cancel()
+    entrance.hidden = true
+    tour.hidden = false
+    header.hidden = false
+    tour.dataset.entered = "true"
+    if (focus) tour.querySelector("[data-tour-panel]:not([hidden])").focus({ preventScroll: true })
+  }
+  const leave = () => {
+    if (leaving) return
+    leaving = true
+    clearTimeout(fallback)
+    if (reduced.matches || !entrance.animate) return reveal()
+    exitAnimation = entrance.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 380, fill: "forwards" })
+    exitAnimation.onfinish = () => reveal()
+  }
+  const open = () => {
+    if (enter.disabled) return
+    enter.disabled = true
+    entrance.dataset.opening = "true"
+    hint.textContent = hint.dataset.openingLabel
+    // Always keep a route in, including browsers without Web Animations.
+    fallback = setTimeout(leave, 3900)
+    if (reduced.matches || !scene.dataset.initialized) leave()
+    else scene.dispatchEvent(new CustomEvent("timbre:play"))
+  }
+  const followChapter = () => {
+    if ([...tour.querySelectorAll("[data-tour-panel]")].some((panel) => `#${panel.id}` === location.hash)) leave()
+  }
+  enter.addEventListener("click", open)
+  skip.addEventListener("click", leave)
+  scene.addEventListener("timbre:finished", leave)
+  window.addEventListener("hashchange", followChapter)
+  disposeTourEntrance = () => {
+    reveal(false)
+    enter.removeEventListener("click", open)
+    skip.removeEventListener("click", leave)
+    scene.removeEventListener("timbre:finished", leave)
+    window.removeEventListener("hashchange", followChapter)
+    disposeTourEntrance = () => {}
+  }
+}
+
 const initializePortfolioTour = () => {
   const tour = document.querySelector("[data-portfolio-tour]")
   if (!tour || tour.dataset.initialized === "true") return
@@ -161,6 +227,12 @@ const initializePortfolioTour = () => {
       panels[current].scrollIntoView({ block: "nearest" })
     }
   }
+  const followHash = () => {
+    const index = panels.findIndex((panel) => `#${panel.id}` === location.hash)
+    if (index >= 0) show(index)
+  }
+  window.addEventListener("hashchange", followHash)
+  disposeTourHash = () => window.removeEventListener("hashchange", followHash)
   links.forEach((link, i) => link.addEventListener("click", (event) => {
     event.preventDefault()
     show(i)
@@ -211,11 +283,14 @@ const initializePortfolioTour = () => {
   tour.querySelector("[data-tour-alert]").addEventListener("click", () => {
     tour.querySelector("[data-tour-notification]").hidden = false
   })
+  initializeTourEntrance(tour)
 }
 
 document.addEventListener("turbo:load", initializePortfolioTour)
 // Turbo restores cached HTML without its event listeners; rebuild the tour on return.
 document.addEventListener("turbo:before-cache", () => {
+  disposeTourEntrance()
+  disposeTourHash()
   const tour = document.querySelector("[data-portfolio-tour]")
   if (tour) delete tour.dataset.initialized
 })

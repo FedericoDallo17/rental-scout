@@ -1,0 +1,11 @@
+@font-face { font-family: Manrope; src: url("/branding/Manrope-variable.ttf") format("truetype"); font-weight: 200 800; font-display: swap; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: 1.5rem; background: #F3F5EC; color: #17312A; font: 450 1rem/1.6 Manrope, system-ui, sans-serif; }
+main { width: min(100%, 36rem); }
+img { display: block; width: 9rem; height: auto; margin-bottom: 3rem; }
+.code { color: #56645B; font-variant-numeric: tabular-nums; }
+h1 { max-width: 22ch; font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 650; line-height: 1.2; letter-spacing: -.04em; }
+.translation { color: #56645B; margin-block: 1.5rem 2rem; }
+.back { display: inline-block; padding: .8rem 1.1rem; border-radius: .5rem; background: #F2CA52; color: #17312A; font-weight: 600; text-decoration: none; }
+.back span { font-size: .85rem; }
+a:focus-visible { outline: 3px solid #173F36; outline-offset: 4px; }

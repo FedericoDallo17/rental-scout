@@ -1,18 +1,22 @@
 # Status
 
-Last updated: 2026-10-10. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
+Last updated: 2026-10-23. New here? Read `.ai/WORKFLOW.md` first - it's the dev loop.
 Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 
 ## Current Phase
 Freshness-first MVP lifecycle and inventory-health observability complete
 
 ## Current Task
-Apartment tracking and saved-search surface area implemented and validated
+Timbre experience and rental/sale regressions verified; production deployment pending
 
 ## Status
 Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
+- Rental/sale regressions fixed: Remax preserves explicit provider operation metadata, normalizes rent/sale, falls back only when metadata is absent and keeps unknown operations out of scope. The queued delivery/idempotency lifecycle and sidebar operation label now pass. Final suite: 327 tests, 2074 assertions, zero failures (10-23).
+- Public tour entrance implemented locally: centered growing symbol, ringing circles, click-triggered approved D2 door/wordmark animation, then a responsive five-chapter journey. Includes skip, keyboard, reduced-motion fallback and Turbo restoration. Focused tests pass (6 tests / 72 assertions); full-suite run has two failures in listing/sidebar and queued scraper delivery tests. See `docs/superpowers/handoffs/2026-10-23-tour-entrance.md` (10-23).
+- Navigation/content review implemented locally: Results is a direct first tab on desktop/mobile; authenticated navigation omits the public tour; Chimes starts with personal matches; inventory diagnostics remain in Administration; Alerts prioritizes activation with secondary help folded. Browser QA passed at desktop/tablet/320px/390px (10-23). See `docs/superpowers/handoffs/2026-10-23-timbre-navigation.md`.
+- Timbre identity integrated locally: approved D2 round/no-frame/outward logo motion, Patio palette, green/ivory PWA icons and favicon, licensed local Manrope, bilingual name and es-UY brand voice. Personal history is Timbres; delivery settings are Avisos. Desktop/mobile browser QA passed, including replay, final geometry, Turbo and reduced motion. No production deployment (10-22).
 - Public recruiter tour at `/tour`: bilingual five-step walkthrough with fictional rentals, budget filtering, ephemeral favorites/progress, notification preview, and technical notes; sign-in and account navigation entry points (10-10).
 - User-approved apartment tracking: private favorites, editable contact/visit/rejection dates, quick today actions, paginated status filters, purge-safe snapshots and stable reingestion identity. Saved searches now persist validated min/max m², used by feed matching and notification fan-out (10-09).
 - Docs, tickets, governance, mock scraper pipeline, initial portal (06-27..06-29)
@@ -58,6 +62,8 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 036 follow-up: current-scrape progress now broadcasts over Turbo Streams with cross-process Cable delivery; a slower page refresh remains as a disconnect fallback (07-19)
 
 ## Doing
+- First-search onboarding implemented locally: branded empty-account welcome, three-step zone/preferences/alerts form, live summary, first-save confirmation and notification setup guidance. Nine integration cases cover actual matching, validation retention and alert readiness; focused suite has 64 tests. Browser QA covered desktop and the final form at 390px; remaining mobile/320px, no-JS and Turbo restoration checks were interrupted by another Chrome extension UI. Full suite: 323 tests, 320 passed; two original baseline failures plus a concurrent public-tour form-count failure outside onboarding. See `docs/superpowers/handoffs/2026-10-23-timbre-onboarding.md`.
+- Timbre implementation is ready for release review. Final suite: 327 tests, 2074 assertions, zero failures. The failures recorded in historical branding/navigation/onboarding/tour handoffs are resolved; their detailed visual coverage and remaining onboarding checks remain documented there. Production deployment is pending.
 - Portfolio tour and responsive visual redesign implemented locally; 308 Rails tests passed. Browser QA verified sorting, favorite persistence, shortlist navigation, and mobile notification settings. Not deployed.
 - Apartment tracking and inline correction follow-up deployed on 10-10. Production QA passed with the dedicated account; public health HTTP 200.
 

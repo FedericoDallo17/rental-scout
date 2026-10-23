@@ -1,0 +1,66 @@
+es:
+  onboarding:
+    default_name: Mi búsqueda
+    welcome: "Qué bueno verte por acá, %{name}."
+    welcome_title: Tu próximo lugar puede estar por sonar.
+    welcome_copy: Contanos dónde y qué buscás. Timbre reúne publicaciones recientes que coinciden con tu búsqueda y puede avisarte cuando aparece una nueva.
+    start: Armar mi primera búsqueda
+    flexible: Podés empezar con lo básico y ajustar después.
+    explore: Primero quiero conocer la app
+    how_it_works: Vos elegís. Timbre está atento.
+    how:
+      search:
+        title: Marcá lo que te importa
+        copy: Elegí barrios, presupuesto y dormitorios para tu búsqueda.
+      watch:
+        title: Dejá que suene
+        copy: Revisamos publicaciones cada hora. Conectá tus avisos para recibir las nuevas coincidencias.
+      decide:
+        title: Encontrá uno que te cierre
+        copy: Guardá favoritos, organizá visitas y contactá desde la publicación original.
+    freshness: Nos enfocamos en novedades; el catálogo reúne publicaciones recientes, no todo el mercado.
+    back_home: Volver al inicio
+    title: Hagamos lugar a tu búsqueda.
+    intro: Tres pasos para empezar. Después podés cambiar lo que quieras.
+    progress: Pasos de tu primera búsqueda
+    steps:
+      where: Zona
+      preferences: Preferencias
+      alerts: Avisos
+    where_title: ¿Por dónde te gustaría buscar?
+    where_copy: Elegí todos los barrios que te interesen en Montevideo.
+    find_neighborhood: Buscar un barrio
+    neighborhood_example: "Por ejemplo, Cordón"
+    no_neighborhoods: No encontramos ese barrio. Probá con otro nombre.
+    zone_fallback: Si no elegís barrios, buscamos publicaciones que indiquen Montevideo como ubicación.
+    fallback_short: Ubicación Montevideo
+    operation: ¿Alquiler o compra?
+    preferences_title: Un lugar que te cierre.
+    preferences_copy: Completá solo lo que tengas claro. Los filtros son opcionales.
+    budget: Presupuesto
+    uyu: Pesos uruguayos (UYU)
+    usd: Dólares (USD)
+    max_budget: Hasta cuánto
+    no_limit: Sin límite
+    expenses_hint: Al incluir gastos, solo coinciden publicaciones con gastos conocidos en la misma moneda.
+    more_preferences: Agregar precio mínimo o superficie
+    alerts_title: Casi está. ¿Le ponemos nombre?
+    alerts_copy: Así vas a reconocer tu búsqueda cuando vuelvas.
+    notify: Quiero avisos de nuevas coincidencias
+    notify_copy: Podés pausarlos cuando quieras desde tu búsqueda.
+    permission_note: Guardar no activa permisos del navegador. Si falta conectar tus avisos, te guiamos en el próximo paso.
+    edit_later: Podés editar estos filtros o crear más búsquedas después.
+    back: Atrás
+    next: Continuar
+    save: Guardar mi búsqueda
+    summary: Tu búsqueda va tomando forma
+    summary_note: Primero verás las coincidencias recientes. Los avisos conectados te ayudan a enterarte de las próximas.
+    complete_title: Tu búsqueda ya está en marcha.
+    complete_silent: Guardamos tus preferencias. Podés revisar las coincidencias acá y activar avisos cuando quieras.
+    complete_connected: Tus avisos están conectados. Te avisamos cuando aparezcan nuevas coincidencias; abajo podés ver las publicaciones recientes.
+    complete_connect: Guardamos tus preferencias. Conectá los avisos para recibir nuevas coincidencias, incluso cuando no estés mirando la app.
+    connect: Conectar mis avisos
+    continue: Ver mi búsqueda
+    wait_title: Todavía no hay coincidencias recientes.
+    wait_copy: Tu búsqueda quedó guardada. Las nuevas coincidencias van a aparecer acá. También podés ajustar tus preferencias si querés ampliar la búsqueda.
+    adjust: Ajustar mi búsqueda

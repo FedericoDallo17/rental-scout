@@ -1,0 +1,13 @@
+<% destinations = [
+  { path: listings_path, label: t("nav.results"), controllers: %w[listings search_preferences], icon: "M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z" },
+  { path: listing_tracks_path, label: mobile ? t("design.saved") : t("tracking.title"), controllers: %w[listing_tracks], icon: "M6 3h12v18l-6-4-6 4V3Z" },
+  { path: scraping_runs_path, label: t("nav.runs"), controllers: %w[scraping_runs], icon: "M5 17h14l-2-3V9a5 5 0 0 0-10 0v5l-2 3Zm5 3h4" },
+  { path: edit_notification_settings_path, label: t("nav.notifications"), controllers: %w[notification_settings], icon: "M3 7h4m4 0h10M3 17h10m4 0h4M7 4v6m4-3H7m6 7v6m4-3h-4" }
+] %>
+<% destinations.each do |destination| %>
+  <%= link_to destination[:path], class: ("app-nav__link" unless mobile),
+    aria: { current: ("page" if destination[:controllers].include?(controller.controller_path)) } do %>
+    <% if mobile %><svg viewBox="0 0 24 24" aria-hidden="true"><path d="<%= destination[:icon] %>" /></svg><% end %>
+    <span><%= destination[:label] %></span>
+  <% end %>
+<% end %>

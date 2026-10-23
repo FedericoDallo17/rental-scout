@@ -9,6 +9,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
 
   test "signed in user sees hybrid workbench search form" do
     user = create_user!(email: "search-form-workbench@example.com")
+    user.search_preferences.create!(name: "Existing search", location_query: "Montevideo")
     create_zone("Pocitos", "pocitos")
     sign_in user
 
@@ -37,6 +38,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
 
   test "new search hides the setup warning when phone notifications are connected" do
     user = create_user!(email: "search-form-notifications@example.com")
+    user.search_preferences.create!(name: "Existing search", location_query: "Montevideo")
     user.update!(pushover_user_key: "configured-key")
     sign_in user
 
@@ -49,6 +51,7 @@ class SearchPreferencesControllerTest < ActionDispatch::IntegrationTest
 
   test "new search recognizes a browser push subscription as connected" do
     user = create_user!(email: "search-form-web-push@example.com")
+    user.search_preferences.create!(name: "Existing search", location_query: "Montevideo")
     user.push_subscriptions.create!(
       endpoint: "https://push.example.test/search-form", p256dh: "public-key", auth: "auth-secret"
     )

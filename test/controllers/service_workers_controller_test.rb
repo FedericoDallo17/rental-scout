@@ -9,5 +9,7 @@ class ServiceWorkersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "no-store", response.headers["Cache-Control"]
     assert_includes response.body, "self.addEventListener(\"push\""
     assert_includes response.body, "clients.openWindow"
+    assert_includes response.body, 'payload.title || "Timbre"'
+    assert_includes response.body, 'icon: "/branding/icon-192.png"'
   end
 end

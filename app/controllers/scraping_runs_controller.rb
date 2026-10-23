@@ -1,6 +1,5 @@
 class ScrapingRunsController < ApplicationController
   def index
-    @location_quality = Scraping::LocationQualityMetrics.new.call
     events = NotificationEvent
       .joins(:search_preference, :listing)
       .where(search_preferences: { user_id: current_user.id })

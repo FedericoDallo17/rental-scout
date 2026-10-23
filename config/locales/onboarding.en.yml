@@ -1,0 +1,66 @@
+en:
+  onboarding:
+    default_name: My search
+    welcome: "Good to see you, %{name}."
+    welcome_title: Your next place could be about to ring.
+    welcome_copy: Tell us where and what you’re looking for. Timbre brings together recent listings that match your search and can let you know when a new one appears.
+    start: Set up my first search
+    flexible: Start with the basics and adjust as you go.
+    explore: Take a look around first
+    how_it_works: You choose. Timbre keeps watch.
+    how:
+      search:
+        title: Choose what matters
+        copy: Pick neighborhoods, a budget and bedrooms for your search.
+      watch:
+        title: Let it ring
+        copy: We check listings every hour. Connect your alerts to receive new matches.
+      decide:
+        title: Find a place that fits
+        copy: Save favorites, organize visits and get in touch through the original listing.
+    freshness: We focus on new arrivals. The feed covers recent listings, not the entire market.
+    back_home: Back to home
+    title: Make room for your search.
+    intro: Three steps to get started. You can change anything later.
+    progress: First search steps
+    steps:
+      where: Location
+      preferences: Preferences
+      alerts: Alerts
+    where_title: Where would you like to look?
+    where_copy: Choose any neighborhoods you’re interested in across Montevideo.
+    find_neighborhood: Find a neighborhood
+    neighborhood_example: "For example, Cordón"
+    no_neighborhoods: We couldn’t find that neighborhood. Try another name.
+    zone_fallback: Without selected neighborhoods, we look for listings that mention Montevideo in their location.
+    fallback_short: Montevideo location
+    operation: Rent or buy?
+    preferences_title: A place that fits your plans.
+    preferences_copy: Fill in what you know. All filters are optional.
+    budget: Budget
+    uyu: Uruguayan pesos (UYU)
+    usd: US dollars (USD)
+    max_budget: Maximum price
+    no_limit: No limit
+    expenses_hint: Including expenses only matches listings with known expenses in the same currency.
+    more_preferences: Add a minimum price or floor area
+    alerts_title: Almost there. Give it a name?
+    alerts_copy: This is how you’ll recognize your search when you return.
+    notify: Alert me to new matches
+    notify_copy: You can pause alerts from your search at any time.
+    permission_note: Saving won’t request browser permissions. If you need to connect alerts, we’ll guide you in the next step.
+    edit_later: You can edit these filters or add more searches later.
+    back: Back
+    next: Continue
+    save: Save my search
+    summary: Your search is taking shape
+    summary_note: You’ll see recent matches first. Connected alerts help you hear about the next ones.
+    complete_title: Your search is up and running.
+    complete_silent: Your preferences are saved. Check your matches here and enable alerts whenever you’re ready.
+    complete_connected: Your alerts are connected. We’ll let you know when new matches arrive; recent listings are below.
+    complete_connect: Your preferences are saved. Connect alerts to hear about new matches even when you’re away from the app.
+    connect: Connect my alerts
+    continue: View my search
+    wait_title: No recent matches just yet.
+    wait_copy: Your search is saved. New matches will appear here. You can also adjust your preferences to broaden your search.
+    adjust: Adjust my search

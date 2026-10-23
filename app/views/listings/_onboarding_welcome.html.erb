@@ -1,0 +1,20 @@
+<main class="onboarding-welcome feed-layout" data-onboarding-welcome>
+  <section class="onboarding-welcome__intro">
+    <p class="onboarding-kicker"><%= t("onboarding.welcome", name: current_user.first_name) %></p>
+    <h1><%= t("onboarding.welcome_title") %></h1>
+    <p class="onboarding-lead"><%= t("onboarding.welcome_copy") %></p>
+    <%= link_to t("onboarding.start"), new_search_preference_path, class: "onboarding-primary" %>
+    <p class="onboarding-note"><%= t("onboarding.flexible") %></p>
+    <%= link_to t("onboarding.explore"), tour_path, class: "onboarding-text-link" %>
+  </section>
+  <aside class="onboarding-welcome__story" aria-label="<%= t("onboarding.how_it_works") %>">
+    <img src="/branding/timbre-simbolo-verde.svg" alt="" width="88" height="88" class="onboarding-welcome__door">
+    <h2><%= t("onboarding.how_it_works") %></h2>
+    <ol class="onboarding-how">
+      <% %w[search watch decide].each do |item| %>
+        <li><strong><%= t("onboarding.how.#{item}.title") %></strong><p><%= t("onboarding.how.#{item}.copy") %></p></li>
+      <% end %>
+    </ol>
+    <p class="onboarding-welcome__footnote"><%= t("onboarding.freshness") %></p>
+  </aside>
+</main>

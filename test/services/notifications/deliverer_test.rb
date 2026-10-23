@@ -72,7 +72,7 @@ class Notifications::DelivererTest < ActiveSupport::TestCase
 
     Notifications::Deliverer.new(client: client).call(notification_event: @event)
 
-    assert_equal "Nueva coincidencia: Centro rentals", delivered.first[:title]
+    assert_equal "Sonó un timbre: Centro rentals", delivered.first[:title]
     assert_equal "Apto Centro - precio no informado", delivered.first[:message]
   end
 

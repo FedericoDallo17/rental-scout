@@ -3,13 +3,18 @@ class SearchPreferencesController < ApplicationController
   before_action :set_zones, only: [:new, :create, :edit, :update]
 
   def new
-    @search_preference = current_user.search_preferences.build(notifications_enabled: true)
+    @onboarding = current_user.search_preferences.none?
+    defaults = { notifications_enabled: true }
+    defaults.merge!(name: t("onboarding.default_name"), location_query: "Montevideo") if @onboarding
+    @search_preference = current_user.search_preferences.build(defaults)
   end
 
   def create
+    @onboarding = params[:onboarding] == "1" && current_user.search_preferences.none?
     @search_preference = current_user.search_preferences.build(search_preference_params)
 
     if @search_preference.save
+      flash[:onboarding_search_id] = @search_preference.id if @onboarding
       redirect_to listings_path(search_id: @search_preference.id), notice: t("flash.search_created")
     else
       render :new, status: :unprocessable_entity

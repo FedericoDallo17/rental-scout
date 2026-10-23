@@ -1,0 +1,19 @@
+es:
+  nav:
+    results: "Resultados"
+  brand:
+    replay: "Volver a tocar el timbre"
+  runs:
+    chime: "Timbre #%{id}"
+    chime_count:
+      one: "%{count} timbre"
+      other: "%{count} timbres"
+    all_chimes: "Todos los timbres"
+  notifications:
+    quick_intro: "Elegí dónde querés recibir los timbres de tus búsquedas."
+    web_push:
+      quick_copy: "Te avisamos en este dispositivo cuando aparece una propiedad para vos, aunque Timbre esté cerrado."
+      activation_help: "Ayuda para activar los avisos"
+    pushover_manage: "Pushover (opcional)"
+    pushover_setup_help: "Cómo conectar Pushover"
+    privacy_and_help: "Privacidad y ayuda"

@@ -1,6 +1,10 @@
+<% if @searches.empty? %>
+  <%= render "onboarding_welcome" %>
+<% else %>
+<% onboarding_complete = @active_search && @onboarding_completed_search_id.to_s == @active_search.id.to_s %>
 <div class="feed-layout search-workbench">
   <aside class="search-sidebar">
-    <p class="search-sidebar__eyebrow">Rental Scout Lite</p>
+    <p class="search-sidebar__eyebrow">Timbre</p>
     <h2><%= t("feed.saved_searches") %></h2>
     <p class="search-sidebar__copy"><%= t("feed.saved_searches_copy") %></p>
     <%= link_to t("feed.new_search"), new_search_preference_path, class: "search-sidebar__action" %>
@@ -28,6 +32,9 @@
   </aside>
 
   <main class="feed-main">
+    <% if onboarding_complete %>
+      <%= render "onboarding_complete", search: @active_search %>
+    <% end %>
     <header class="feed-header">
       <div>
         <p class="feed-header__eyebrow"><%= t("feed.marketplace") %></p>
@@ -218,8 +225,11 @@
       <% end %>
       <% else %>
         <section class="feed-empty-state" aria-label="<%= t("feed.no_results_label") %>">
-          <h2><%= t("feed.no_results_title") %></h2>
-          <p><%= t("feed.no_results_copy") %></p>
+          <h2><%= t(onboarding_complete ? "onboarding.wait_title" : "feed.no_results_title") %></h2>
+          <p><%= t(onboarding_complete ? "onboarding.wait_copy" : "feed.no_results_copy") %></p>
+          <% if onboarding_complete %>
+            <%= link_to t("onboarding.adjust"), edit_search_preference_path(@active_search), class: "onboarding-text-link" %>
+          <% end %>
         </section>
       <% end %>
     <% else %>
@@ -230,3 +240,4 @@
     <% end %>
   </main>
 </div>
+<% end %>

@@ -1,14 +1,3 @@
 <nav class="mobile-navigation" aria-label="<%= t("design.navigation") %>">
-  <%= link_to listings_path, aria: { current: ("page" if controller_name == "listings") } do %>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3V10Zm6 10v-7h6v7" /></svg>
-    <span><%= t("design.explore") %></span>
-  <% end %>
-  <%= link_to listing_tracks_path, aria: { current: ("page" if controller_name == "listing_tracks") } do %>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4V3Z" /></svg>
-    <span><%= t("design.saved") %></span>
-  <% end %>
-  <%= link_to edit_notification_settings_path, aria: { current: ("page" if controller_name == "notification_settings") } do %>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17h14l-2-3V9a5 5 0 0 0-10 0v5l-2 3Zm5 3h4" /></svg>
-    <span><%= t("design.alerts") %></span>
-  <% end %>
+  <%= render "layouts/primary_navigation", mobile: true %>
 </nav>

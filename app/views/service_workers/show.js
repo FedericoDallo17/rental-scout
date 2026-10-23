@@ -1,7 +1,8 @@
 self.addEventListener("push", (event) => {
   const payload = event.data ? event.data.json() : {}
-  event.waitUntil(self.registration.showNotification(payload.title || "Rental Scout", {
+  event.waitUntil(self.registration.showNotification(payload.title || "Timbre", {
     body: payload.body || "",
+    icon: "/branding/icon-192.png",
     tag: payload.tag,
     data: { url: payload.url || "/" }
   }))

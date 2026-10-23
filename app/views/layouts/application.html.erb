@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
-    <title><%= content_for(:title) || "Rental Scout Lite" %></title>
+    <title><%= content_for(:title) || "Timbre" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-    <meta name="theme-color" content="#244b40">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%= tag.link rel: "manifest", href: "/manifest.json" %>
+    <%= render "layouts/brand_head" %>
 
     <%= yield :head %>
 
@@ -21,22 +20,21 @@
   <body class="<%= user_signed_in? ? "app-body" : "auth-body" %>">
     <% if user_signed_in? %>
       <header class="app-header">
-        <nav class="app-nav" aria-label="<%= t("nav.account") %>">
+        <nav class="app-nav" aria-label="<%= t("design.navigation") %>">
           <%= link_to root_path, class: "app-nav__brand" do %>
-            <span class="app-nav__mark">RSL</span>
-            <span>Rental Scout Lite</span>
+            <%= render "layouts/brand" %>
           <% end %>
+
+          <div class="app-primary-navigation">
+            <%= render "layouts/primary_navigation", mobile: false %>
+          </div>
 
         <details class="app-account-menu" data-responsive-disclosure open>
           <summary class="app-account-menu__toggle"><%= t("design.menu") %><span aria-hidden="true">☰</span></summary>
           <div class="app-user">
-          <%= link_to t("tour.nav"), tour_path, class: "app-nav__link", aria: { current: ("page" if current_page?(tour_path)) } %>
-          <%= link_to t("tracking.title"), listing_tracks_path, class: "app-nav__link", aria: { current: ("page" if current_page?(listing_tracks_path)) } %>
-          <%= link_to t("nav.runs"), scraping_runs_path, class: "app-nav__link", aria: { current: ("page" if current_page?(scraping_runs_path)) } %>
           <% if current_user.admin? %>
             <%= link_to t("nav.admin"), admin_root_path, class: "app-nav__link", aria: { current: ("page" if current_page?(admin_root_path)) } %>
           <% end %>
-          <%= link_to t("nav.notifications"), edit_notification_settings_path, class: "app-nav__link", aria: { current: ("page" if current_page?(edit_notification_settings_path)) } %>
           <%= render "layouts/language_switcher" %>
           <span class="app-user__email"><%= current_user.email %></span>
             <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, form_class: "app-sign-out", class: "app-sign-out__button" %>
@@ -54,22 +52,15 @@
     <% else %>
       <main class="auth-shell">
         <aside class="auth-story">
-          <span class="auth-story__label">Rental Scout Lite · Montevideo</span>
+          <span class="auth-story__label">Montevideo, Uruguay</span>
           <h2><%= t("design.home_title") %></h2>
           <p><%= t("design.home_copy") %></p>
-          <div class="auth-story__architecture" aria-hidden="true">
-            <svg viewBox="0 0 480 300" fill="none">
-              <circle cx="360" cy="70" r="42" fill="#d9b97c"/>
-              <path d="M0 280h480M35 280V120l115-50 115 50v160M150 70v210M265 280V155l120-35 60 35v125" stroke="currentColor" stroke-width="2"/>
-              <path d="M58 145h65v36H58zM58 204h65v36H58zM177 145h65v36h-65zM177 204h65v36h-65zM288 174h73v35h-73zM288 231h73v35h-73zM400 174h23v35h-23zM400 231h23v35h-23z" fill="currentColor" fill-opacity=".1" stroke="currentColor"/>
-              <path d="M90 145v36m119-36v36m115-7v35M15 280v-38m0 16-10-12m10 4 12-18M463 280v-53m0 31-12-15m12 4 13-19" stroke="currentColor" stroke-width="2"/>
-            </svg>
-          </div>
+          <%= render "layouts/brand_motion" %>
           <span class="auth-story__footnote"><%= t("design.home_note") %></span>
         </aside>
         <section class="auth-card">
           <div class="auth-card__topline">
-            <div class="auth-brand">Rental Scout Lite</div>
+            <div class="auth-brand"><%= render "layouts/brand" %></div>
             <%= render "layouts/language_switcher" %>
           </div>
 

@@ -1,4 +1,23 @@
-<main class="tour-shell" data-portfolio-tour>
+<section class="tour-entrance" data-tour-entrance hidden aria-label="<%= t("tour.entrance.label") %>">
+  <div class="tour-entrance__top">
+    <span>Montevideo, Uruguay</span>
+    <%= render "layouts/language_switcher" %>
+  </div>
+  <div class="tour-entrance__center">
+    <div class="timbre-motion tour-entrance__motion" data-timbre-motion data-timbre-trigger="manual">
+      <button type="button" class="tour-entrance__bell" data-tour-enter aria-label="<%= t("tour.entrance.enter") %>" aria-describedby="tour-entrance-hint">
+        <span class="timbre-motion__art" aria-hidden="true"><%= render "layouts/brand_art" %></span>
+      </button>
+    </div>
+    <p class="tour-entrance__hint" id="tour-entrance-hint" data-tour-entrance-hint data-opening-label="<%= t("tour.entrance.opening") %>"><%= t("tour.entrance.enter") %></p>
+  </div>
+  <div class="tour-entrance__bottom">
+    <p><%= t("tour.entrance.note") %></p>
+    <button type="button" data-tour-skip><%= t("tour.entrance.skip") %></button>
+  </div>
+</section>
+
+<main class="tour-shell" data-portfolio-tour id="tour-journey">
   <header class="tour-intro">
     <p class="tour-sample-label"><%= t("tour.sample_label") %></p>
     <h1><%= t("tour.title") %></h1>
@@ -10,22 +29,20 @@
       <h2><%= t("tour.page_title") %></h2>
       <nav aria-label="<%= t("tour.steps_label") %>">
         <% %w[search match track alerts health].each_with_index do |step, index| %>
-          <%= link_to "#{index + 1}. #{t("tour.steps.#{step}.title")}", "#tour-#{step}", data: { tour_step: index } %>
+          <%= link_to "#tour-#{step}", data: { tour_step: index } do %>
+            <span class="tour-step-number" aria-hidden="true"><%= index + 1 %></span><span><%= t("tour.steps.#{step}.title") %></span>
+          <% end %>
         <% end %>
       </nav>
-      <p><%= t("tour.boundary") %></p>
-      <div class="tour-navigation" hidden data-tour-navigation>
-        <button type="button" class="tour-button tour-button--secondary" data-tour-back><%= t("tour.back") %></button>
-        <button type="button" class="tour-button" data-tour-next data-finish-label="<%= t("tour.restart") %>"><%= t("tour.next") %></button>
-      </div>
-      <p class="tour-progress" aria-live="polite" data-tour-progress data-template="<%= t("tour.progress", current: "{current}", total: 5) %>"></p>
     </aside>
 
     <div class="tour-panels">
       <% %w[search match track alerts health].each do |step| %>
         <section id="tour-<%= step %>" class="tour-panel" data-tour-panel tabindex="-1" aria-labelledby="tour-<%= step %>-title">
-          <h2 id="tour-<%= step %>-title"><%= t("tour.steps.#{step}.title") %></h2>
-          <p class="tour-panel-copy"><%= t("tour.steps.#{step}.copy") %></p>
+          <div class="tour-panel-story">
+            <h2 id="tour-<%= step %>-title"><%= t("tour.steps.#{step}.title") %></h2>
+            <p class="tour-panel-copy"><%= t("tour.steps.#{step}.copy") %></p>
+          </div>
 
           <% case step %>
           <% when "search" %>
@@ -80,7 +97,7 @@
               <p><%= t("tour.alert_copy") %></p>
               <button type="button" class="tour-button" data-tour-alert><%= t("tour.preview_alert") %></button>
               <div class="tour-notification" role="status" data-tour-notification hidden>
-                <strong>Rental Scout Lite</strong>
+                <strong>Timbre</strong>
                 <p><%= t("tour.alert_message") %></p>
                 <small><%= t("tour.alert_sample") %></small>
               </div>
@@ -105,4 +122,14 @@
       <noscript><p><%= t("tour.no_script") %></p></noscript>
     </div>
   </div>
+  <footer class="tour-footer">
+    <div class="tour-footer__context">
+      <p class="tour-progress" aria-live="polite" data-tour-progress data-template="<%= t("tour.progress", current: "{current}", total: 5) %>"></p>
+      <p><%= t("tour.boundary") %></p>
+    </div>
+    <div class="tour-navigation" hidden data-tour-navigation>
+      <button type="button" class="tour-button tour-button--secondary" data-tour-back><%= t("tour.back") %></button>
+      <button type="button" class="tour-button" data-tour-next data-finish-label="<%= t("tour.restart") %>"><%= t("tour.next") %></button>
+    </div>
+  </footer>
 </main>

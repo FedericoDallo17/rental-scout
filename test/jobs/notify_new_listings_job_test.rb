@@ -53,7 +53,7 @@ class NotifyNewListingsJobTest < ActiveJob::TestCase
     NotifyNewListingsJob.perform_now(run.id)
 
     assert_equal 1, delivered.size
-    assert_match "1 new rental", delivered.first[:message]
+    assert_match "1 new property", delivered.first[:message]
     assert_equal 2, NotificationEvent.where(status: "sent").count
   ensure
     Notifications::PushoverClient.define_singleton_method(:new, original_new)

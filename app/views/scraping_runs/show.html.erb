@@ -6,6 +6,7 @@
     </div>
     <div class="runs-header__tools">
       <%= link_to t("runs.feed"), listings_path, class: "runs-header__link" %>
+      <%= link_to t("runs.all_chimes"), scraping_runs_path, class: "runs-header__link" %>
       <% if current_user.admin? %>
         <%= link_to t("runs.all_runs"), admin_root_path, class: "runs-header__link" %>
       <% end %>

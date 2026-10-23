@@ -1,5 +1,11 @@
 es:
   tour:
+    entrance:
+      label: Bienvenido a Timbre
+      enter: Tocá el timbre para entrar
+      opening: Pasá, te estábamos esperando.
+      note: Un lugar para vos empieza con un timbre.
+      skip: Saltar intro
     page_title: Recorrido interactivo
     nav: Recorrido
     invitation: "¿Querés explorar el proyecto? No necesitás una cuenta."
@@ -7,7 +13,7 @@ es:
     open_app: Abrir la app
     sample_label: "Demo del portfolio · Avisos ficticios"
     title: Encontrá un alquiler antes de que pase desapercibido.
-    intro: "Explorá cómo Rental Scout Lite reúne alquileres recientes de Montevideo y te ayuda a seguir los que te interesan. Unos dos minutos, sin registro."
+    intro: "Explorá cómo Timbre reúne alquileres recientes de Montevideo y te ayuda a seguir los que te interesan. Unos dos minutos, sin registro."
     steps_label: Pasos del recorrido
     boundary: "Todos los ejemplos son ficticios. Los cambios duran solo en esta página; no se envían mensajes."
     back: Anterior
@@ -25,7 +31,7 @@ es:
         title: Seguí tus favoritos
         copy: "Guardá un apartamento y probá cambiar su estado. La app registra fechas de contacto, visita y descarte, y conserva una copia aunque el aviso salga del inventario reciente."
       alerts:
-        title: Enterate de las novedades
+        title: Escuchá tus timbres
         copy: "Después de una búsqueda de avisos, las nuevas coincidencias se agrupan en una notificación personal. Probá una vista previa; la app permite notificaciones del navegador y Pushover cuando están configurados."
       health:
         title: Conocé cómo funciona
@@ -50,9 +56,9 @@ es:
       rejected: Descartado
     tracking_feedback: "Seguimiento de ejemplo actualizado: %{status}."
     no_matches: "Todavía no hay coincidencias. Volvé y aumentá el presupuesto."
-    alert_heading: Un aviso personal después de cada búsqueda
+    alert_heading: Un timbre cuando aparece un lugar para vos
     alert_copy: "Las nuevas coincidencias enlazan a tus resultados. Volver a encontrar el mismo aviso no genera otra notificación de novedad."
-    preview_alert: Ver notificación de ejemplo
+    preview_alert: Probar un timbre
     alert_message: "2 nuevos alquileres coinciden con Mi próximo apartamento. Abrí tus resultados para revisarlos."
     alert_sample: "Solo una vista previa. No se envió nada."
     health_heading: Cómo mantenemos útil el inventario

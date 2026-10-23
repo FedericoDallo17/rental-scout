@@ -109,8 +109,8 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     get listings_path
 
     assert_response :success
-    assert_includes response.body, "Save your first search to start a feed tailored to you."
-    assert_includes response.body, "0 listings"
+    assert_select "[data-onboarding-welcome] h1", text: "Your next place could be about to ring."
+    assert_select "a[href='#{new_search_preference_path}']", text: "Set up my first search"
     refute_includes response.body, "Apto Pocitos"
     refute_includes response.body, "Mock Source"
   end

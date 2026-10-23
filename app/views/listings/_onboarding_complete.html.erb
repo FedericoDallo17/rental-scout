@@ -1,0 +1,15 @@
+<section class="onboarding-complete" data-onboarding-complete aria-labelledby="onboarding-complete-title">
+  <span class="onboarding-complete__check" aria-hidden="true">✓</span>
+  <div>
+    <h2 id="onboarding-complete-title"><%= t("onboarding.complete_title") %></h2>
+    <% if !search.notifications_enabled? %>
+      <p><%= t("onboarding.complete_silent") %></p>
+    <% elsif current_user.pushover_active? || current_user.push_subscriptions.exists? %>
+      <p><%= t("onboarding.complete_connected") %></p>
+    <% else %>
+      <p><%= t("onboarding.complete_connect") %></p>
+      <%= link_to t("onboarding.connect"), edit_notification_settings_path, class: "onboarding-primary" %>
+    <% end %>
+    <%= link_to t("onboarding.continue"), listings_path(search_id: search.id), class: "onboarding-text-link" %>
+  </div>
+</section>

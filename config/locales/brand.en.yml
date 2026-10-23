@@ -1,0 +1,19 @@
+en:
+  nav:
+    results: "Results"
+  brand:
+    replay: "Ring the bell again"
+  runs:
+    chime: "Chime #%{id}"
+    chime_count:
+      one: "%{count} chime"
+      other: "%{count} chimes"
+    all_chimes: "All chimes"
+  notifications:
+    quick_intro: "Choose where to receive chimes for your searches."
+    web_push:
+      quick_copy: "Get matching-property alerts on this device, even when Timbre is closed."
+      activation_help: "Help enabling alerts"
+    pushover_manage: "Pushover (optional)"
+    pushover_setup_help: "How to connect Pushover"
+    privacy_and_help: "Privacy and help"

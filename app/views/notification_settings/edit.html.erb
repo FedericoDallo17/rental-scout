@@ -1,15 +1,9 @@
-<main class="notification-settings">
+<main class="notification-settings notification-settings--focused">
   <section class="notification-settings__panel">
-    <p class="notification-settings__eyebrow"><%= t("notifications.account") %></p>
     <h1><%= t("notifications.title") %></h1>
-    <p class="notification-settings__intro"><%= t("notifications.intro") %></p>
+    <p class="notification-settings__intro"><%= t("notifications.quick_intro") %></p>
 
     <% notifications_ready = current_user.push_subscriptions.exists? || current_user.pushover_active? %>
-    <div class="notification-settings__status notification-settings__status--<%= notifications_ready ? "ready" : "missing" %>">
-      <strong><%= notifications_ready ? t("notifications.ready") : t("notifications.setup_needed") %></strong>
-      <span><%= notifications_ready ? t("notifications.configured") : t("notifications.not_configured") %></span>
-    </div>
-
     <div class="notification-settings__channels">
     <section
       class="notification-settings__channel notification-settings__web-push"
@@ -23,13 +17,14 @@
       data-denied-label="<%= t("notifications.web_push.denied") %>"
       data-unsupported-label="<%= t("notifications.web_push.unsupported") %>"
       data-error-label="<%= t("notifications.web_push.error") %>">
-      <p class="notification-settings__channel-label"><%= t("notifications.option") %></p>
       <h2><%= t("notifications.web_push.title") %></h2>
-      <p><%= t("notifications.web_push.copy") %></p>
+      <p><%= t("notifications.web_push.quick_copy") %></p>
       <button type="button" class="notification-settings__submit" data-web-push-toggle>
         <%= t("notifications.web_push.enable") %>
       </button>
       <p role="status" aria-live="polite" data-web-push-status></p>
+      <details class="notification-settings__disclosure" data-notification-help>
+        <summary><%= t("notifications.web_push.activation_help") %></summary>
       <section class="notification-settings__device-guides" data-device-guides>
         <h3><%= t("notifications.web_push.guides_title") %></h3>
         <% %i[ios android mac windows].each do |device| %>
@@ -44,10 +39,32 @@
           </details>
         <% end %>
       </section>
+      </details>
     </section>
 
-    <section class="notification-settings__channel notification-settings__pushover">
-      <p class="notification-settings__channel-label"><%= t("notifications.option") %></p>
+    <div class="notification-settings__status notification-settings__status--<%= notifications_ready ? "ready" : "missing" %>">
+      <strong><%= notifications_ready ? t("notifications.ready") : t("notifications.setup_needed") %></strong>
+      <span><%= notifications_ready ? t("notifications.configured") : t("notifications.not_configured") %></span>
+    </div>
+
+    <% if notifications_ready %>
+      <div class="notification-settings__connected-actions">
+        <%= button_to t("notifications.send_test"), test_delivery_notification_settings_path,
+          method: :post,
+          class: "notification-settings__submit" %>
+        <%= link_to t("notifications.back"), listings_path, class: "notification-settings__cancel" %>
+      </div>
+    <% end %>
+
+
+    <details class="notification-settings__channel notification-settings__pushover">
+      <summary>
+        <span><%= t("notifications.pushover_manage") %></span>
+        <% if current_user.pushover_user_key.present? %>
+          <span class="notification-settings__summary-state"><%= current_user.pushover_enabled? ? t("notifications.pushover_connected") : t("notifications.pushover_paused") %></span>
+        <% end %>
+      </summary>
+      <div class="notification-settings__pushover-content">
       <h2><%= t("notifications.pushover_title") %></h2>
       <p><%= t("notifications.pushover_copy") %></p>
 
@@ -91,6 +108,16 @@
         </div>
       <% else %>
         <p class="notification-settings__channel-state"><%= t("notifications.pushover_not_connected") %></p>
+        <%= form_with url: notification_settings_path, method: :patch, scope: :user, class: "notification-settings__form" do |form| %>
+          <div class="notification-settings__field">
+            <%= form.label :pushover_user_key, t("notifications.key") %>
+            <%= form.password_field :pushover_user_key, value: nil, autocomplete: "off", spellcheck: false, required: true %>
+            <p><%= t("notifications.key_validation_hint") %></p>
+          </div>
+          <%= form.submit t("notifications.connect"), class: "notification-settings__submit" %>
+        <% end %>
+        <details class="notification-settings__disclosure">
+          <summary><%= t("notifications.pushover_setup_help") %></summary>
         <%= render "pushover_explanation" %>
 
         <ol class="notification-settings__steps">
@@ -110,16 +137,10 @@
           </li>
         </ol>
 
-        <%= form_with url: notification_settings_path, method: :patch, scope: :user, class: "notification-settings__form" do |form| %>
-          <div class="notification-settings__field">
-            <%= form.label :pushover_user_key, t("notifications.key") %>
-            <%= form.password_field :pushover_user_key, value: nil, autocomplete: "off", spellcheck: false, required: true %>
-            <p><%= t("notifications.key_validation_hint") %></p>
-          </div>
-          <%= form.submit t("notifications.connect"), class: "notification-settings__submit" %>
-        <% end %>
+        </details>
       <% end %>
-    </section>
+      </div>
+    </details>
     </div>
 
     <section class="notification-settings__searches" aria-labelledby="notification-searches-title">
@@ -137,19 +158,12 @@
       <% end %>
     </section>
 
-    <% if notifications_ready %>
-      <div class="notification-settings__connected-actions">
-        <%= button_to t("notifications.send_test"), test_delivery_notification_settings_path,
-          method: :post,
-          class: "notification-settings__submit" %>
-        <%= link_to t("notifications.back"), listings_path, class: "notification-settings__cancel" %>
-      </div>
-    <% end %>
 
   </section>
 
-  <aside class="notification-settings__aside">
-    <p class="notification-settings__eyebrow"><%= t("notifications.privacy") %></p>
+  <details class="notification-settings__disclosure notification-settings__help" data-notification-help>
+    <summary><%= t("notifications.privacy_and_help") %></summary>
+    <div class="notification-settings__help-content">
     <h2><%= t("notifications.private_title") %></h2>
     <p><%= t("notifications.private_copy") %></p>
     <p><%= t("notifications.validation_copy") %></p>
@@ -164,5 +178,6 @@
         <li><%= t("notifications.troubleshooting_searches") %></li>
       </ul>
     </section>
-  </aside>
+    </div>
+  </details>
 </main>

@@ -1,3 +1,6 @@
+<% if @onboarding %>
+  <%= render "onboarding", search_preference: @search_preference, zones: @zones %>
+<% else %>
 <main class="search-form-page">
   <header class="search-form-header">
     <p class="search-form-header__eyebrow"><%= t("searches.eyebrow") %></p>
@@ -6,3 +9,4 @@
 
   <%= render "form", search_preference: @search_preference, zones: @zones %>
 </main>
+<% end %>

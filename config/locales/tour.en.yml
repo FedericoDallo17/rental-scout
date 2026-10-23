@@ -1,5 +1,11 @@
 en:
   tour:
+    entrance:
+      label: Welcome to Timbre
+      enter: Ring the bell to step inside
+      opening: Come on in.
+      note: Your next place starts with a ring.
+      skip: Skip intro
     page_title: Interactive tour
     nav: Tour
     invitation: "Here to explore the project? No account needed."
@@ -7,7 +13,7 @@ en:
     open_app: Open the app
     sample_label: "Portfolio demo · Fictional listings"
     title: Find a rental before it gets buried.
-    intro: "Explore how Rental Scout Lite brings fresh Montevideo rentals into one search, then helps you keep track of the ones worth pursuing. About two minutes; no signup."
+    intro: "Explore how Timbre brings fresh Montevideo rentals into one search, then helps you keep track of the ones worth pursuing. About two minutes; no signup."
     steps_label: Tour steps
     boundary: "All examples are fictional. Changes last only on this page; no messages are sent."
     back: Back

@@ -8,6 +8,8 @@ class ListingsController < ApplicationController
     include_unknown_area max_expenses expenses_currency include_unknown_expenses property_type parking_required].freeze
 
   def index
+    @onboarding_completed_search_id = flash[:onboarding_search_id]
+    flash.delete(:onboarding_search_id)
     @searches = current_user.search_preferences.includes(:zones).ordered_for_sidebar
     @active_search = @searches.find_by(id: params[:search_id]) if params[:search_id].present?
     match_index = Listings::SavedSearchMatches.new(@searches).call
