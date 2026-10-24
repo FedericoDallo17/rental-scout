@@ -1,6 +1,6 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
-import "timbre_brand"
+import { playTimbreChime } from "timbre_brand"
 import "onboarding"
 
 // Native disclosures remain usable without JavaScript. Start compact on phones,
@@ -174,6 +174,7 @@ const initializeTourEntrance = (tour) => {
   }
   const open = () => {
     if (enter.disabled) return
+    playTimbreChime()
     enter.disabled = true
     entrance.dataset.opening = "true"
     hint.textContent = hint.dataset.openingLabel

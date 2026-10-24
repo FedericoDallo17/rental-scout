@@ -1,5 +1,54 @@
 // Approved D2 motion: a rigid door opens outward about its left hinge, the
 // lettering passes through the opening, then the original SVG paths are restored.
+const activeChimes = new Set()
+
+const closeChime = (context) => {
+  activeChimes.delete(context)
+  if (context.state !== "closed") context.close().catch(() => {})
+}
+
+// Created only inside an explicit click/keypress. Two softly decaying bell notes;
+// no downloads, audio permission prompt, or sound during automatic introductions.
+export async function playTimbreChime() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext
+  if (!AudioContext) return
+  let context
+  try {
+    activeChimes.forEach(closeChime)
+    context = new AudioContext()
+    activeChimes.add(context)
+    if (context.state === "suspended") await context.resume()
+    if (context.state !== "running") return closeChime(context)
+    const start = context.currentTime + 0.01
+    const notes = [[659.25, 0, 1.1], [523.25, 0.48, 1.35]]
+    const partials = [[1, 0.10], [2.756, 0.018], [5.404, 0.006]]
+    notes.forEach(([frequency, delay, decay], noteIndex) => {
+      const at = start + delay
+      partials.forEach(([ratio, volume], partialIndex) => {
+        const oscillator = context.createOscillator()
+        const envelope = context.createGain()
+        oscillator.type = "sine"
+        oscillator.frequency.value = frequency * ratio
+        envelope.gain.setValueAtTime(0.0001, at)
+        envelope.gain.exponentialRampToValueAtTime(volume, at + 0.008)
+        envelope.gain.exponentialRampToValueAtTime(0.0001, at + decay)
+        oscillator.connect(envelope)
+        envelope.connect(context.destination)
+        if (noteIndex === 1 && partialIndex === 0) oscillator.onended = () => closeChime(context)
+        oscillator.start(at)
+        oscillator.stop(at + decay + 0.02)
+      })
+    })
+  } catch {
+    // Audio restrictions must never prevent opening the door.
+    if (context) closeChime(context)
+  }
+}
+
+const stopChimes = () => activeChimes.forEach(closeChime)
+window.addEventListener("pagehide", stopChimes)
+document.addEventListener("turbo:before-cache", stopChimes)
+
 const duration = 3300
 const activeScenes = new Set()
 const svgNamespace = "http://www.w3.org/2000/svg"
@@ -131,10 +180,14 @@ function initializeScene(root) {
     if (manual && !wasPlaying) root.dataset.scene = "idle"
     if (wasPlaying) root.dispatchEvent(new CustomEvent("timbre:finished"))
   }
+  const replayWithSound = () => {
+    playTimbreChime()
+    play()
+  }
   const onPageHide = () => finish()
   const dispose = () => {
     finish()
-    replay?.removeEventListener("click", play)
+    replay?.removeEventListener("click", replayWithSound)
     root.removeEventListener("timbre:play", play)
     reduced.removeEventListener("change", motionPreferenceChanged)
     window.removeEventListener("pagehide", onPageHide)
@@ -145,7 +198,7 @@ function initializeScene(root) {
     delete root.dataset.doorAngle
   }
   root.dataset.initialized = "true"
-  replay?.addEventListener("click", play)
+  replay?.addEventListener("click", replayWithSound)
   root.addEventListener("timbre:play", play)
   reduced.addEventListener("change", motionPreferenceChanged)
   window.addEventListener("pagehide", onPageHide)
