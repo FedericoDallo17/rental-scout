@@ -16,7 +16,8 @@ class PasswordRecoveryTest < ActionDispatch::IntegrationTest
   end
 
   test "recovery sends a localized email and its link changes the password only once" do
-    post user_password_path, params: { user: { email: @user.email } }
+    post user_password_path, params: { user: { email: @user.email } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html, text/html, application/xhtml+xml" }
     assert_redirected_to new_user_session_path
     assert_equal 1, ActionMailer::Base.deliveries.size
     mail = ActionMailer::Base.deliveries.last

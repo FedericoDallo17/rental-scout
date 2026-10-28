@@ -7,13 +7,13 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle and inventory-health observability complete
 
 ## Current Task
-Timbre experience and rental/sale regressions verified; production deployment pending
+Password recovery deployed and verified with Resend SMTP
 
 ## Status
 Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
-- Password recovery code repair verified: TLS SMTP configuration, shared MAIL_FROM, saved-language emails, retry responses for SMTP/provider failures, reset/login/expired/reused-token regression coverage. Full suite: 336 tests / 2136 assertions; production assets compile. Resend activation still needs account/key and domain verification (10-27).
+- Password recovery deployed and verified with Resend: TLS SMTP configuration persisted for web/job, shared MAIL_FROM, saved-language emails and delivery-error handling. Full suite: 336 tests / 2136 assertions. Production recovery sent to Resend's test sink, followed the HTTPS link, reset the password, consumed the token and signed in with the new password; temporary user rolled back (10-27).
 - Click-triggered Timbre ding-dong added locally to tour activation and explicit brand replay; automatic intros remain silent. Lazy Web Audio synthesis, finish/navigation cleanup and blocked-audio fallback verified; full suite passes (327 tests, 2074 assertions). See `docs/superpowers/handoffs/2026-10-23-timbre-sound.md` (10-23).
 - Rental/sale regressions fixed: Remax preserves explicit provider operation metadata, normalizes rent/sale, falls back only when metadata is absent and keeps unknown operations out of scope. The queued delivery/idempotency lifecycle and sidebar operation label now pass. Final suite: 327 tests, 2074 assertions, zero failures (10-23).
 - Public tour entrance implemented locally: centered growing symbol, ringing circles, click-triggered approved D2 door/wordmark animation, then a responsive five-chapter journey. Includes skip, keyboard, reduced-motion fallback and Turbo restoration. Focused tests pass (6 tests / 72 assertions); full-suite run has two failures in listing/sidebar and queued scraper delivery tests. See `docs/superpowers/handoffs/2026-10-23-tour-entrance.md` (10-23).
@@ -64,7 +64,6 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - Ticket 036 follow-up: current-scrape progress now broadcasts over Turbo Streams with cross-process Cable delivery; a slower page refresh remains as a disconnect fallback (07-19)
 
 ## Doing
-- Password recovery repair: authenticated TLS SMTP, shared sender, localized mail and delivery-error handling; Resend Free selected. Provider account/key and domain verification are pending. See `docs/superpowers/plans/2026-10-27-password-recovery.md`.
 - First-search onboarding implemented locally: branded empty-account welcome, three-step zone/preferences/alerts form, live summary, first-save confirmation and notification setup guidance. Nine integration cases cover actual matching, validation retention and alert readiness; focused suite has 64 tests. Browser QA covered desktop and the final form at 390px; remaining mobile/320px, no-JS and Turbo restoration checks were interrupted by another Chrome extension UI. Full suite: 323 tests, 320 passed; two original baseline failures plus a concurrent public-tour form-count failure outside onboarding. See `docs/superpowers/handoffs/2026-10-23-timbre-onboarding.md`.
 - Timbre implementation is ready for release review. Final suite: 327 tests, 2074 assertions, zero failures. The failures recorded in historical branding/navigation/onboarding/tour handoffs are resolved; their detailed visual coverage and remaining onboarding checks remain documented there. Production deployment is pending.
 - Portfolio tour and responsive visual redesign implemented locally; 308 Rails tests passed. Browser QA verified sorting, favorite persistence, shortlist navigation, and mobile notification settings. Not deployed.
