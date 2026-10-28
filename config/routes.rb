@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get "service-worker.js", to: "service_workers#show", defaults: { format: :js }
 
-  devise_for :users
+  devise_for :users, controllers: { passwords: "users/passwords" }
   authenticated :user do
     root "listings#index", as: :authenticated_root
   end

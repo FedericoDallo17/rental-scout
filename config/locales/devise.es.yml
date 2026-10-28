@@ -20,6 +20,11 @@ es:
         subject: "Instrucciones de confirmación"
       reset_password_instructions:
         subject: "Instrucciones para restablecer la contraseña"
+        greeting: "Hola %{name}:"
+        instructions: "Recibimos una solicitud para cambiar tu contraseña de Timbre. Podés hacerlo desde este enlace."
+        action: "Cambiar mi contraseña"
+        ignore: "Si no solicitaste este cambio, ignorá este correo."
+        unchanged: "Tu contraseña no cambiará hasta que abras el enlace y elijas una nueva."
       unlock_instructions:
         subject: "Instrucciones de desbloqueo"
       email_changed:
@@ -30,6 +35,7 @@ es:
       failure: "No pudimos autenticarte con %{kind} debido a «%{reason}»."
       success: "Te autenticaste correctamente con tu cuenta de %{kind}."
     passwords:
+      delivery_failed: "No pudimos enviar el correo. Intentá nuevamente en unos minutos."
       no_token: "No podés acceder a esta página sin llegar desde un correo de restablecimiento de contraseña. Verificá que hayas usado la URL completa."
       send_instructions: "En unos minutos recibirás un correo con instrucciones para restablecer tu contraseña."
       send_paranoid_instructions: "Si tu correo existe en nuestra base de datos, en unos minutos recibirás un enlace para recuperar tu contraseña."

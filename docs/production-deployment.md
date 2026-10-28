@@ -75,6 +75,45 @@ ssh deploy@167.233.115.254 'sudo /usr/local/lib/rental-scout/deploy-production F
 Coolify's service page reflects the last deployed image for both roles.
 Normal deploys do not restart the database or change volumes.
 
+## Transactional email (Resend)
+
+Password recovery uses authenticated SMTP with required TLS. Configure a Resend
+Free account, verify `timbre.dallo.dev` using the DNS records returned by Resend,
+and create a sending API key restricted to that domain. Disable click tracking
+for authentication mail so reset links are not rewritten by a tracking service.
+
+Persist these settings in Coolify's Compose configuration for **both** `web`
+and `job` (service environment keys alone are not automatically passed into
+Compose containers):
+
+```text
+SMTP_ADDRESS=smtp.resend.com
+SMTP_PORT=587
+SMTP_USERNAME=resend
+SMTP_PASSWORD=<Resend API key, kept only in Coolify secrets>
+MAIL_FROM=Timbre <notifications@timbre.dallo.dev>
+APP_HOST=timbre.dallo.dev
+APP_PROTOCOL=https
+```
+
+Port 587 requires STARTTLS and peer certificate verification. Providers using
+implicit TLS can instead set `SMTP_SSL=true` and `SMTP_PORT=465`. Connection and
+read timeouts are 10 seconds. Missing SMTP credentials fail configuration when
+an SMTP server is specified; credentials are never needed for image builds.
+
+Until a provider is configured, delivery raises an explicit configuration error
+without attempting localhost SMTP or pretending mail was sent. Recovery shows a
+translated retry message with HTTP 503 for missing configuration and SMTP,
+network, TLS or timeout failures. Once the settings are saved, recreate `web`
+and `job`, check their mail configuration without printing secrets, and verify
+the verified-domain state plus an actual recovery request using an explicitly
+authorized recipient. Never log the recovery token or message body.
+
+Devise and application mail share `MAIL_FROM`. Recovery messages use the
+account's saved language, independent of the signed-out browser language.
+Registration confirmation and email/password-change notifications are not
+enabled by the current User model; property alerts use Web Push/Pushover, not SMTP.
+
 ---
 
 # Original Kamal bootstrap reference

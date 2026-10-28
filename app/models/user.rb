@@ -14,4 +14,10 @@ class User < ApplicationRecord
   def pushover_active?
     pushover_enabled? && pushover_user_key.present?
   end
+
+  # Recovery is requested while signed out; the request language may differ
+  # from the account's saved language.
+  def send_devise_notification(notification, *args)
+    I18n.with_locale(locale) { super }
+  end
 end
