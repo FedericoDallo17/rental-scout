@@ -258,11 +258,13 @@ module Sources
     end
 
     def operation_type_from_id(operation_type_id)
-      return "alquiler" if operation_type_id.to_i == 2
+      return if operation_type_id.blank?
+
+      { "1" => "venta", "2" => "alquiler" }.fetch(operation_type_id.to_s, "unknown")
     end
 
     def operation_type(link)
-      link.to_s.split("/").reject(&:blank?).first.presence
+      link.to_s.split("/").reject(&:blank?).first.presence_in(%w[alquiler venta])
     end
   end
 end

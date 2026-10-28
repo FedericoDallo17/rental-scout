@@ -7,12 +7,13 @@ Full audit context: docs/superpowers/reports/2026-07-06-state-of-the-project.md
 Freshness-first MVP lifecycle and inventory-health observability complete
 
 ## Current Task
-Password recovery deployed and verified with Resend SMTP
+InfoCasas sale classification corrected and verified against all four active providers
 
 ## Status
 Hourly acquisition is freshness-first: InfoCasas uses its publication window, Remax and Imperium stop bounded recent pagination at known source-local IDs, and Housi remains one page. A bounded Sunday reconciliation refreshes older inventory without notifying users. MercadoLibre remains paused until API keys or an allowed index payload sample are available.
 
 ## Done
+- InfoCasas operation IDs now map 1 to sale and 2 to rental (numeric/string); only exact legacy URL operations may override the requested operation when the provider ID is absent. Explicit unknown IDs remain out of scope. Full suite: 340 tests / 2158 assertions. Exactly one live sale index HTTP request per active provider returned 200; InfoCasas 50, Remax 50, Housi 20, Imperium 8 normalized listings, all correctly classified. See `docs/superpowers/handoffs/2026-10-27-infocasas-sale-classification.md`. Historical invalid inventory recovery remains pending; no bulk relabeling performed (10-27).
 - Password recovery deployed and verified with Resend: TLS SMTP configuration persisted for web/job, shared MAIL_FROM, saved-language emails and delivery-error handling. Full suite: 336 tests / 2136 assertions. Production recovery sent to Resend's test sink, followed the HTTPS link, reset the password, consumed the token and signed in with the new password; temporary user rolled back (10-27).
 - Click-triggered Timbre ding-dong added locally to tour activation and explicit brand replay; automatic intros remain silent. Lazy Web Audio synthesis, finish/navigation cleanup and blocked-audio fallback verified; full suite passes (327 tests, 2074 assertions). See `docs/superpowers/handoffs/2026-10-23-timbre-sound.md` (10-23).
 - Rental/sale regressions fixed: Remax preserves explicit provider operation metadata, normalizes rent/sale, falls back only when metadata is absent and keeps unknown operations out of scope. The queued delivery/idempotency lifecycle and sidebar operation label now pass. Final suite: 327 tests, 2074 assertions, zero failures (10-23).
@@ -73,6 +74,7 @@ Hourly acquisition is freshness-first: InfoCasas uses its publication window, Re
 - MercadoLibre public API and HTML probes return access/login gates from this environment; user is obtaining API keys.
 
 ## Risks
+- 2,920 InfoCasas records observed in production have invalid historical operations and are excluded as `unknown_operation`. The parser fix prevents new misclassification and corrects records when fetched again; older records still require source-verified recovery, not blanket conversion to sale.
 - Second source introduces currency handling and cross-source dedup risks called out in adapter-contract ADR.
 - Real Pushover delivery requires runtime `PUSHOVER_API_TOKEN` and real user `pushover_user_key`; tests use injected fake clients.
 

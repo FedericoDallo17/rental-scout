@@ -2,6 +2,82 @@ require "test_helper"
 require "net/http"
 
 class Sources::InfoCasasApiAdapterTest < ActiveSupport::TestCase
+  test "provider sale and rental IDs take precedence over the URL and requested operation" do
+    [1, "1", 2, "2"].each do |id|
+      expected = id.to_s == "1" ? "venta" : "alquiler"
+      opposite = expected == "venta" ? "alquiler" : "venta"
+      entry = info_casas_entry(id: 789, operation_type_id: id, link: "/#{opposite}/apartamento/789")
+      adapter = Sources::InfoCasasApiAdapter.new
+      response = Struct.new(:body).new(stubbed_info_casas_response_for([entry]))
+      http = Object.new
+      http.define_singleton_method(:request) { |_| response }
+
+      stub_net_http_start(->(*, **, &block) { block.call(http) }) do
+        listing = adapter.fetch_listings(operation_type: opposite).first
+        assert_equal expected, listing[:operation_type], "provider ID #{id.inspect}"
+        assert Scraping::ListingScopeValidator.new.call(attributes: listing)[:in_scope]
+      end
+    end
+  end
+
+  test "missing operation ID uses only exact legacy URL operations before the requested operation" do
+    [
+      ["/apartamento-en-pocitos/789", "venta", "venta"],
+      ["/proyectos/urban-26/789", "venta", "venta"],
+      ["/venta-de-apartamento/789", "alquiler", "alquiler"],
+      ["/venta/apartamento/789", "alquiler", "venta"],
+      ["/alquiler/apartamento/789", "venta", "alquiler"]
+    ].each do |link, requested, expected|
+      entry = info_casas_entry(id: 789, link:)
+      response = Struct.new(:body).new(stubbed_info_casas_response_for([entry]))
+      http = Object.new
+      http.define_singleton_method(:request) { |_| response }
+
+      stub_net_http_start(->(*, **, &block) { block.call(http) }) do
+        listing = Sources::InfoCasasApiAdapter.new.fetch_listings(operation_type: requested).first
+        assert_equal expected, listing[:operation_type], link
+      end
+    end
+  end
+
+  test "explicit unknown provider operation cannot become an in scope sale" do
+    [3, "1-invalid"].each do |id|
+      entry = info_casas_entry(id: 789, operation_type_id: id, link: "/venta/apartamento/789")
+      response = Struct.new(:body).new(stubbed_info_casas_response_for([entry]))
+      http = Object.new
+      http.define_singleton_method(:request) { |_| response }
+
+      stub_net_http_start(->(*, **, &block) { block.call(http) }) do
+        listing = Sources::InfoCasasApiAdapter.new.fetch_listings(operation_type: "venta").first
+        scoped = Scraping::ListingScopeValidator.new.call(attributes: listing)
+        assert_not scoped[:in_scope]
+        assert_equal "unknown_operation", scoped[:scope_rejection_reason]
+      end
+    end
+  end
+
+  test "sale requests send operation ID one and normalize real descriptive URLs" do
+    entry = info_casas_entry(id: 789, operation_type_id: 1, link: "/apartamento-en-pocitos/789")
+    response = Struct.new(:body).new(stubbed_info_casas_response_for([entry]))
+    http = Object.new
+    test_case = self
+    calls = 0
+    http.define_singleton_method(:request) do |request|
+      calls += 1
+      JSON.parse(request.body).each do |query|
+        test_case.assert_equal 1, query.dig("variables", "params", "operation_type_id")
+      end
+      response
+    end
+
+    stub_net_http_start(->(*, **, &block) { block.call(http) }) do
+      listing = Sources::InfoCasasApiAdapter.new.fetch_listings(operation_type: "venta").first
+      assert_equal "venta", listing[:operation_type]
+      assert Scraping::ListingScopeValidator.new.call(attributes: listing)[:in_scope]
+    end
+    assert_equal 1, calls
+  end
+
   test "fetch_listings normalizes the legacy info casas payload into listing intake attributes" do
     adapter = Sources::InfoCasasApiAdapter.new(page_throttle_seconds: 0, detail_throttle_seconds: 0)
     stub_http_response(adapter, sample_response_body) do
